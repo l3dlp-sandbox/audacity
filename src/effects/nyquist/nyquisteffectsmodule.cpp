@@ -36,31 +36,31 @@ std::string au::effects::NyquistEffectsModule::moduleName() const
 
 void au::effects::NyquistEffectsModule::registerExports()
 {
-    m_nyquistEffectsRepository = std::make_shared<NyquistEffectsRepository>(iocContext());
+    m_nyquistEffectsRepository = std::make_shared<NyquistEffectsRepository>(muse::modularity::globalCtx());
 
     globalIoc()->registerExport<INyquistEffectsRepository>(moduleName(), m_nyquistEffectsRepository);
 }
 
 void au::effects::NyquistEffectsModule::resolveImports()
 {
-    auto scannerRegister = ioc()->resolve<muse::audioplugins::IAudioPluginsScannerRegister>(moduleName());
+    auto scannerRegister = globalIoc()->resolve<muse::audioplugins::IAudioPluginsScannerRegister>(moduleName());
     if (scannerRegister) {
         scannerRegister->registerScanner(std::make_shared<NyquistPluginsScanner>());
     }
 
-    auto metaReaderRegister = ioc()->resolve<muse::audioplugins::IAudioPluginMetaReaderRegister>(moduleName());
+    auto metaReaderRegister = globalIoc()->resolve<muse::audioplugins::IAudioPluginMetaReaderRegister>(moduleName());
     if (metaReaderRegister) {
         metaReaderRegister->registerReader(m_nyquistMetaReader);
     }
 
-    auto paramExtractorRegistry = ioc()->resolve<IParameterExtractorRegistry>(moduleName());
+    auto paramExtractorRegistry = globalIoc()->resolve<IParameterExtractorRegistry>(moduleName());
     if (paramExtractorRegistry) {
         paramExtractorRegistry->registerExtractor(std::make_shared<NyquistParameterExtractorService>());
     }
 
-    auto launchRegister = ioc()->resolve<IEffectViewLaunchRegister>(moduleName());
+    auto launchRegister = globalIoc()->resolve<IEffectViewLaunchRegister>(moduleName());
     if (launchRegister) {
-        launchRegister->regLauncher("Nyquist", std::make_shared<NyquistViewLauncher>(iocContext()));
+        launchRegister->regLauncher("Nyquist", std::make_shared<NyquistViewLauncher>(muse::modularity::globalCtx()));
     }
 }
 

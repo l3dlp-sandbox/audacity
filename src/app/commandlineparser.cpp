@@ -77,27 +77,9 @@ void CommandLineParser::parse(int argc, char** argv)
     QStringList args = prepareArguments(argc, argv);
     m_parser.parse(args);
 
-    auto floatValue = [this](const QString& name) -> std::optional<float> {
-        bool ok = true;
-        float val = m_parser.value(name).toFloat(&ok);
-        if (ok) {
-            return val;
-        }
-        return std::nullopt;
-    };
-
     auto doubleValue = [this](const QString& name) -> std::optional<double> {
         bool ok = true;
         double val = m_parser.value(name).toDouble(&ok);
-        if (ok) {
-            return val;
-        }
-        return std::nullopt;
-    };
-
-    auto intValue = [this](const QString& name) -> std::optional<int> {
-        bool ok = true;
-        int val = m_parser.value(name).toInt(&ok);
         if (ok) {
             return val;
         }
