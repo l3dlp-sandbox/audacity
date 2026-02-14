@@ -125,13 +125,19 @@ muse::async::Promise<ProjectList> Au3AudioComService::downloadProjectList(size_t
                     std::lock_guard guard(m_cacheMutex);
                     m_projectListCache[batchNumber] = CachedProjectItem { projects, std::chrono::system_clock::now() };
                 }
+
+                if (cancellationContext->Cancelled()) {
+                    (void)reject(static_cast<int>(muse::Ret::Code::Cancel), "Cancelled");
+                    return;
+                }
+
                 (void)resolve(projects);
             } else {
                 const auto* errorResponse = std::get_if<ResponseResult>(&result);
                 if (errorResponse && errorResponse->Code != SyncResultCode::Cancelled) {
-                    (void)reject(-2, "Failed to fetch project list from cloud service");
+                    (void)reject(static_cast<int>(muse::Ret::Code::UnknownError), "Failed to fetch project list from cloud service");
                 } else if (errorResponse && errorResponse->Code == SyncResultCode::Cancelled) {
-                    (void)reject(-1, "Cancelled");
+                    (void)reject(static_cast<int>(muse::Ret::Code::Cancel), "Cancelled");
                 }
             }
         }).detach();
@@ -199,13 +205,19 @@ muse::async::Promise<AudioList> Au3AudioComService::downloadAudioList(size_t aud
                     std::lock_guard guard(m_cacheMutex);
                     m_audioListCache[batchNumber] = CachedAudioItem { audioList, std::chrono::system_clock::now() };
                 }
+
+                if (cancellationContext->Cancelled()) {
+                    (void)reject(static_cast<int>(muse::Ret::Code::Cancel), "Cancelled");
+                    return;
+                }
+
                 (void)resolve(audioList);
             } else {
                 const auto* errorResponse = std::get_if<ResponseResult>(&result);
                 if (errorResponse && errorResponse->Code != SyncResultCode::Cancelled) {
-                    (void)reject(-2, "Failed to fetch audio list from cloud service");
+                    (void)reject(static_cast<int>(muse::Ret::Code::UnknownError), "Failed to fetch audio list from cloud service");
                 } else if (errorResponse && errorResponse->Code == SyncResultCode::Cancelled) {
-                    (void)reject(-1, "Cancelled");
+                    (void)reject(static_cast<int>(muse::Ret::Code::Cancel), "Cancelled");
                 }
             }
         }).detach();

@@ -152,7 +152,7 @@ void CloudAudioFilesModel::loadItemsIfNecessary()
         })
         .onReject(this, [this](int errCode, const std::string&) {
             m_isWaitingForPromise = false;
-            if (errCode == -1) {
+            if (errCode == static_cast<int>(muse::Ret::Code::Cancel)) {
                 return;
             }
             setState(State::Error);

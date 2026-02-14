@@ -153,7 +153,7 @@ void CloudProjectsModel::loadItemsIfNecessary()
         })
         .onReject(this, [this](int errorCode, const std::string&) {
             m_isWaitingForPromise = false;
-            if (errorCode == -1) {
+            if (errorCode == static_cast<int>(muse::Ret::Code::Cancel)) {
                 return;
             }
             setState(State::Error);
