@@ -20,14 +20,12 @@ Rectangle {
         // -> 5 * spaceXL accounts for the combined vertical margins and spacing:
         // Calculate total height needed:
         // - Top margin: prv.spaceXL (1)
-        // - Title height: titleLabel.height
-        // - Spacing after title: prv.spaceXL (2)
         // - Flickable top margin: prv.spaceXL (3)
         // - Content: parametersColumn.height
         // - Flickable bottom margin: prv.spaceXL (4)
         // - Bottom margin: prv.spaceXL (5)
         // - Border: 2 * prv.borderWidth
-        var totalHeight = prv.spaceXL * 5 + titleLabel.height + parametersColumn.height + 2 * prv.borderWidth
+        var totalHeight = prv.spaceXL * 4 + parametersColumn.height + 2 * prv.borderWidth
         // we automatically size the height to fit the content for plugins with few parameters
         // we limit the height to avoid making the dialog too tall
         return Math.min(totalHeight, prv.maxDialogHeight)
@@ -63,14 +61,6 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: prv.spaceXL
         spacing: prv.spaceXL
-
-        StyledTextLabel {
-            id: titleLabel
-            Layout.fillWidth: true
-            text: viewModel.title
-            font: ui.theme.headerBoldFont
-            horizontalAlignment: Text.AlignHCenter
-        }
 
         Rectangle {
             Layout.fillWidth: true

@@ -17,7 +17,6 @@ GeneratedEffectViewerModel::GeneratedEffectViewerModel(QObject* parent, EffectIn
     : AbstractEffectViewModel(parent, instanceId)
     , m_parametersModel(new EffectParametersListModel(this, instanceId))
     , m_effectName(computeEffectName(instanceId, effectsProvider().get(), instancesRegister().get()))
-    , m_title(computeTitle(m_effectName))
 {
     // Connect to parameters model to forward hasParametersChanged signal
     connect(m_parametersModel, &EffectParametersListModel::hasParametersChanged,
@@ -52,14 +51,6 @@ QString GeneratedEffectViewerModel::computeEffectName(EffectInstanceId instanceI
         return meta.title.toQString();
     }
     return QString("Unknown Effect");
-}
-
-QString GeneratedEffectViewerModel::computeTitle(const QString& effectName)
-{
-    if (effectName.isEmpty()) {
-        return QObject::tr("Auto-Generated UI");
-    }
-    return QObject::tr("%1 Fallback UI").arg(effectName);
 }
 
 IParameterExtractorService* GeneratedEffectViewerModel::getParameterExtractor() const
