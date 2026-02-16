@@ -38,6 +38,7 @@ list( APPEND LIBRARIES
 list( APPEND LIBRARIES
    PRIVATE
       au3-sqlite-helpers-interface
+      sqlite
 )
 
 audacity_library( ${TARGET} "${SOURCES}" "${LIBRARIES}"
