@@ -180,9 +180,7 @@ std::shared_ptr<muse::IApplication> AppFactory::newPluginRegistrationApp(const C
     app->addModule(new au::effects::AudioUnitEffectsModule());
     app->addModule(new au::effects::Lv2EffectsModule());
     app->addModule(new au::effects::VstEffectsModule());
-#if AU_MODULE_EFFECTS_NYQUIST
     app->addModule(new au::effects::NyquistEffectsModule());
-#endif
 
     return app;
 }
