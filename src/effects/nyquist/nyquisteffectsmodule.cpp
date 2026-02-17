@@ -26,7 +26,6 @@ static void nyquist_init_qrc()
 au::effects::NyquistEffectsModule::NyquistEffectsModule()
     : m_nyquistMetaReader(std::make_shared<NyquistPluginsMetaReader>())
 {
-    nyquist_init_qrc();
 }
 
 std::string au::effects::NyquistEffectsModule::moduleName() const
@@ -66,6 +65,7 @@ void au::effects::NyquistEffectsModule::resolveImports()
 
 void au::effects::NyquistEffectsModule::registerResources()
 {
+    nyquist_init_qrc();
 }
 
 void au::effects::NyquistEffectsModule::registerUiTypes()
