@@ -42,11 +42,16 @@
 #include "toast/toastmodule.h"
 #include "effects/effects_base/effectsmodule.h"
 #include "effects/builtin/builtineffectsmodule.h"
-#include "effects/nyquist/nyquisteffectsmodule.h"
 #include "importexport/import/importermodule.h"
 #include "importexport/export/exportermodule.h"
 #include "importexport/labels/labelsmodule.h"
 #include "au3cloud/au3cloudmodule.h"
+
+#if AU_MODULE_EFFECTS_NYQUIST
+#include "effects/nyquist/nyquisteffectsmodule.h"
+#else
+#include "stubs/nyquist/nyquisteffectsstubmodule.h"
+#endif
 
 #ifdef AU_MODULE_EFFECTS_LV2
 #include "effects/lv2/lv2effectsmodule.h"
@@ -59,6 +64,7 @@
 #else
 #include "stubs/vst/vsteffectsstubmodule.h"
 #endif
+
 #ifdef AU_MODULE_EFFECTS_AUDIO_UNIT
 #include "effects/audio_unit/audiouniteffectsmodule.h"
 #else
@@ -174,7 +180,9 @@ std::shared_ptr<muse::IApplication> AppFactory::newPluginRegistrationApp(const C
     app->addModule(new au::effects::AudioUnitEffectsModule());
     app->addModule(new au::effects::Lv2EffectsModule());
     app->addModule(new au::effects::VstEffectsModule());
+#if AU_MODULE_EFFECTS_NYQUIST
     app->addModule(new au::effects::NyquistEffectsModule());
+#endif
 
     return app;
 }
