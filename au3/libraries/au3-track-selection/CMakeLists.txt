@@ -17,8 +17,6 @@ set( SOURCES
 # AU4 has its own selection model and we don't want SyncLock from au3
 #   SelectionState.cpp
 #   SelectionState.h
-#   SyncLock.cpp
-#   SyncLock.h
    TrackFocus.cpp
    TrackFocus.h
 )

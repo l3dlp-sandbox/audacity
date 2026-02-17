@@ -1,7 +1,6 @@
 #include "RepeatBase.h"
 #include "au3-effects/EffectOutputTracks.h"
 #include "au3-label-track/LabelTrack.h"
-#include "au3-track-selection/SyncLock.h"
 #include "au3-wave-track/WaveClip.h"
 #include "au3-wave-track/WaveTrack.h"
 #include <cmath>
@@ -63,11 +62,13 @@ bool RepeatBase::Process(EffectInstance&, EffectSettings&)
     outputs.Get().Any().VisitWhile(
         bGoodResult,
         [&](LabelTrack& track) {
-        if (SyncLock::IsSelectedOrSyncLockSelected(track)) {
-            if (!track.Repeat(mT0, mT1, repeatCount)) {
-                bGoodResult = false;
-            }
-        }
+        assert(false && "please adjust to SyncLock removal");
+        // TODO: please adjust to SyncLock removal
+        // if (SyncLock::IsSelectedOrSyncLockSelected(track)) {
+        //     if (!track.Repeat(mT0, mT1, repeatCount)) {
+        //         bGoodResult = false;
+        //     }
+        // }
     },
         [&](auto&& fallthrough) {
         return [&](WaveTrack& track) {

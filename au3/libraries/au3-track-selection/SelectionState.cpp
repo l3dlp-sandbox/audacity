@@ -9,7 +9,6 @@
 #include "SelectionState.h"
 
 #include "au3-time-frequency-selection/ViewInfo.h"
-#include "SyncLock.h"
 #include "au3-track/Track.h"
 #include "au3-project/Project.h"
 

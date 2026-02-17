@@ -17,7 +17,6 @@
 #include "au3-effects/EffectOutputTracks.h"
 #include "au3-fft/FFT.h"
 #include "au3-preferences/Prefs.h"
-#include "au3-track-selection/SyncLock.h"
 #include "au3-track/TimeWarper.h"
 #include "au3-wave-track/WaveTrack.h"
 #include <algorithm>
