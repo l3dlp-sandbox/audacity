@@ -8,7 +8,7 @@
 #include "ieffectsconfiguration.h"
 #include "iparameterextractorregistry.h"
 #include "effectstypes.h"
-#include "realtimeeffectviewerdialogmodel.h"
+#include "effectsviewtypes.h"
 
 #include "framework/global/modularity/ioc.h"
 #include "framework/global/async/asyncable.h"

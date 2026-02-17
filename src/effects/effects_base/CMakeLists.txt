@@ -78,6 +78,7 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/effectmanagemenu.h
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsuiengine.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsuiengine.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewtypes.h
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewutils.h
     ${CMAKE_CURRENT_LIST_DIR}/view/destructiveeffectviewerdialogmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/destructiveeffectviewerdialogmodel.h
