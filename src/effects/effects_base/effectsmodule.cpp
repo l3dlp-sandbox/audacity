@@ -5,9 +5,7 @@
 
 #include "au3-module-manager/PluginManager.h"
 #include "au3-files/FileNames.h"
-#include "au3-files/PathList.h"
 
-#include "framework/ui/iuiactionsregister.h"
 #include "framework/interactive/iinteractiveuriregister.h"
 #include "framework/diagnostics/idiagnosticspathsregister.h"
 
@@ -16,7 +14,6 @@
 #include "internal/effectsmenuprovider.h"
 #include "internal/effectsconfiguration.h"
 #include "internal/effectsactionscontroller.h"
-#include "internal/effectsuiactions.h"
 #include "internal/effectinstancesregister.h"
 #include "internal/effectexecutionscenario.h"
 #include "internal/realtimeeffectservice.h"
