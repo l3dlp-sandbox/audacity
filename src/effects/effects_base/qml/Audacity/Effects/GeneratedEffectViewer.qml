@@ -2,6 +2,7 @@
  * Audacity: A Digital Audio Editor
  */
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 
 import Muse.Ui
@@ -71,8 +72,12 @@ Rectangle {
             radius: prv.borderRadius
 
             StyledFlickable {
+                id: flickable
+
                 anchors.fill: parent
-                anchors.margins: prv.spaceXL
+                anchors.margins: prv.spaceM
+                anchors.topMargin: prv.spaceXXL
+                anchors.bottomMargin: prv.spaceXXL
                 contentHeight: parametersColumn.height
 
                 ColumnLayout {
@@ -122,6 +127,18 @@ Rectangle {
                         }
                     }
                 }
+
+                ScrollBar.vertical: scrollBar
+                ScrollBar.horizontal: null
+            }
+
+            StyledScrollBar {
+                id: scrollBar
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.margins: 0
+                policy: ScrollBar.AlwaysOn
             }
         }
     }
