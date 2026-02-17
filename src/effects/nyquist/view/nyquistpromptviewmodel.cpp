@@ -12,6 +12,8 @@
 #include "effects/nyquist/internal/nyquistparameterextractorservice.h"
 
 #include <QFileDialog>
+#include <QDir>
+#include <QFileInfo>
 
 using namespace au::effects;
 using namespace muse;
