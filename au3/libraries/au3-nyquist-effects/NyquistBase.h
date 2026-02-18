@@ -292,7 +292,7 @@ protected:
     sampleCount mMaxLen;
     int mTrackIndex;
     bool mFirstInGroup;
-    double mOutputTime;
+    double mOutputDuration;
     unsigned mCount;
     unsigned mNumSelectedChannels;
 
@@ -302,7 +302,7 @@ protected:
     wxString mPerTrackProps;
 
     bool mRestoreSplits;
-    int mMergeClips;
+    bool mMergeClips;
 
     friend class NyquistEffectsModule;
     friend class au::effects::NyquistParameterExtractorService;

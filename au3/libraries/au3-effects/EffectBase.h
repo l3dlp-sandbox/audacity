@@ -100,8 +100,8 @@ protected:
     const TrackList* inputTracks() const { return mTracks.get(); }
     const AudacityProject* FindProject() const;
 
-    double mF0{};
-    double mF1{};
+    double mF0{ 0. };
+    double mF1{ 0. };
     bool mSpectralSelectionEnabled{ false };
 
     wxArrayString mPresetNames;
@@ -113,13 +113,13 @@ private:
 public:
     // Public until we can move these fields out of here into EffectContext
     std::shared_ptr<TrackList> mTracks{}; // the complete list of all tracks
-    int mNumTracks{}; // This is really mNumWaveTracks, per CountWaveTracks() and GetNumWaveTracks().
+    int mNumTracks{ 0 }; // This is really mNumWaveTracks, per CountWaveTracks() and GetNumWaveTracks().
     BasicUI::ProgressDialog* mProgress{}; // Temporary pointer, NOT deleted in destructor.
-    double mProjectRate{};        // Sample rate of the project - NEW tracks should
-                                  // be created with this rate...
-    WaveTrackFactory* mFactory{};
-    double mT0{};
-    double mT1{};
+    double mProjectRate{ 0. };        // Sample rate of the project - NEW tracks should
+                                      // be created with this rate...
+    WaveTrackFactory* mFactory{ nullptr };
+    double mT0{ 0. };
+    double mT1{ 0. };
     bool mIsPreview{ false };
 
     // Some public members that only change "context" fields

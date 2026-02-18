@@ -1350,7 +1350,7 @@ void WaveTrack::ClearAndPasteAtSameTempo(
     t1 = SnapToSample(t1);
 
     const auto endTime = src.GetEndTime();
-    double dur = std::min(t1 - t0, endTime);
+    const double dur = std::min(t1 - t0, endTime);
 
     // If duration is 0, then it's just a plain paste
     if (dur == 0.0) {
@@ -1444,13 +1444,13 @@ void WaveTrack::ClearAndPasteAtSameTempo(
 
     const auto tolerance = 2.0 / track.GetRate();
 
-    // This is not a split-cut operation.
     constexpr auto addCutLines = false;
-    constexpr auto split = false;
+    // ClearAndPaste means "replace t0 to t1 by nothing and paste (eating around if necessary) the source track".
+    constexpr auto split = true;
     constexpr auto moveClips = false;
 
-    // Now, clear the selection
-    track.HandleClear(t0, t1, addCutLines, split, moveClips, clearByTrimming);
+    // Now, make room as needed
+    track.HandleClear(t0, std::max(t1, t0 + endTime), addCutLines, split, moveClips, clearByTrimming);
 
     // And paste in the new data
     track.PasteWaveTrackAtSameTempo(t0, src, merge, moveClips);

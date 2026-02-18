@@ -71,7 +71,7 @@ NyquistBase::NyquistBase(const wxString& fName)
 
     // set clip/split handling when applying over clip boundary.
     mRestoreSplits = true; // Default: Restore split lines.
-    mMergeClips = -1;     // Default (auto):  Merge if length remains unchanged.
+    mMergeClips = false;     // Default: Don't merge clips
 
     mVersion = 4;
 
@@ -637,7 +637,7 @@ bool NyquistBase::Process(EffectInstance&, EffectSettings& settings)
     //  mProgress->Hide();
     //}
 
-    mOutputTime = 0;
+    mOutputDuration = 0;
     mCount = 0;
     const auto scale
         =(GetType() == EffectTypeProcess ? 0.5 : 1.0) / GetNumWaveGroups();
@@ -987,8 +987,8 @@ bool NyquistBase::Process(EffectInstance&, EffectSettings& settings)
         mCount += mCurNumChannels;
     }
 
-    if (mOutputTime > 0.0) {
-        mT1 = mT0 + mOutputTime;
+    if (mOutputDuration > 0.0) {
+        mT1 = mT0 + mOutputDuration;
     }
 
 finish:
@@ -1536,8 +1536,8 @@ bool NyquistBase::ProcessOne(
         return false;
     }
 
-    mOutputTime = out->GetEndTime();
-    if (mOutputTime <= 0) {
+    mOutputDuration = out->GetEndTime();
+    if (mOutputDuration <= 0) {
         BasicUI::ShowMessageBox(XO("Nyquist returned nil audio.\n"));
         return false;
     }
@@ -1556,17 +1556,11 @@ bool NyquistBase::ProcessOne(
     }
 
     {
-        const bool bMergeClips = (mMergeClips < 0)
-                                 // Use sample counts to determine default
-                                 // behaviour - times will rarely be equal.
-                                 ?
-                                 (out->TimeToLongSamples(mT0)
-                                  + out->TimeToLongSamples(mOutputTime)
-                                  == out->TimeToLongSamples(mT1))
-                                 : mMergeClips != 0;
         PasteTimeWarper warper { mT1, mT0 + tempTrack->GetEndTime() };
+        auto pProject = FindProject();
+        const auto& selectedRegion = ViewInfo::Get(*pProject).selectedRegion;
         mCurChannelGroup->ClearAndPaste(
-            mT0, mT1, *tempTrack, mRestoreSplits, bMergeClips, &warper);
+            selectedRegion.t0(), selectedRegion.t1(), *tempTrack, mRestoreSplits, mMergeClips, &warper);
     }
 
     // If we were first in the group adjust non-selected group tracks
@@ -2058,7 +2052,11 @@ bool NyquistBase::Parse(
         long v;
         // -1 = auto (default), 0 = don't merge clips, 1 = do merge clips
         tokens[1].ToLong(&v);
-        mMergeClips = v;
+        if (v == 0) {
+            mMergeClips = false;
+        } else if (v == 1) {
+            mMergeClips = true;
+        }
         return true;
     }
 

@@ -27,6 +27,7 @@
 #include "au3-wave-track/WaveTrack.h"
 #include "au3-wave-track/WaveTrackSink.h"
 #include "au3-mixer/WideSampleSource.h"
+#include "au3-time-frequency-selection/ViewInfo.h"
 
 PerTrackEffect::Instance::~Instance() = default;
 
@@ -330,7 +331,9 @@ bool PerTrackEffect::DoProcess(TrackList& outputs,
                 PasteTimeWarper warper { mT1,
                                          mT0 + (*results->begin())->GetEndTime() };
                 const auto preserve = !isGenerator;
-                wt.ClearAndPaste(mT0, mT1,
+                auto pProject = FindProject();
+                const auto& selectedRegion = ViewInfo::Get(*pProject).selectedRegion;
+                wt.ClearAndPaste(selectedRegion.t0(), selectedRegion.t1(),
                                  static_cast<WaveTrack&>(*results->DetachFirst()),
                                  preserve, true, &warper);
                 results.reset();
