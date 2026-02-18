@@ -234,7 +234,7 @@ void PluginManager::FindFilesInPathList(const wxString& pattern,
     // just remove the MacOSX part.
     ff.RemoveLastDir();
 #endif
-    ff.AppendDir(wxT("plug-ins"));
+    ff.AppendDir(wxT("nyquist-plug-ins"));
     paths.push_back(ff.GetPath());
 
     // Weed out duplicates

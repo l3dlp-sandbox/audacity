@@ -2,13 +2,11 @@
 Nyquist plug-ins (.ny files) for Audacity.
 
 This CMakeLists.txt handles:
-1. Installing plug-ins for release builds
-2. Copying plug-ins to the build directory for development builds
+1. Installing nyquist-plug-ins for release builds
+2. Copying nyquist-plug-ins to the build directory for development builds
 ]]
 
-set(TARGET plug-ins)
-
-message(STATUS "========== Configuring ${TARGET} ==========")
+set(TARGET nyquist-plug-ins)
 
 # List of Nyquist plug-in files
 set(PLUGIN_FILES
@@ -44,20 +42,20 @@ set(PLUGIN_FILES
 
 # Determine install and build destinations based on platform
 if(OS_IS_MAC)
-   # On macOS, plug-ins go in Contents/plug-ins (not Contents/Resources/plug-ins)
+   # On macOS, nyquist-plug-ins go in Contents/nyquist-plug-ins (not Contents/Resources/nyquist-plug-ins)
    # This matches what PluginManager.cpp expects (see lines 229-238)
-   set(PLUGINS_INSTALL_DEST "${AU4_SHARE_NAME}Contents/plug-ins")
-   set(PLUGINS_BUILD_DEST "${CMAKE_BINARY_DIR}/src/app/${AU4_SHARE_NAME}Contents/plug-ins")
+   set(PLUGINS_INSTALL_DEST "${AU4_SHARE_NAME}Contents/nyquist-plug-ins")
+   set(PLUGINS_BUILD_DEST "${CMAKE_BINARY_DIR}/src/app/${AU4_SHARE_NAME}Contents/nyquist-plug-ins")
 elseif(OS_IS_LIN)
-   # On Linux, files go in share/audacity/plug-ins which PathList.cpp expects
-   set(PLUGINS_INSTALL_DEST "${CMAKE_INSTALL_PREFIX}/share/audacity/plug-ins")
-   set(PLUGINS_BUILD_DEST "${CMAKE_BINARY_DIR}/share/audacity/plug-ins")
+   # On Linux, files go in share/audacity/nyquist-plug-ins which PathList.cpp expects
+   set(PLUGINS_INSTALL_DEST "${CMAKE_INSTALL_PREFIX}/share/audacity/nyquist-plug-ins")
+   set(PLUGINS_BUILD_DEST "${CMAKE_BINARY_DIR}/share/audacity/nyquist-plug-ins")
 else()
-   set(PLUGINS_INSTALL_DEST "${AU4_SHARE_NAME}${AU4_INSTALL_NAME}bin/plug-ins")
-   set(PLUGINS_BUILD_DEST "${CMAKE_BINARY_DIR}/${AU4_SHARE_NAME}${AU4_INSTALL_NAME}plug-ins")
+   set(PLUGINS_INSTALL_DEST "${AU4_SHARE_NAME}${AU4_INSTALL_NAME}bin/nyquist-plug-ins")
+   set(PLUGINS_BUILD_DEST "${CMAKE_BINARY_DIR}/${AU4_SHARE_NAME}${AU4_INSTALL_NAME}nyquist-plug-ins")
 endif()
 
-# Install plug-ins for release builds
+# Install nyquist-plug-ins for release builds
 install(DIRECTORY
    ${CMAKE_CURRENT_SOURCE_DIR}/
    DESTINATION ${PLUGINS_INSTALL_DEST}
@@ -67,7 +65,7 @@ install(DIRECTORY
    PATTERN ".*" EXCLUDE
 )
 
-# Copy plug-ins to build directory for development builds
+# Copy nyquist-plug-ins to build directory for development builds
 # Build list of source and output files
 foreach( plugin ${PLUGIN_FILES} )
    set( src "${CMAKE_CURRENT_SOURCE_DIR}/${plugin}" )
