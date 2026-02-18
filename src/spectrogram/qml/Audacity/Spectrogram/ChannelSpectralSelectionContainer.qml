@@ -224,7 +224,6 @@ Item {
 
                 onPressed: {
                     selectionModel.startCenterFrequencyDrag()
-                    selectionController.startFrequencySelectionDrag()
                 }
 
                 onPositionChanged: function (mouse) {
@@ -234,12 +233,10 @@ Item {
 
                 onReleased: {
                     selectionModel.endCenterFrequencyDrag()
-                    selectionController.endFrequencySelectionDrag()
                 }
 
                 onCanceled: {
                     selectionModel.endCenterFrequencyDrag()
-                    selectionController.endFrequencySelectionDrag()
                 }
             }
 

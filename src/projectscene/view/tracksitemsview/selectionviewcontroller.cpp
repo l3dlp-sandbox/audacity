@@ -284,52 +284,6 @@ void SelectionViewController::updateSelectionVerticalResize(double y1, double y2
     }
 }
 
-void SelectionViewController::startFrequencySelectionDrag()
-{
-    const auto selection = selectionController()->frequencySelection();
-    if (!selection.isValid()) {
-        return;
-    }
-    m_dragStartFrequencySelection = selection;
-}
-
-void SelectionViewController::dragFrequencySelectionCenterFrequency(double newCenterFreq)
-{
-    IF_ASSERT_FAILED(m_dragStartFrequencySelection.isValid()) {
-        return;
-    }
-    const auto config = spectrogramService()->trackSpectrogramConfiguration(m_dragStartFrequencySelection.trackId);
-    IF_ASSERT_FAILED(config) {
-        return;
-    }
-    const auto range = m_dragStartFrequencySelection.endFrequency - m_dragStartFrequencySelection.startFrequency;
-    auto newStartFreq = newCenterFreq - range / 2;
-    auto newEndFreq = newCenterFreq + range / 2;
-
-    const auto minFreq = config->minFreq();
-    const auto maxFreq = config->maxFreq();
-    if (newStartFreq < minFreq) {
-        const auto delta = minFreq - newStartFreq;
-        newEndFreq = std::max<double>(newEndFreq - delta, minFreq);
-        newStartFreq = minFreq;
-    } else if (newEndFreq > maxFreq) {
-        const auto delta = newEndFreq - maxFreq;
-        newStartFreq = std::min<double>(newStartFreq + delta, maxFreq);
-        newEndFreq = maxFreq;
-    }
-
-    if (newStartFreq == newEndFreq) {
-        return;
-    }
-
-    selectionController()->setFrequencySelection({ m_dragStartFrequencySelection.trackId, newStartFreq, newEndFreq });
-}
-
-void SelectionViewController::endFrequencySelectionDrag()
-{
-    m_dragStartFrequencySelection = {};
-}
-
 void SelectionViewController::selectTrackAudioData(double y)
 {
     if (!isProjectOpened()) {
@@ -525,13 +479,13 @@ double SelectionViewController::spectrogramHitFrequency(const spectrogram::Spect
 void SelectionViewController::setFrequencySelection(double y1, double y2)
 {
     if (!m_spectrogramHit || !isInExtendedSpectrogram(*m_spectrogramHit, y1) || !isInExtendedSpectrogram(*m_spectrogramHit, y2)) {
-        selectionController()->resetFrequencySelection();
+        frequencySelectionController()->resetFrequencySelection();
         return;
     }
 
     const auto freq1 = spectrogramHitFrequency(*m_spectrogramHit, y1);
     const auto freq2 = spectrogramHitFrequency(*m_spectrogramHit, y2);
-    selectionController()->setFrequencySelection({ m_spectrogramHit->trackId, freq1, freq2 });
+    frequencySelectionController()->setFrequencySelection({ m_spectrogramHit->trackId, freq1, freq2 });
 }
 
 bool SelectionViewController::isInExtendedSpectrogram(const spectrogram::SpectrogramHit& hit, double y) const

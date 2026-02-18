@@ -2,6 +2,7 @@
 
 #include "internal/globalspectrogramconfiguration.h"
 #include "internal/spectrogramservice.h"
+#include "internal/frequencyselectioncontroller.h"
 #include "internal/au3/au3spectrogrampainter.h"
 #include "internal/au3/au3peakfinderfactory.h"
 
@@ -44,6 +45,7 @@ void SpectrogramModule::registerExports()
     ioc()->registerExport<ISpectrogramPainter>(moduleName(), m_au3SpectrogramPainter);
     ioc()->registerExport<ISpectrogramService>(moduleName(), m_spectrogramService);
     ioc()->registerExport<IPeakFinderFactory>(moduleName(), new Au3PeakFinderFactory(iocContext()));
+    ioc()->registerExport<IFrequencySelectionController>(moduleName(), new FrequencySelectionController(iocContext()));
 }
 
 void SpectrogramModule::registerUiTypes()

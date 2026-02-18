@@ -10,6 +10,7 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/ispectrogramconfiguration.h
     ${CMAKE_CURRENT_LIST_DIR}/iglobalspectrogramconfiguration.h
     ${CMAKE_CURRENT_LIST_DIR}/itrackspectrogramconfiguration.h
+    ${CMAKE_CURRENT_LIST_DIR}/ifrequencyselectioncontroller.h
     ${CMAKE_CURRENT_LIST_DIR}/ispectrogramservice.h
     ${CMAKE_CURRENT_LIST_DIR}/spectrogrammodule.cpp
     ${CMAKE_CURRENT_LIST_DIR}/spectrogrammodule.h
@@ -21,6 +22,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/internal/ipeakfinderfactory.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/clipparameters.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/clipparameters.h
+    ${CMAKE_CURRENT_LIST_DIR}/internal/frequencyselectioncontroller.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/internal/frequencyselectioncontroller.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/macromagic.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/numberscale.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/roseuscolormaps.h
@@ -72,7 +75,7 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/scalesectionparameterlistmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/globalspectrogramsettingsmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/globalspectrogramsettingsmodel.h
-
+    
     ${CMAKE_CURRENT_LIST_DIR}/view/channelspectralselectionmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/channelspectralselectionmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/clipchannelspectrogramview.cpp

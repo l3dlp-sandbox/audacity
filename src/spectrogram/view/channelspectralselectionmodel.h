@@ -6,6 +6,7 @@
 #include "ispectrogramservice.h"
 #include "spectrogramtypes.h" // SelectionInfo
 #include "internal/ipeakfinderfactory.h"
+#include "internal/frequencyselectioncontroller.h"
 
 #include "framework/global/modularity/ioc.h"
 
@@ -36,8 +37,9 @@ class ChannelSpectralSelectionModel : public QObject, public muse::Injectable
     Q_PROPERTY(double selectionHeight READ selectionHeight NOTIFY selectionRangeChanged FINAL)
     Q_PROPERTY(bool verticalDragActive READ verticalDragActive NOTIFY verticalDragActiveChanged FINAL)
 
-    muse::Inject<spectrogram::ISpectrogramService> spectrogramService { this };
-    muse::Inject<spectrogram::IPeakFinderFactory> peakFinderFactory { this };
+    muse::Inject<ISpectrogramService> spectrogramService { this };
+    muse::Inject<IPeakFinderFactory> peakFinderFactory { this };
+    muse::Inject<IFrequencySelectionController> frequencySelectionController { this };
 
 public:
     ChannelSpectralSelectionModel(QObject* parent = nullptr);
@@ -104,5 +106,7 @@ private:
     double m_selectionStartTime = 0.0;
     double m_selectionEndTime = 0.0;
     std::unique_ptr<IPeakFinder> m_peakFinder;
+
+    FrequencySelection m_dragStartFrequencySelection;
 };
 }

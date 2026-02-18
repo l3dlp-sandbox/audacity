@@ -12,6 +12,7 @@
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/itrackeditinteraction.h"
 #include "spectrogram/view/spectrogramhit.h"
+#include "spectrogram/ifrequencyselectioncontroller.h"
 #include "spectrogram/ispectrogramservice.h"
 #include "spectrogram/iglobalspectrogramconfiguration.h"
 #include "trackedit/internal/itracknavigationcontroller.h"
@@ -38,8 +39,10 @@ class SelectionViewController : public QObject, public muse::async::Asyncable, p
     muse::Inject<context::IGlobalContext> globalContext { this };
     muse::Inject<trackedit::ISelectionController> selectionController { this };
     muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction { this };
-    muse::Inject<spectrogram::ISpectrogramService> spectrogramService { this };
     muse::Inject<trackedit::ITrackNavigationController> trackNavigationController { this };
+
+    muse::Inject<spectrogram::IFrequencySelectionController> frequencySelectionController { this };
+    muse::Inject<spectrogram::ISpectrogramService> spectrogramService { this };
 
 public:
     SelectionViewController(QObject* parent = nullptr);
@@ -62,10 +65,6 @@ public:
     Q_INVOKABLE void onSelectionHorizontalResize(double x, double x2, bool completed);
     Q_INVOKABLE void startSelectionVerticalResize(spectrogram::SpectrogramHit hit);
     Q_INVOKABLE void updateSelectionVerticalResize(double y1, double y2, bool completed);
-
-    Q_INVOKABLE void startFrequencySelectionDrag();
-    Q_INVOKABLE void dragFrequencySelectionCenterFrequency(double frequency);
-    Q_INVOKABLE void endFrequencySelectionDrag();
 
     Q_INVOKABLE void selectTrackAudioData(double y);
     Q_INVOKABLE void selectItemData(const TrackItemKey& key);
@@ -126,6 +125,5 @@ private:
     bool isInExtendedSpectrogram(const spectrogram::SpectrogramHit& hit, double y) const;
 
     std::optional<const spectrogram::SpectrogramHit> m_spectrogramHit;
-    spectrogram::FrequencySelection m_dragStartFrequencySelection;
 };
 }

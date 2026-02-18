@@ -97,12 +97,6 @@ public:
     virtual muse::async::Channel<secs_t> dataSelectedEndTimeChanged() const = 0;
     virtual muse::async::Channel<secs_t> dataSelectedEndTimeSelected() const = 0;
 
-    virtual spectrogram::FrequencySelection frequencySelection() const = 0;
-    virtual void setFrequencySelection(spectrogram::FrequencySelection) = 0;
-    virtual bool hasFrequencySelection(trackedit::TrackId trackId) const = 0;
-    virtual void resetFrequencySelection() = 0;
-    virtual muse::async::Channel<trackedit::TrackId> frequencySelectionChanged() const = 0;
-
     virtual trackedit::secs_t selectionStartTime() const = 0;
     virtual void setSelectionStartTime(trackedit::secs_t time) = 0;
 

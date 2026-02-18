@@ -953,54 +953,6 @@ void Au3SelectionController::setSelectionStartTime(secs_t time)
     m_selectionStartTime.set(time, true);
 }
 
-au::spectrogram::FrequencySelection Au3SelectionController::frequencySelection() const
-{
-    return m_frequencySelection;
-}
-
-void Au3SelectionController::setFrequencySelection(spectrogram::FrequencySelection frequencySelection)
-{
-    const std::optional<trackedit::TrackId> previousTrackId
-        = m_frequencySelection.isValid() ? std::make_optional(m_frequencySelection.trackId) : std::nullopt;
-
-    if (m_frequencySelection == frequencySelection) {
-        return;
-    }
-
-    muse::Defer notifyPreviousTrack([this, trackId = frequencySelection.trackId, previousTrackId]() {
-        if (previousTrackId && previousTrackId != trackId) {
-            m_frequencySelectionChanged.send(*previousTrackId);
-        }
-    });
-
-    m_frequencySelection = frequencySelection;
-    if (frequencySelection.isValid()) {
-        m_frequencySelectionChanged.send(frequencySelection.trackId);
-    }
-}
-
-bool Au3SelectionController::hasFrequencySelection(TrackId trackId) const
-{
-    return m_frequencySelection.isValid() && m_frequencySelection.trackId == trackId;
-}
-
-void Au3SelectionController::resetFrequencySelection()
-{
-    if (!m_frequencySelection.isValid()) {
-        return;
-    }
-
-    const trackedit::TrackId previousTrackId = m_frequencySelection.trackId;
-
-    m_frequencySelection = spectrogram::FrequencySelection{};
-    m_frequencySelectionChanged.send(previousTrackId);
-}
-
-muse::async::Channel<au::trackedit::TrackId> Au3SelectionController::frequencySelectionChanged() const
-{
-    return m_frequencySelectionChanged;
-}
-
 void Au3SelectionController::updateSelectionController()
 {
     auto& tracks = Au3TrackList::Get(projectRef());

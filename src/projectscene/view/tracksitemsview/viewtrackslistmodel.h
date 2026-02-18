@@ -12,6 +12,7 @@
 #include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
 #include "projectscene/iprojectsceneconfiguration.h"
+#include "spectrogram/ifrequencyselectioncontroller.h"
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/itrackeditinteraction.h"
 #include "trackedit/internal/itracknavigationcontroller.h"
@@ -38,6 +39,8 @@ class ViewTracksListModel : public QAbstractListModel, public muse::async::Async
     muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction{ this };
     muse::Inject<playback::ITrackPlaybackControl> trackPlaybackControl{ this };
     muse::Inject<trackedit::ITrackNavigationController> trackNavigationController{ this };
+    muse::Inject<spectrogram::IFrequencySelectionController> frequencySelectionController{ this };
+
 public:
     explicit ViewTracksListModel(QObject* parent = nullptr);
 

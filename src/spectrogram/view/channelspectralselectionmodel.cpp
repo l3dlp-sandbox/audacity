@@ -7,7 +7,6 @@
 
 #include "framework/global/types/number.h"
 #include "framework/global/log.h"
-#include <qtmetamacros.h>
 
 namespace au::spectrogram {
 ChannelSpectralSelectionModel::ChannelSpectralSelectionModel(QObject* parent)
@@ -144,6 +143,7 @@ std::pair<double, double> ChannelSpectralSelectionModel::selectionYRange() const
 void ChannelSpectralSelectionModel::startCenterFrequencyDrag()
 {
     m_peakFinder = peakFinderFactory()->newInstance(m_trackId, m_channel, m_selectionStartTime, m_selectionEndTime);
+    m_dragStartFrequencySelection = frequencySelectionController()->frequencySelection();
     emit verticalDragActiveChanged();
 }
 
@@ -159,12 +159,38 @@ void ChannelSpectralSelectionModel::dragCenterFrequency(double y)
     }
 
     const double peakFrequency = m_peakFinder->findPeak(frequency);
-    emit centerFrequencyChangeRequested(peakFrequency);
+
+    const auto config = spectrogramService()->trackSpectrogramConfiguration(m_dragStartFrequencySelection.trackId);
+    IF_ASSERT_FAILED(config) {
+        return;
+    }
+    const auto range = m_dragStartFrequencySelection.endFrequency - m_dragStartFrequencySelection.startFrequency;
+    auto newStartFreq = peakFrequency - range / 2;
+    auto newEndFreq = peakFrequency + range / 2;
+
+    const auto minFreq = config->minFreq();
+    const auto maxFreq = config->maxFreq();
+    if (newStartFreq < minFreq) {
+        const auto delta = minFreq - newStartFreq;
+        newEndFreq = std::max<double>(newEndFreq - delta, minFreq);
+        newStartFreq = minFreq;
+    } else if (newEndFreq > maxFreq) {
+        const auto delta = newEndFreq - maxFreq;
+        newStartFreq = std::min<double>(newStartFreq + delta, maxFreq);
+        newEndFreq = maxFreq;
+    }
+
+    if (newStartFreq == newEndFreq) {
+        return;
+    }
+
+    frequencySelectionController()->setFrequencySelection({ m_dragStartFrequencySelection.trackId, newStartFreq, newEndFreq });
 }
 
 void ChannelSpectralSelectionModel::endCenterFrequencyDrag()
 {
     m_peakFinder.reset();
+    m_dragStartFrequencySelection = {};
     emit verticalDragActiveChanged();
 }
 }

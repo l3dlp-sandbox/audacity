@@ -95,12 +95,6 @@ public:
     trackedit::secs_t selectionStartTime() const override;
     void setSelectionStartTime(trackedit::secs_t time) override;
 
-    spectrogram::FrequencySelection frequencySelection() const override;
-    void setFrequencySelection(spectrogram::FrequencySelection) override;
-    bool hasFrequencySelection(trackedit::TrackId trackId) const override;
-    void resetFrequencySelection() override;
-    muse::async::Channel<trackedit::TrackId> frequencySelectionChanged() const override;
-
     // grouping
     bool selectionContainsGroup() const override;
     bool isSelectionGrouped() const override;
@@ -162,8 +156,5 @@ private:
 
     // track focus state
     Val<TrackId> m_focusedTrack = Val<TrackId> { TrackId(-1) };
-
-    spectrogram::FrequencySelection m_frequencySelection;
-    muse::async::Channel<trackedit::TrackId> m_frequencySelectionChanged;
 };
 }
