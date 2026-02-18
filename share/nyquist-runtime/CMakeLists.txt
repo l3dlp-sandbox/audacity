@@ -6,8 +6,56 @@ This CMakeLists.txt handles:
 2. Copying runtime files to the build directory for development builds
 ]]
 
+set(TARGET nyquist-runtime)
 
-set( TARGET nyquist-runtime )
+
+set( RUNTIME_FILES
+        aud-do-support.lsp
+        dspprims.lsp
+        envelopes.lsp
+        equalizer.lsp
+        evalenv.lsp
+        fileio.lsp
+        init.lsp
+        misc.lsp
+        nyinit-dbg.lsp
+        nyinit.lsp
+        nyqmisc.lsp
+        nyquist-plot.txt
+        nyquist.lsp
+        printrec.lsp
+        profile.lsp
+        sal-parse.lsp
+        sal.lsp
+        seq.lsp
+        seqfnint.lsp
+        seqmidi.lsp
+        sliders.lsp
+        sndfnint.lsp
+        spec-plot.lsp
+        spectral-analysis.lsp
+        stk.lsp
+        system.lsp
+        test.lsp
+        velocity.lsp
+        xlinit.lsp
+        xm.lsp
+        rawwaves/mand1.raw
+        rawwaves/mand10.raw
+        rawwaves/mand11.raw
+        rawwaves/mand12.raw
+        rawwaves/mand2.raw
+        rawwaves/mand3.raw
+        rawwaves/mand4.raw
+        rawwaves/mand5.raw
+        rawwaves/mand6.raw
+        rawwaves/mand7.raw
+        rawwaves/mand8.raw
+        rawwaves/mand9.raw
+        rawwaves/mandpluk.raw
+        rawwaves/marmstk1.raw
+        rawwaves/sinewave.raw
+)
 
 # Determine install and build destinations based on platform
 if(OS_IS_MAC)
@@ -23,55 +71,16 @@ else()
    set(NYQUIST_BUILD_DEST "${CMAKE_BINARY_DIR}/")
 endif()
 
-set( RUNTIME
-   aud-do-support.lsp
-   dspprims.lsp
-   envelopes.lsp
-   equalizer.lsp
-   evalenv.lsp
-   fileio.lsp
-   init.lsp
-   misc.lsp
-   nyinit-dbg.lsp
-   nyinit.lsp
-   nyqmisc.lsp
-   nyquist-plot.txt
-   nyquist.lsp
-   printrec.lsp
-   profile.lsp
-   sal-parse.lsp
-   sal.lsp
-   seq.lsp
-   seqfnint.lsp
-   seqmidi.lsp
-   sliders.lsp
-   sndfnint.lsp
-   spec-plot.lsp
-   spectral-analysis.lsp
-   stk.lsp
-   system.lsp
-   test.lsp
-   velocity.lsp
-   xlinit.lsp
-   xm.lsp
-   rawwaves/mand1.raw
-   rawwaves/mand10.raw
-   rawwaves/mand11.raw
-   rawwaves/mand12.raw
-   rawwaves/mand2.raw
-   rawwaves/mand3.raw
-   rawwaves/mand4.raw
-   rawwaves/mand5.raw
-   rawwaves/mand6.raw
-   rawwaves/mand7.raw
-   rawwaves/mand8.raw
-   rawwaves/mand9.raw
-   rawwaves/mandpluk.raw
-   rawwaves/marmstk1.raw
-   rawwaves/sinewave.raw
-)
+# Install Nyquist runtime files for release builds
+if( NOT CMAKE_SYSTEM_NAME MATCHES "Darwin" )
+   if( NOT "${CMAKE_GENERATOR}" MATCHES "Visual Studio*")
+      install( DIRECTORY "${NYQUIST_BUILD_DEST}${TARGET}"
+              DESTINATION "${NYQUIST_INSTALL_DEST}" )
+   endif()
+endif()
 
-foreach( source ${RUNTIME} )
+
+foreach( source ${RUNTIME_FILES} )
    set( src "${CMAKE_CURRENT_SOURCE_DIR}/${source}" )
    set( dst "${NYQUIST_BUILD_DEST}${TARGET}/${source}" )
 
@@ -98,12 +107,3 @@ foreach( source ${RUNTIME} )
 endforeach()
 
 add_custom_target( ${TARGET} ALL DEPENDS ${OUTPUTS} SOURCES ${SOURCES} )
-
-# Install Nyquist runtime files for release builds
-if( NOT CMAKE_SYSTEM_NAME MATCHES "Darwin" )
-   if( NOT "${CMAKE_GENERATOR}" MATCHES "Visual Studio*")
-      install( DIRECTORY "${NYQUIST_BUILD_DEST}${TARGET}"
-               DESTINATION "${NYQUIST_INSTALL_DEST}" )
-   endif()
-endif()
-
