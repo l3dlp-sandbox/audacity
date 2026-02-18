@@ -49,8 +49,6 @@
 
 #if AU_MODULE_EFFECTS_NYQUIST
 #include "effects/nyquist/nyquisteffectsmodule.h"
-#else
-#include "stubs/nyquist/nyquisteffectsstubmodule.h"
 #endif
 
 #ifdef AU_MODULE_EFFECTS_LV2

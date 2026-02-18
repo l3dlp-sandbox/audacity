@@ -10,13 +10,7 @@ muse::String au::effects::utils::builtinEffectCategoryIdString(BuiltinEffectCate
 {
     switch (category) {
     case BuiltinEffectCategoryId::None:
-        // Maybe a temporary solution to generator menu organization:
-        // since generators don't have a category, with this they'll end up in the Audacity "category".
-        // When we implement Nyquist support, though, either we create the
-        // "Nyquist" category and are happy with that, or we
-        // will have to ask our designers to specify organization of generators
-        // (and analyzers).
-        return muse::String{ "Audacity" };
+        return muse::String{ "" };
     case BuiltinEffectCategoryId::VolumeAndCompression:
         return muse::String{ "Volume and compression" };
     case BuiltinEffectCategoryId::Fading:
@@ -45,16 +39,16 @@ int au::effects::utils::builtinEffectCategoryIdOrder(const muse::String& categor
 {
     using namespace au::effects::utils;
     static const std::map<muse::String, int> categoryOrder = {
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::VolumeAndCompression), 0 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Fading), 1 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::PitchAndTempo), 2 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::EqAndFilters), 3 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::NoiseRemovalAndRepair), 4 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::DelayAndReverb), 5 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::DistortionAndModulation), 6 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Special), 7 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Legacy), 8 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::None), 9 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::None), 0 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::VolumeAndCompression), 1 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Fading), 2 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::PitchAndTempo), 3 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::EqAndFilters), 4 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::NoiseRemovalAndRepair), 5 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::DelayAndReverb), 6 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::DistortionAndModulation), 7 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Special), 8 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Legacy), 9 },
     };
     auto it = categoryOrder.find(category);
     return it == categoryOrder.end() ? INT_MAX : it->second;
@@ -149,6 +143,11 @@ MenuItemList makeDestructiveBuiltinEffectSubmenu(const EffectMetaList& effects, 
 
     MenuItemList items;
     for (const auto& [category, effectIds] : categoriesSorted) {
+        if (category.isEmpty()) {
+            for (const auto& effectId : effectIds) {
+                items << effectMenu.makeMenuEffectItem(effectId);
+            }
+        }
         items << makeEffectSubmenu(CiString { category }, effectIds, effectMenu);
     }
     return items;

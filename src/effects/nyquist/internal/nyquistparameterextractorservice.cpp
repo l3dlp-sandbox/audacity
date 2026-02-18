@@ -342,21 +342,6 @@ muse::String NyquistParameterExtractorService::getParameterValueString(EffectIns
     }
 }
 
-bool NyquistParameterExtractorService::requiresCustomViewer(EffectInstance* instance) const
-{
-    return isNyquistPrompt(instance);
-}
-
-bool NyquistParameterExtractorService::isNyquistPrompt(EffectInstance* instance) const
-{
-    NyquistBase* nyquist = getNyquistBase(instance);
-    if (!nyquist) {
-        return false;
-    }
-
-    return nyquist->mIsPrompt;
-}
-
 muse::String NyquistParameterExtractorService::getPromptCommandText(EffectInstance* instance) const
 {
     NyquistBase* nyquist = getNyquistBase(instance);

@@ -122,7 +122,7 @@ NyquistBase::~NyquistBase()
 PluginPath NyquistBase::GetPath() const
 {
     if (mIsPrompt) {
-        return NYQUIST_PROMPT_ID;
+        return Effect::GetPath();
     }
 
     return mFileName.GetFullPath();
@@ -130,10 +130,6 @@ PluginPath NyquistBase::GetPath() const
 
 ComponentInterfaceSymbol NyquistBase::GetSymbol() const
 {
-    if (mIsPrompt) {
-        return { NYQUIST_PROMPT_ID, NYQUIST_PROMPT_NAME };
-    }
-
     return mName;
 }
 

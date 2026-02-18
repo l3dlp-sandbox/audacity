@@ -10,17 +10,16 @@
 
 #include "framework/interactive/iinteractive.h"
 
-#include "effects/effects_base/view/abstracteffectviewmodel.h"
-#include "effects/effects_base/ieffectsprovider.h"
-#include "effects/effects_base/ieffectinstancesregister.h"
 #include "effects/effects_base/iparameterextractorregistry.h"
+
+#include "../common/builtineffectmodel.h"
 
 namespace au::effects {
 class NyquistParameterExtractorService;
 
 //! ViewModel for the Nyquist Prompt effect
 //! Provides a multi-line text editor for entering Nyquist code directly
-class NyquistPromptViewModel : public AbstractEffectViewModel
+class NyquistPromptViewModel : public BuiltinEffectModel
 {
     Q_OBJECT
 
@@ -28,7 +27,6 @@ class NyquistPromptViewModel : public AbstractEffectViewModel
     Q_PROPERTY(QString title READ title CONSTANT FINAL)
 
 protected:
-    muse::Inject<IEffectsProvider> effectsProvider{ this };
     muse::Inject<IParameterExtractorRegistry> parameterExtractorRegistry{ this };
     muse::GlobalInject<muse::io::IFileSystem> fileSystem;
     muse::Inject<muse::IInteractive> interactive{ this };
@@ -49,12 +47,8 @@ public:
 signals:
     void commandTextChanged();
 
-protected:
-    void doInit() override;
-    void doStartPreview() override;
-    void doStopPreview() override;
-
 private:
+    void doReload() override;
     NyquistParameterExtractorService* getExtractor() const;
 
     QString m_commandText;

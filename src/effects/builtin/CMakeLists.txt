@@ -131,6 +131,11 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/noisereduction/noisereductionviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/noisereduction/noisereductionviewmodel.h
 
+    ${CMAKE_CURRENT_LIST_DIR}/nyquistprompt/nyquistprompteffect.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/nyquistprompt/nyquistprompteffect.h
+    ${CMAKE_CURRENT_LIST_DIR}/nyquistprompt/nyquistpromptviewmodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/nyquistprompt/nyquistpromptviewmodel.h
+
     ${CMAKE_CURRENT_LIST_DIR}/fade/fadeeffect.cpp
     ${CMAKE_CURRENT_LIST_DIR}/fade/fadeeffect.h
 

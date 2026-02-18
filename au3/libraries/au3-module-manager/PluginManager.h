@@ -234,9 +234,9 @@ private:
 // Defining these special names in the low-level PluginManager.h
 // is unfortunate
 // Internal name should be stable across versions
-#define NYQUIST_PROMPT_ID wxT("Nyquist Prompt")
+#define NYQUIST_PROMPT_ID wxT("Nyquist prompt")
 // User-visible name might change in later versions
-#define NYQUIST_PROMPT_NAME XO("Nyquist Prompt")
+#define NYQUIST_PROMPT_NAME XO("Nyquist prompt")
 
 // Latest version of the plugin registry config
 constexpr auto REGVERCUR = "1.5";

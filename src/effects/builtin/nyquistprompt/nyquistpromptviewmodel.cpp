@@ -2,13 +2,12 @@
  * Audacity: A Digital Audio Editor
  */
 #include "nyquistpromptviewmodel.h"
+#include "nyquistprompteffect.h"
 
+#include "au3wrap/internal/wxtypes_convert.h"
 #include "framework/global/log.h"
-#include "framework/global/io/file.h"
 #include "framework/global/translation.h"
 
-#include "au3-components/EffectInterface.h"
-#include "effects/effects_base/iparameterextractorregistry.h"
 #include "effects/nyquist/internal/nyquistparameterextractorservice.h"
 
 #include <QFileDialog>
@@ -19,7 +18,7 @@ using namespace au::effects;
 using namespace muse;
 
 NyquistPromptViewModel::NyquistPromptViewModel(QObject* parent, int instanceId)
-    : AbstractEffectViewModel(parent, instanceId)
+    : BuiltinEffectModel(parent, instanceId)
 {
 }
 
@@ -34,22 +33,15 @@ void NyquistPromptViewModel::setCommandText(const QString& text)
         return;
     }
 
+    effect<NyquistPromptEffect>().commandText() = au3::wxFromString(text);
+
     m_commandText = text;
     emit commandTextChanged();
-
-    // Update the effect instance with the new command text
-    NyquistParameterExtractorService* extractor = getExtractor();
-    if (extractor) {
-        EffectInstance* instance = instancesRegister()->instanceById(m_instanceId).get();
-        if (instance) {
-            extractor->setPromptCommandText(instance, String::fromQString(text));
-        }
-    }
 }
 
 QString NyquistPromptViewModel::title() const
 {
-    return QObject::tr("Nyquist Prompt");
+    return QObject::tr("Nyquist prompt");
 }
 
 void NyquistPromptViewModel::loadScript()
@@ -173,38 +165,11 @@ void NyquistPromptViewModel::debugEffect()
     }
 }
 
-void NyquistPromptViewModel::doInit()
+void NyquistPromptViewModel::doReload()
 {
     // Load the current command text from the effect instance
-    NyquistParameterExtractorService* extractor = getExtractor();
-    if (extractor) {
-        EffectInstance* instance = instancesRegister()->instanceById(m_instanceId).get();
-        if (instance) {
-            String text = extractor->getPromptCommandText(instance);
-            m_commandText = text.toQString();
-            emit commandTextChanged();
-        }
-    }
-}
-
-void NyquistPromptViewModel::doStartPreview()
-{
-    // Start preview playback
-    const EffectSettingsAccessPtr settingsAccess = instancesRegister()->settingsAccessById(m_instanceId);
-    if (!settingsAccess) {
-        return;
-    }
-
-    settingsAccess->ModifySettings([this](EffectSettings& settings) {
-        executionScenario()->previewEffect(m_instanceId, settings);
-        return nullptr;
-    });
-}
-
-void NyquistPromptViewModel::doStopPreview()
-{
-    // Stop preview playback
-    effectsProvider()->stopPreview();
+    m_commandText = QString::fromStdString(au3::wxToStdString(effect<NyquistPromptEffect>().commandText()));
+    emit commandTextChanged();
 }
 
 NyquistParameterExtractorService* NyquistPromptViewModel::getExtractor() const

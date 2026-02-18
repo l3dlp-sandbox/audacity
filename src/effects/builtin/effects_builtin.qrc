@@ -38,5 +38,6 @@
         <file>noisegen/NoiseView.qml</file>
         <file>noisereduction/NoiseReductionSlider.qml</file>
         <file>noisereduction/NoiseReductionView.qml</file>
+        <file>nyquistprompt/NyquistPromptView.qml</file>
     </qresource>
 </RCC>

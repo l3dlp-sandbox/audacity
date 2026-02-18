@@ -12,7 +12,6 @@ import Audacity.BuiltinEffects
 import Audacity.Lv2
 import Audacity.Vst
 import Audacity.AudioUnit
-import Audacity.Nyquist
 
 EffectStyledDialogView {
     id: root
@@ -107,9 +106,6 @@ EffectStyledDialogView {
             break
         case ViewerComponentType.Generated:
             viewerLoader.sourceComponent = generatedViewerComp
-            break
-        case ViewerComponentType.NyquistPrompt:
-            viewerLoader.sourceComponent = nyquistPromptViewerComp
             break
         default:
             viewerLoader.sourceComponent = null
@@ -341,13 +337,6 @@ EffectStyledDialogView {
     Component {
         id: generatedViewerComp
         GeneratedEffectViewer {
-            instanceId: root.instanceId
-        }
-    }
-
-    Component {
-        id: nyquistPromptViewerComp
-        NyquistPromptViewer {
             instanceId: root.instanceId
         }
     }

@@ -42,6 +42,8 @@
 #include "tonegen/chirpeffect.h"
 #include "tonegen/toneeffect.h"
 #include "reverb/reverbeffect.h"
+#include "nyquistprompt/nyquistprompteffect.h"
+#include "nyquistprompt/nyquistpromptviewmodel.h"
 #include "reverb/reverbviewmodel.h"
 #include "tonegen/toneviewmodel.h"
 #include "dtmfgen/dtmfgenerator.h"
@@ -95,6 +97,7 @@ void BuiltinEffectsRepository::preInit()
     static BuiltinEffectsModule::Registration< DtmfGenerator > regDtmf;
     static BuiltinEffectsModule::Registration< CompressorEffect > regCompressor;
     static BuiltinEffectsModule::Registration< LimiterEffect > regLimiter;
+    static BuiltinEffectsModule::Registration< NyquistPromptEffect > regNyquistPrompt;
 }
 
 void BuiltinEffectsRepository::init()
@@ -136,6 +139,9 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             break;
         case EffectTypeAnalyze:
             meta.type = EffectType::Analyzer;
+            break;
+        case EffectTypeTool:
+            meta.type = EffectType::Tool;
             break;
         default:
             assert(false);
@@ -300,6 +306,15 @@ void BuiltinEffectsRepository::updateEffectMetaList()
                     muse::mtrc("effects", "Reverb"),
                     muse::mtrc("effects", "Reverb effect"),
                     BuiltinEffectCategoryId::DelayAndReverb,
+                    true
+                    );
+        } else if (symbol == NyquistPromptEffect::Symbol) {
+            REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(NyquistPromptViewModelFactory);
+            regView(NyquistPromptEffect::Symbol, u"qrc:/nyquistprompt/NyquistPromptView.qml");
+            regMeta(desc,
+                    muse::mtrc("effects", "Nyquist prompt"),
+                    muse::mtrc("effects", "Nyquist prompt effect"),
+                    BuiltinEffectCategoryId::None,
                     true
                     );
         } else if (symbol == NoiseGenerator::Symbol) {

@@ -80,17 +80,6 @@ public:
         (void)parameterId;
     }
 
-    //! Check if an effect instance requires a custom (non-generated) viewer.
-    //! For example, the Nyquist Prompt needs a code-editor UI instead of the
-    //! auto-generated parameter controls.
-    //! @param instance The effect instance to check
-    //! @return true if the instance needs a custom viewer, false for generated UI
-    virtual bool requiresCustomViewer(EffectInstance* instance) const
-    {
-        (void)instance;
-        return false;
-    }
-
     //! Notify that an instance is being destroyed
     //! Called when an instance is unregistered to allow cleanup of cached data
     //! @param instance The effect instance being destroyed

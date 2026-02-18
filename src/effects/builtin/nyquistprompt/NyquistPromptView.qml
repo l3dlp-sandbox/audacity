@@ -8,14 +8,19 @@ import Muse.Ui
 import Muse.UiComponents
 
 import Audacity.Effects
+import Audacity.BuiltinEffects
 
-Rectangle {
+BuiltinEffectBase {
     id: root
 
-    required property int instanceId
+    property string title: qsTrc("effects/nyquist", "Nyquist prompt")
+    property bool isApplyAllowed: true
 
-    implicitWidth: prv.dialogWidth
+    width: prv.dialogWidth
     implicitHeight: Math.min(prv.dialogHeight, prv.maxDialogHeight)
+
+    builtinEffectModel: NyquistPromptViewModelFactory.createModel(root, root.instanceId)
+    property alias viewModel: root.builtinEffectModel
 
     color: ui.theme.backgroundPrimaryColor
 
@@ -34,12 +39,6 @@ Rectangle {
         readonly property int dialogWidth: 640
         readonly property int dialogHeight: 480
         readonly property int maxDialogHeight: 640
-    }
-
-    property var viewModel: NyquistPromptViewModelFactory.createModel(root, root.instanceId)
-
-    Component.onCompleted: {
-        viewModel.init()
     }
 
     ColumnLayout {
@@ -103,17 +102,4 @@ Rectangle {
             }
         }
     }
-
-    // Preview methods - delegate to viewModel
-    function startPreview() {
-        viewModel.startPreview()
-    }
-
-    function stopPreview() {
-        viewModel.stopPreview()
-    }
-
-    property bool isApplyAllowed: true
-    property bool usesPresets: false  // Nyquist Prompt doesn't use presets
-    property bool isPreviewing: viewModel.isPreviewing
 }

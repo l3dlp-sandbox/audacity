@@ -28,13 +28,6 @@ public:
 
     muse::String getParameterValueString(EffectInstance* instance, const muse::String& parameterId, double value) const override;
 
-    bool requiresCustomViewer(EffectInstance* instance) const override;
-
-    //! Check if the effect instance is the Nyquist Prompt
-    //! @param instance The effect instance to check
-    //! @return true if this is the Nyquist Prompt, false otherwise
-    bool isNyquistPrompt(EffectInstance* instance) const;
-
     //! Get the Nyquist command text from the Nyquist Prompt
     //! @param instance The effect instance (must be Nyquist Prompt)
     //! @return The command text, or empty string if not a prompt

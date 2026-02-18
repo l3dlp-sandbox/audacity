@@ -16,7 +16,6 @@ public:
         Vst,
         Builtin,
         Generated,
-        NyquistPrompt,
         Unknown
     };
     Q_ENUM(Type)

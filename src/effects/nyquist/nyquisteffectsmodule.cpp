@@ -16,13 +16,6 @@
 #include "internal/nyquistpluginsscanner.h"
 #include "internal/nyquistpluginsmetareader.h"
 
-#include "view/nyquistpromptviewmodel.h"
-
-static void nyquist_init_qrc()
-{
-    Q_INIT_RESOURCE(nyquist);
-}
-
 au::effects::NyquistEffectsModule::NyquistEffectsModule()
     : m_nyquistMetaReader(std::make_shared<NyquistPluginsMetaReader>())
 {
@@ -61,16 +54,6 @@ void au::effects::NyquistEffectsModule::resolveImports()
     if (launchRegister) {
         launchRegister->regLauncher("Nyquist", std::make_shared<NyquistViewLauncher>(muse::modularity::globalCtx()));
     }
-}
-
-void au::effects::NyquistEffectsModule::registerResources()
-{
-    nyquist_init_qrc();
-}
-
-void au::effects::NyquistEffectsModule::registerUiTypes()
-{
-    REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(NyquistPromptViewModelFactory);
 }
 
 void au::effects::NyquistEffectsModule::onInit(const muse::IApplication::RunMode& runMode)

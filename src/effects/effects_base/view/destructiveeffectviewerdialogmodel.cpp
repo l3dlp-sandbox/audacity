@@ -81,19 +81,7 @@ ViewerComponentType DestructiveEffectViewerDialogModel::viewerComponentType() co
         return ViewerComponentType::Builtin;
     }
 
-    // Nyquist effects: check if the extractor signals a custom viewer is needed
-    // (e.g., the Nyquist Prompt needs a code-editor UI that is custom made)
     if (family == EffectFamily::Nyquist) {
-        IParameterExtractorService* extractor = parameterExtractorRegistry()
-                                                ? parameterExtractorRegistry()->extractorForFamily(EffectFamily::Nyquist)
-                                                : nullptr;
-        if (extractor) {
-            EffectInstance* instance = instancesRegister()->instanceById(m_instanceId).get();
-            if (instance && extractor->requiresCustomViewer(instance)) {
-                return ViewerComponentType::NyquistPrompt;
-            }
-        }
-        // Regular Nyquist effects use generated UI (no vendor UI available)
         return ViewerComponentType::Generated;
     }
 
