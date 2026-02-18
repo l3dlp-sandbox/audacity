@@ -29,9 +29,10 @@ EffectStyledDialogView {
 
     QtObject {
         id: prv
+        property alias viewer: viewerLoader.item
+
         property int minimumWidth: viewerModel.effectFamily === EffectFamily.LV2 ? 500 : 270
         property int padding: viewerModel.effectFamily == EffectFamily.Builtin ? 16 : 4
-        property alias viewItem: viewerLoader.item
     }
 
     Component.onCompleted: {
@@ -51,8 +52,8 @@ EffectStyledDialogView {
         target: viewerModel
         function onViewerComponentTypeChanged() {
             // For Audio Units, reload the view instead of switching components
-            if (viewerModel.viewerComponentType === ViewerComponentType.AudioUnit && viewerLoader.item) {
-                viewerLoader.item.reload()
+            if (viewerModel.viewerComponentType === ViewerComponentType.AudioUnit && viewer) {
+                viewer.reload()
             } else {
                 loadViewer()
             }
