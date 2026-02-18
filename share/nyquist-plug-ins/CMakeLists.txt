@@ -56,13 +56,9 @@ else()
 endif()
 
 # Install nyquist-plug-ins for release builds
-install(DIRECTORY
-   ${CMAKE_CURRENT_SOURCE_DIR}/
+install(FILES
+   ${PLUGIN_FILES}
    DESTINATION ${PLUGINS_INSTALL_DEST}
-   FILES_MATCHING
-   PATTERN "*.ny"
-   PATTERN "CMakeLists.txt" EXCLUDE
-   PATTERN ".*" EXCLUDE
 )
 
 # Copy nyquist-plug-ins to build directory for development builds
