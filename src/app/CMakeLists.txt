@@ -132,22 +132,6 @@ add_to_link_if_exists(record)
 add_to_link_if_exists(spectrogram)
 add_to_link_if_exists(toast)
 
-if (AU_MODULE_EFFECTS_VST)
-    add_definitions(-DAU_MODULE_EFFECTS_VST)
-endif()
-
-if (AU_MODULE_EFFECTS_LV2)
-    add_definitions(-DAU_MODULE_EFFECTS_LV2)
-endif()
-
-if (AU_MODULE_EFFECTS_AUDIO_UNIT)
-    add_definitions(-DAU_MODULE_EFFECTS_AUDIO_UNIT)
-endif()
-
-if (AU_MODULE_EFFECTS_NYQUIST)
-    add_definitions(-DAU_MODULE_EFFECTS_NYQUIST)
-endif()
-
 set (AUDACITY_APPEND_SRC)
 
 if (OS_IS_WIN)

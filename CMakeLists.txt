@@ -117,16 +117,29 @@ option(AU_BUILD_UICOMPONENTS_TESTS "Build uicomponents tests" ON)
 option(AU_BUILD_TRACKEDIT_TESTS "Build trackedit tests" ON)
 
 option(AU_MODULE_EFFECTS_VST "Build audacity vst module" ON)
+if (AU_MODULE_EFFECTS_VST)
+    add_compile_definitions(AU_MODULE_EFFECTS_VST)
+endif()
+
 set(AU_MODULE_VST_VST3_SDK_PATH "" CACHE PATH "[optional] Path to VST3_SDK. SDK version >= ${VST3_SDK_VERSION} required")
 
 option(AU_MODULE_EFFECTS_NYQUIST "Build audacity nyquist module" ON)
+if(AU_MODULE_EFFECTS_NYQUIST)
+    add_compile_definitions(AU_MODULE_EFFECTS_NYQUIST)
+endif()
 
 if (OS_IS_LIN)
     option(AU_MODULE_EFFECTS_LV2 "Build audacity lv2 module" ON)
+    if (AU_MODULE_EFFECTS_LV2)
+        add_compile_definitions(AU_MODULE_EFFECTS_LV2)
+    endif()
 endif(OS_IS_LIN)
 
 if( CMAKE_SYSTEM_NAME MATCHES "Darwin" )
     option(AU_MODULE_EFFECTS_AUDIO_UNIT "Build Audacity Audio Unit module" ON)
+    if (AU_MODULE_EFFECTS_AUDIO_UNIT)
+        add_compile_definitions(AU_MODULE_EFFECTS_AUDIO_UNIT)
+    endif()
 endif()
 
 # Time-stretching and pitch-shifting libraries
