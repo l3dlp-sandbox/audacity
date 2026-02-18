@@ -71,7 +71,7 @@ NyquistBase::NyquistBase(const wxString& fName)
 
     // set clip/split handling when applying over clip boundary.
     mRestoreSplits = true; // Default: Restore split lines.
-    mMergeClips = false;     // Default: Don't merge clips
+    mMergeClips = -1;     // Default (auto):  Merge if length remains unchanged.
 
     mVersion = 4;
 
@@ -1559,8 +1559,11 @@ bool NyquistBase::ProcessOne(
         PasteTimeWarper warper { mT1, mT0 + tempTrack->GetEndTime() };
         auto pProject = FindProject();
         const auto& selectedRegion = ViewInfo::Get(*pProject).selectedRegion;
+        const bool mergeClips = (mMergeClips < 0)
+                                ? GetType() != EffectTypeGenerate
+                                : mMergeClips > 0;
         mCurChannelGroup->ClearAndPaste(
-            selectedRegion.t0(), selectedRegion.t1(), *tempTrack, mRestoreSplits, mMergeClips, &warper);
+            selectedRegion.t0(), selectedRegion.t1(), *tempTrack, mRestoreSplits, mergeClips, &warper);
     }
 
     // If we were first in the group adjust non-selected group tracks

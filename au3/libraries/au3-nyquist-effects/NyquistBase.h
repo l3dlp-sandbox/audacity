@@ -302,7 +302,7 @@ protected:
     wxString mPerTrackProps;
 
     bool mRestoreSplits;
-    bool mMergeClips;
+    int mMergeClips;
 
     friend class NyquistEffectsModule;
     friend class au::effects::NyquistParameterExtractorService;
