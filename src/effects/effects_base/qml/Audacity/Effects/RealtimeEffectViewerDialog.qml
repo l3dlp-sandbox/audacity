@@ -6,7 +6,6 @@ import QtQuick.Layouts
 
 import Muse.Ui
 import Muse.UiComponents
-import Muse.Vst
 
 import Audacity.Effects
 import Audacity.BuiltinEffects
@@ -137,7 +136,6 @@ EffectStyledDialogView {
     Component {
         id: generatedViewerComponent
         GeneratedEffectViewer {
-            id: view
             instanceId: root.instanceId
         }
     }
