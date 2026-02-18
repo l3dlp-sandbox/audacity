@@ -132,7 +132,7 @@ bool NyquistEffectsModule::Initialize()
     wxLogDebug("Audacity path list has %zu entries", audacityPathList.size());
     for (size_t i = 0, cnt = audacityPathList.size(); i < cnt; i++) {
         wxFileName name(audacityPathList[i], wxT(""));
-        name.AppendDir(wxT("nyquist"));
+        name.AppendDir(wxT("nyquist-runtime"));
         name.SetFullName(wxT("nyquist.lsp"));
         wxLogDebug("Checking path: %s", name.GetFullPath());
         if (name.FileExists()) {
