@@ -34,11 +34,12 @@ set( SOURCES
    >
 )
 set( LIBRARIES
-   vst_sdk_3
    au3-utility
    au3-effects-interface
    au3-files-interface
+   PRIVATE
    wxBase
+   vst_sdk_3
 )
 audacity_library( ${TARGET} "${SOURCES}" "${LIBRARIES}"
    "" ""

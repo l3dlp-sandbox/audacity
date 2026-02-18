@@ -22,6 +22,7 @@
 
 #include "view/toolbars/audiosetupcontextmenumodel.h"
 #include "view/toolbars/projecttoolbarmodel.h"
+#include "view/toolbars/geteffectsmodel.h"
 #include "view/toolbars/undoredotoolbarmodel.h"
 #include "view/toolbars/workspacestoolbarmodel.h"
 
@@ -128,6 +129,8 @@ void ProjectSceneModule::resolveImports()
                            "Audacity/ProjectScene/tracksitemsview/labeleditor/LabelEditorDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://projectscene/addnewlabeltrack"),
                            "Audacity/ProjectScene/tracksitemsview/labeleditor/AddNewLabelTrackDialog.qml");
+        ir->registerQmlUri(muse::Uri("audacity://projectscene/geteffects"),
+                           "Audacity/ProjectScene/toolbars/GetEffectsDialog.qml");
     }
 }
 
@@ -151,6 +154,7 @@ void ProjectSceneModule::registerUiTypes()
     qmlRegisterType<UndoRedoToolBarModel>("Audacity.ProjectScene", 1, 0, "UndoRedoToolBarModel");
     qmlRegisterType<WorkspacesToolBarModel>("Audacity.ProjectScene", 1, 0, "WorkspacesToolBarModel");
     qmlRegisterType<AudioSetupContextMenuModel>("Audacity.ProjectScene", 1, 0, "AudioSetupContextMenuModel");
+    qmlRegisterType<GetEffectsModel>("Audacity.ProjectScene", 1, 0, "GetEffectsModel");
 
     qmlRegisterType<PlaybackToolBarModel>("Audacity.ProjectScene", 1, 0, "PlaybackToolBarModel");
     qmlRegisterType<PlaybackToolBarCustomiseModel>("Audacity.ProjectScene", 1, 0, "PlaybackToolBarCustomiseModel");

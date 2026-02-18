@@ -16,7 +16,9 @@
 #include <stdexcept>
 #include <string_view>
 
-#include "au3-import-export/rapidjson/document.h"
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 #include "au3-string-utils/CodeConversions.h"
 #include "au3-preferences/Prefs.h"
 
@@ -212,7 +214,15 @@ ServiceConfig::GetPreferredAudioFormats(bool preferLossless) const
     }
 }
 
-rapidjson::Document
+static std::string DocumentToString(rapidjson::Document& doc)
+{
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    doc.Accept(writer);
+    return std::string(buffer.GetString(), buffer.GetSize());
+}
+
+std::string
 ServiceConfig::GetExportConfig(const std::string& mimeType) const
 {
     if (mimeType == "audio/x-wavpack") {
@@ -222,21 +232,22 @@ ServiceConfig::GetExportConfig(const std::string& mimeType) const
         config.AddMember("bit_rate", rapidjson::Value(40), config.GetAllocator());
         config.AddMember("bit_depth", 24, config.GetAllocator());
         config.AddMember("hybrid_mode", false, config.GetAllocator());
-        return config;
+        return DocumentToString(config);
     } else if (mimeType == "audio/x-flac") {
         rapidjson::Document config;
         config.SetObject();
         config.AddMember(
             "bit_depth", rapidjson::Value(24), config.GetAllocator());
         config.AddMember("level", rapidjson::Value(5), config.GetAllocator());
+        return DocumentToString(config);
     } else if (mimeType == "audio/x-wav") {
-        return {};
+        return "{}";
     } else if (mimeType == "audio/mpeg") {
         rapidjson::Document config;
         config.SetObject();
         config.AddMember("mode", rapidjson::Value("VBR"), config.GetAllocator());
         config.AddMember("quality", rapidjson::Value(5), config.GetAllocator());
-        return config;
+        return DocumentToString(config);
     }
 
     throw std::invalid_argument("unknown mime-type");

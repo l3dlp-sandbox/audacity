@@ -19,6 +19,7 @@ set( SOURCES
 set( LIBRARIES
    au3-utility
    au3-effects-interface
+   PRIVATE
    "-framework AudioUnit"
    "-framework AudioToolbox"
    wxBase

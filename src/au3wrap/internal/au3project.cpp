@@ -3,7 +3,9 @@
 */
 #include "au3project.h"
 
-#include "global/defer.h"
+#include "framework/global/defer.h"
+#include "framework/global/translation.h"
+#include "framework/global/log.h"
 
 #include "au3-project-history/ProjectHistory.h"
 #include "au3-project-history/UndoManager.h"
@@ -11,13 +13,12 @@
 #include "au3-file-formats/AcidizerTags.h"
 #include "au3-import-export/Import.h"
 #include "au3-import-export/ImportPlugin.h"
-#include "au3-import-export/ImportProgressListener.h"
 #include "au3-numeric-formats/ProjectTimeSignature.h"
 #include "au3-project-file-io/ProjectFileIO.h"
 #include "au3-project/Project.h"
-#include "au3-tags/Tags.h"
 #include "au3-wave-track/WaveClip.h"
 #include "au3-wave-track/WaveTrack.h"
+#include "au3-wave-track/WaveTrackUtilities.h"
 #include "au3-stretching-sequence/TempoChange.h"
 
 //! HACK
@@ -26,17 +27,13 @@
 //! so, to fix it, included this file here
 #include "au3-project-file-io/SqliteSampleBlock.cpp"
 
-#include "translation.h"
-#include "wxtypes_convert.h"
-#include "../au3types.h"
-#include "domconverter.h"
-#include "trackcolor.h"
+#include "project/projecterrors.h"
 
-#include "log.h"
+#include "wxtypes_convert.h"
+#include "trackcolor.h"
+#include "../au3types.h"
 
 #include <random>
-
-#include "project/projecterrors.h"
 
 using namespace au::au3;
 

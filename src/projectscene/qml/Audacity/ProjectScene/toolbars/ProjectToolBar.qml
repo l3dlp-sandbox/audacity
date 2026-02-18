@@ -26,6 +26,10 @@ StyledToolBarView {
         onOpenAudioSetupContextMenu: {
             audioSetupContextMenuLoader.show(Qt.point(root.width / 3, root.rowHeight + bottomMargin), audioSetupContextMenuModel.items)
         }
+
+        onOpenGetEffectsDialog: {
+            api.launcher.open("audacity://projectscene/geteffects")
+        }
     }
 
     AudioSetupContextMenuModel {

@@ -22,6 +22,7 @@ set( SOURCES
    IMeterSender.h
 )
 set( LIBRARIES
+   PRIVATE
    portaudio::portaudio
    $<$<BOOL:${USE_PORTMIXER}>:portmixer>
    au3-preferences-interface

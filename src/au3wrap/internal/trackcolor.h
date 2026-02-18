@@ -1,10 +1,10 @@
 #pragma once
 
-#include "modularity/ioc.h"
+#include "framework/global/modularity/ioc.h"
+#include "framework/draw/types/color.h"
 
 #include "projectscene/iprojectsceneconfiguration.h"
 
-#include "draw/types/color.h"
 #include "au3-track/Track.h"
 
 namespace au::au3 {

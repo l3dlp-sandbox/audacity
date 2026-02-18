@@ -19,6 +19,7 @@ set(MODULE_TEST_LINK
     trackedit
     muse::actions
     muse::draw
+    sqlite # required for SQLITE_CANTOPEN and SQLITE_READONLY macros used in audacityproject_tests.cpp
 )
 
 set(MODULE_TEST_DATA_ROOT ${CMAKE_CURRENT_LIST_DIR})

@@ -44,6 +44,7 @@ set( LIBRARIES
    au3-project-interface
    au3-registries
    PRIVATE
+   rapidjson::rapidjson
    au3-effects-interface
    wxBase
    SndFile::sndfile

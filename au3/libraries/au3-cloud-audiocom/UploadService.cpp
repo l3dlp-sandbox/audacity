@@ -33,8 +33,8 @@
 
 #include "au3-files/TempDirectory.h"
 #include "au3-files/FileNames.h"
-#include "au3-import-export/rapidjson/document.h"
-#include "au3-import-export/rapidjson/writer.h"
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
 
 namespace audacity::cloud::audiocom {
 namespace {

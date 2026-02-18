@@ -13,7 +13,14 @@
 **********************************************************************/
 #pragma once
 
-#include <public.sdk/source/vst/hosting/module.h>
+#include <memory>
+
+namespace VST3 {
+namespace Hosting {
+class Module;
+class ClassInfo;
+}
+}
 #include "au3-effects/PerTrackEffect.h"
 
 /**
@@ -27,7 +34,7 @@ protected:
     // Keep strong reference to a module; this because it has to be destroyed in the destructor of this class,
     // otherwise the destruction of mEditController and mEffectComponent would trigger a memory fault.
     std::shared_ptr<VST3::Hosting::Module> mModule;
-    const VST3::Hosting::ClassInfo mEffectClassInfo;
+    const std::unique_ptr<const VST3::Hosting::ClassInfo> mEffectClassInfo;
 
     // Mutable cache fields computed once on demand
     mutable bool mRescanFactoryPresets { true };
@@ -38,7 +45,7 @@ public:
     static EffectFamilySymbol GetFamilySymbol();
 
     VST3EffectBase(
-        std::shared_ptr<VST3::Hosting::Module> module, VST3::Hosting::ClassInfo effectClassInfo);
+        std::shared_ptr<VST3::Hosting::Module> module, const VST3::Hosting::ClassInfo& effectClassInfo);
 
     VST3EffectBase(const VST3EffectBase&) = delete;
     VST3EffectBase(VST3EffectBase&&) = delete;

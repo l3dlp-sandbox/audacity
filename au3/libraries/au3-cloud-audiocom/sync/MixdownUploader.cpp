@@ -20,7 +20,7 @@
 #include "au3-import-export/ExportPluginRegistry.h"
 #include "au3-project-rate/ProjectRate.h"
 #include "au3-basic-ui/BasicUI.h"
-#include "au3-import-export/rapidjson/document.h"
+#include <rapidjson/document.h>
 
 namespace audacity::cloud::audiocom::sync {
 namespace {

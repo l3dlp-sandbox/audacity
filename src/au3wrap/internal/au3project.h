@@ -5,10 +5,10 @@
 
 #include <memory>
 
-#include "global/types/ret.h"
-#include "global/async/notification.h"
-#include "global/io/ifilesystem.h"
-#include "global/modularity/ioc.h"
+#include "framework/global/types/ret.h"
+#include "framework/global/async/notification.h"
+#include "framework/global/io/ifilesystem.h"
+#include "framework/global/modularity/ioc.h"
 
 #include "au3wrap/iau3project.h"
 #include "au3-track/Track.h"

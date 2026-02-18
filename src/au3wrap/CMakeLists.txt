@@ -86,6 +86,9 @@ if(AU_MODULE_EFFECTS_VST)
     add_subdirectory(vst3)
 endif()
 
+# RapidJSON (header-only, used by au3-musehub, au3-cloud-audiocom, au3-import-export, au3-sentry-reporting)
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/rapidjson rapidjson)
+
 # Include AU3 libraries - this will add all library subdirectories
 # and set AU3_LIBRARIES_LIST in this scope
 add_subdirectory(${AU3_LIBRARIES} au3-libraries)
@@ -249,7 +252,12 @@ set(MODULE_SRC ${MODULE_SRC}
 set(MODULE_INCLUDE ${AU3_INCLUDE})
 set(MODULE_DEF ${AU3_DEF})
 set(MODULE_SRC ${MODULE_SRC})
-set(MODULE_LINK ${AU3_LINK} project audio)
+set(MODULE_LINK ${AU3_LINK}
+        project # required for projectconfiguration and projecterrors
+        audio # required for audiometer
+        sqlite # static Factory init HACK for au3-project-file-io/SqliteSampleBlock.cpp included in au3project.cpp
+        # TODO: fix Hack and remove sqlite dependency from au3wrap
+)
 set(MODULE_LINK_PUBLIC ${AU3_LIBRARIES_LIST})
 
 set(MODULE_USE_PCH OFF)

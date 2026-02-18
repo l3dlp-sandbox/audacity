@@ -14,6 +14,7 @@ set( SOURCES
 set( LIBRARIES
    au3-audio-io-interface
    au3-playable-track-interface
+   PRIVATE
    portmidi::portmidi
    portsmf
    wxBase

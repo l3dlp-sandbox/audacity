@@ -27,6 +27,7 @@ public:
 
 signals:
     void openAudioSetupContextMenu();
+    void openGetEffectsDialog();
     void isCompactModeChanged();
 
 private:

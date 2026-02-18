@@ -28,7 +28,7 @@
 #include "au3-network-manager/NetworkManager.h"
 #include "au3-network-manager/Request.h"
 #include "au3-string-utils/CodeConversions.h"
-#include "au3-import-export/rapidjson/document.h"
+#include <rapidjson/document.h>
 
 namespace audacity::cloud::audiocom {
 namespace {

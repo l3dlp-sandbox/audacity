@@ -63,6 +63,7 @@ PUBLIC
       au3-import-export-interface
       wavpack::wavpack # Required for the WavPackCompressor
       wxBase # Required to retrieve the OS information
+      rapidjson::rapidjson # Required for the JSON parsing
 )
 
 set ( DEFINES

@@ -90,6 +90,7 @@ set( LIBRARIES
    au3-builtin-effects
    au3-label-track
    au3-wave-track-fft
+   au3-musehub
 )
 
 # Conditional libraries based on AU4 build options

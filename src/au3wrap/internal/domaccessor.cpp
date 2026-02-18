@@ -1,8 +1,7 @@
 #include "domaccessor.h"
 
-#include "containers.h"
-
-#include "log.h"
+#include "framework/global/containers.h"
+#include "framework/global/log.h"
 
 using namespace au::au3;
 using namespace au::trackedit;

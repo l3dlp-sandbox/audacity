@@ -43,7 +43,7 @@ public:
     struct VST3_API Factory : DefaultedGlobalHook<Factory,
                                                   Callable::UniquePtrFactory<VST3EffectBase,
                                                                              std::shared_ptr<VST3::Hosting::Module>,
-                                                                             VST3::Hosting::ClassInfo
+                                                                             const VST3::Hosting::ClassInfo&
                                                                              >::Function
                                                   > {};
 

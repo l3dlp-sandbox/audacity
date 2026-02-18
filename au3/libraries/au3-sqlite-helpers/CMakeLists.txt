@@ -29,11 +29,12 @@ set( SOURCES
 )
 set( LIBRARIES
    PUBLIC
-      sqlite
       au3-exceptions-interface
       au3-strings-interface
       au3-string-utils-interface
+      PRIVATE
       wxBase
+      sqlite
 )
 audacity_library( ${TARGET} "${SOURCES}" "${LIBRARIES}"
    "" "" )

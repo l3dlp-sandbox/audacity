@@ -10,7 +10,7 @@ set( SOURCES
    AcidizerTags.h
 )
 set( LIBRARIES
-   PUBLIC
+      PRIVATE
       SndFile::sndfile
       au3-math-interface
       wxBase

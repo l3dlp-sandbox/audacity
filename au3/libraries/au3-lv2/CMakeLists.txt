@@ -32,6 +32,7 @@ set( SOURCES
 )
 set( LIBRARIES
    au3-effects-interface
+   PRIVATE
    lv2sdk
    wxBase
 )

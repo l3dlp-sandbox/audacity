@@ -79,6 +79,13 @@ const UiActionList PlaybackUiActions::m_mainActions = {
              TranslatableString("action", "Open audio setup context menu"),
              IconCode::Code::CONFIGURE
              ),
+    UiAction("get-effects",
+             au::context::UiCtxProjectOpened,
+             au::context::CTX_PROJECT_FOCUSED,
+             TranslatableString("action", "Get effects"),
+             TranslatableString("action", "Open Get effects dialog"),
+             IconCode::Code::PLUGIN
+             ),
     UiAction("audio-settings",
              au::context::UiCtxProjectOpened,
              au::context::CTX_PROJECT_FOCUSED,

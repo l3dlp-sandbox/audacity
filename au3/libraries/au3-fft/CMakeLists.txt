@@ -23,7 +23,7 @@ set( SOURCES
    SpectrumTransformer.h
 )
 set( LIBRARIES
-PUBLIC
+   PRIVATE
    pffft
    au3-math-interface
    au3-strings-interface

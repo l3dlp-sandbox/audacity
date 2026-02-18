@@ -24,6 +24,7 @@ set( SOURCES
    RingBuffer.h
 )
 set( LIBRARIES
+   PRIVATE
    portaudio::portaudio
    au3-mixer-interface
    au3-project-rate-interface

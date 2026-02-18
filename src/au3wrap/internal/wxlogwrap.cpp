@@ -4,7 +4,7 @@
 
 #define LOG_TAG "AU3"
 
-#include "log.h"
+#include "framework/global/log.h"
 
 using namespace au::au3;
 

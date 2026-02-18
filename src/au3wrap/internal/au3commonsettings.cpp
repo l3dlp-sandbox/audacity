@@ -5,8 +5,8 @@
 
 #include "../internal/wxtypes_convert.h"
 
-#include "global/settings.h"
-#include "log.h"
+#include "framework/global/settings.h"
+#include "framework/global/log.h"
 
 using namespace au::au3;
 

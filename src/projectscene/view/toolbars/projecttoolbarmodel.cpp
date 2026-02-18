@@ -20,6 +20,7 @@ void ProjectToolBarModel::load()
     muse::actions::ActionCodeList itemsCodes = {
         "toggle-mixer",
         "audio-setup",
+        "get-effects"
     };
 
     ToolBarItemList items;
@@ -37,6 +38,7 @@ void ProjectToolBarModel::load()
     });
 
     dispatcher()->reg(this, "audio-setup", [this]() { emit openAudioSetupContextMenu(); });
+    dispatcher()->reg(this, "get-effects", [this]() { emit openGetEffectsDialog(); });
 
     m_loaded = true;
 }

@@ -10,10 +10,10 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <wx/string.h>
 
-#include "rapidjson/fwd.h"
 #include "ExportOptionsEditor.h"
 
 #include "au3-strings/wxArrayStringEx.h"
@@ -151,15 +151,15 @@ public:
     virtual std::vector<std::string> GetMimeTypes(int formatIndex) const;
 
     /**
-     * @brief Attempt to parse configuration JSON object and produce
+     * @brief Attempt to parse configuration JSON string and produce
      * a suitable set of parameters. Configuration is format dependent.
      *
      * @param formatIndex Internal format index
-     * @param config Configuration JSON object
+     * @param config Configuration as a JSON string
      * @param parameters Where to put parameters
      * @return Whether the parsing was successful
      **/
-    virtual bool ParseConfig(int formatIndex, const rapidjson::Value& config, ExportProcessor::Parameters& parameters) const;
+    virtual bool ParseConfig(int formatIndex, const std::string& config, ExportProcessor::Parameters& parameters) const;
 
     virtual bool CheckFileName(wxFileName& filename, int format = 0) const;
 

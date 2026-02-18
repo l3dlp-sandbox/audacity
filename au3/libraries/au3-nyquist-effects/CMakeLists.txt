@@ -16,6 +16,7 @@ set( LIBRARIES
    au3-note-track-interface
    au3-time-track-interface
    au3-wave-track-settings
+   PRIVATE
    libnyquist
    wxBase
 )

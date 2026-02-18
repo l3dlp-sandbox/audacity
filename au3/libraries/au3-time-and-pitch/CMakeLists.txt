@@ -40,6 +40,7 @@ set( LIBRARIES
 PUBLIC
    au3-files-interface
    au3-utility-interface
+   PRIVATE
    pffft
    wxBase
 )

@@ -3,7 +3,7 @@
 */
 #pragma once
 
-#include "modularity/imodulesetup.h"
+#include "framework/global/modularity/imodulesetup.h"
 
 #include "iglobalconfiguration.h"
 

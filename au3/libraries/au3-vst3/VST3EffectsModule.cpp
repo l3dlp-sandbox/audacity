@@ -300,7 +300,7 @@ public:
         if (auto vst3effect = dynamic_cast<VST3EffectBase*>(&component)) {
             VST3Wrapper wrapper(
                 *vst3effect->mModule,
-                vst3effect->mEffectClassInfo
+                *vst3effect->mEffectClassInfo
                 );
             wrapper.InitializeComponents();
         } else {
