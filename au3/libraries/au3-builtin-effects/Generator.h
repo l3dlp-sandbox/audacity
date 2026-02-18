@@ -22,7 +22,8 @@ class TrackList;
 class BUILTIN_EFFECTS_API Generator /* not final */ : public StatefulEffect
 {
 public:
-    Generator() { }
+    Generator(bool preserveUnderlyingClipBoundaries)
+        : mPreserveUnderlyingClipBoundaries{preserveUnderlyingClipBoundaries} { }
 
 protected:
     //! GenerateTrack() must be overridden by the actual generator class
@@ -39,6 +40,8 @@ protected:
     // If mDuration was valid (>= 0), then the tracks are replaced by the
     // generated results and true is returned. Otherwise, return false.
     bool Process(EffectInstance& instance, EffectSettings& settings) override;
+
+    const bool mPreserveUnderlyingClipBoundaries;
 };
 
 #endif

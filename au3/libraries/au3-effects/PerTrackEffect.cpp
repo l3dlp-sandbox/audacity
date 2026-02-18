@@ -329,9 +329,10 @@ bool PerTrackEffect::DoProcess(TrackList& outputs,
             if (results) {
                 PasteTimeWarper warper { mT1,
                                          mT0 + (*results->begin())->GetEndTime() };
+                const auto preserve = !isGenerator;
                 wt.ClearAndPaste(mT0, mT1,
                                  static_cast<WaveTrack&>(*results->DetachFirst()),
-                                 true, true, &warper);
+                                 preserve, true, &warper);
                 results.reset();
             }
         };
