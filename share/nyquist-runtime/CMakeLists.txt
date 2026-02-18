@@ -7,13 +7,11 @@ This CMakeLists.txt handles:
 ]]
 
 
-set( TARGET nyquist )
-
-message( STATUS "========== Configuring ${TARGET} ==========" )
+set( TARGET nyquist-runtime )
 
 # Determine install and build destinations based on platform
 if(OS_IS_MAC)
-   # On macOS, Nyquist runtime files go in Contents/Resources/nyquist
+   # On macOS, Nyquist runtime files go in Contents/Resources/nyquist-runtime
    set(NYQUIST_INSTALL_DEST "${AU4_SHARE_NAME}${AU4_INSTALL_NAME}")
    set(NYQUIST_BUILD_DEST "${CMAKE_BINARY_DIR}/src/app/${AU4_SHARE_NAME}${AU4_INSTALL_NAME}")
 elseif(OS_IS_LIN)

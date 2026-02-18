@@ -238,8 +238,7 @@ target_link_libraries(audacity PRIVATE ${LINK_LIB}  ${COVERAGE_LINK_FLAGS})
 ###########################################
 
 if (AU_MODULE_EFFECTS_NYQUIST)
-    # Make audacity depend on Nyquist runtime and nyquist-plug-ins deployment targets
-    add_dependencies(audacity nyquist nyquist-plug-ins)
+    add_dependencies(audacity nyquist-runtime nyquist-plug-ins)
 endif()
 
 ###########################################
