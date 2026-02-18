@@ -126,19 +126,19 @@ TranslatableString NyquistEffectsModule::GetDescription() const
 
 bool NyquistEffectsModule::Initialize()
 {
-    wxLogDebug("NyquistEffectsModule::Initialize - Starting initialization");
+    wxLogDebug("Starting initialization");
     const auto& audacityPathList = FileNames::AudacityPathList();
 
-    wxLogDebug("NyquistEffectsModule::Initialize - Audacity path list has %zu entries", audacityPathList.size());
+    wxLogDebug("Audacity path list has %zu entries", audacityPathList.size());
     for (size_t i = 0, cnt = audacityPathList.size(); i < cnt; i++) {
         wxFileName name(audacityPathList[i], wxT(""));
         name.AppendDir(wxT("nyquist"));
         name.SetFullName(wxT("nyquist.lsp"));
-        wxLogDebug("NyquistEffectsModule::Initialize - Checking path: %s", name.GetFullPath());
+        wxLogDebug("Checking path: %s", name.GetFullPath());
         if (name.FileExists()) {
             // set_xlisp_path doesn't handle fn_Str() in Unicode build. May or may not actually work.
             nyx_set_xlisp_path(name.GetPath().ToUTF8());
-            wxLogDebug("NyquistEffectsModule::Initialize - SUCCESS: Found nyquist.lsp at %s", name.GetFullPath());
+            wxLogDebug("SUCCESS: Found nyquist.lsp at %s", name.GetFullPath());
             return true;
         }
     }
@@ -221,14 +221,14 @@ PluginPaths NyquistEffectsModule::FindModulePaths(PluginManagerInterface& pm) co
     auto pathList = NyquistBase::GetNyquistSearchPath();
     FilePaths files;
 
-    wxLogDebug("NyquistEffectsModule::FindModulePaths - Search paths (%zu):", pathList.size());
+    wxLogDebug("Search paths (%zu):", pathList.size());
     for (size_t i = 0; i < pathList.size(); ++i) {
         wxLogDebug("  [%zu] %s", i, pathList[i]);
     }
 
     // Log the user plugin directory specifically
     wxString userPluginDir = FileNames::PlugInDir();
-    wxLogDebug("NyquistEffectsModule::FindModulePaths - User plugin directory: %s", userPluginDir);
+    wxLogDebug("User plugin directory: %s", userPluginDir);
 
     // Add the Nyquist prompt
     files.push_back(NYQUIST_PROMPT_ID);
@@ -239,12 +239,12 @@ PluginPaths NyquistEffectsModule::FindModulePaths(PluginManagerInterface& pm) co
     pm.FindFilesInPathList(wxT("*.NY"), pathList, files); // Ed's fix for bug 179
 
     // Remove duplicates - case-insensitive comparison.
-    std::sort(files.begin(), files.end(), 
-        [](const wxString& a, const wxString& b) { return a.CmpNoCase(b) < 0; });
+    std::sort(files.begin(), files.end(),
+              [](const wxString& a, const wxString& b) { return a.CmpNoCase(b) < 0; });
     files.erase(std::unique(files.begin(), files.end(),
-        [](const wxString& a, const wxString& b) { return a.CmpNoCase(b) == 0; }), files.end());
+                            [](const wxString& a, const wxString& b) { return a.CmpNoCase(b) == 0; }), files.end());
 
-    wxLogDebug("NyquistEffectsModule::FindModulePaths - Found %zu total files", files.size());
+    wxLogDebug("Found %zu total files", files.size());
     for (size_t i = 0; i < files.size(); ++i) {
         wxLogDebug("  [%zu] %s", i, files[i]);
     }
@@ -256,11 +256,11 @@ unsigned NyquistEffectsModule::DiscoverPluginsAtPath(
     const PluginPath& path, TranslatableString& errMsg,
     const RegistrationCallback& callback)
 {
-    wxLogDebug("NyquistEffectsModule::DiscoverPluginsAtPath - path: %s", path);
+    wxLogDebug("path: %s", path);
     errMsg = {};
     NyquistBase effect(path);
     if (effect.IsOk()) {
-        wxLogDebug("NyquistEffectsModule::DiscoverPluginsAtPath - effect is OK");
+        wxLogDebug("effect is OK");
         if (callback) {
             callback(this, &effect);
         }
@@ -268,7 +268,7 @@ unsigned NyquistEffectsModule::DiscoverPluginsAtPath(
     }
 
     errMsg = effect.InitializationError();
-    wxLogDebug("NyquistEffectsModule::DiscoverPluginsAtPath - effect NOT OK, error: %s", errMsg.Debug());
+    wxLogDebug("effect NOT OK, error: %s", errMsg.Debug());
     return 0;
 }
 
