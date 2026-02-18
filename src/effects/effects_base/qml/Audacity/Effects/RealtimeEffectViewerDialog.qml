@@ -22,8 +22,8 @@ EffectStyledDialogView {
     title: viewerModel.title + " - " + viewerModel.trackName
     navigationSection.name: title
 
-    contentWidth: Math.max(viewLoader.width, prv.minimumWidth)
-    contentHeight: 2 * prv.padding + viewLoader.height + presetsBar.height
+    contentWidth: Math.max(viewerLoader.width, prv.minimumWidth)
+    contentHeight: 2 * prv.padding + viewerLoader.height + presetsBar.height
 
     alwaysOnTop: true
 
@@ -31,7 +31,7 @@ EffectStyledDialogView {
         id: prv
         property int minimumWidth: viewerModel.effectFamily === EffectFamily.LV2 ? 500 : 270
         property int padding: viewerModel.effectFamily == EffectFamily.Builtin ? 16 : 4
-        property alias viewItem: viewLoader.item
+        property alias viewItem: viewerLoader.item
     }
 
     Component.onCompleted: {
@@ -51,8 +51,8 @@ EffectStyledDialogView {
         target: viewerModel
         function onViewerComponentTypeChanged() {
             // For Audio Units, reload the view instead of switching components
-            if (viewerModel.viewerComponentType === ViewerComponentType.AudioUnit && viewLoader.item) {
-                viewLoader.item.reload()
+            if (viewerModel.viewerComponentType === ViewerComponentType.AudioUnit && viewerLoader.item) {
+                viewerLoader.item.reload()
             } else {
                 loadViewer()
             }
@@ -62,22 +62,22 @@ EffectStyledDialogView {
     function loadViewer() {
         switch (viewerModel.viewerComponentType) {
         case ViewerComponentType.AudioUnit:
-            viewLoader.sourceComponent = audioUnitViewerComponent
+            viewerLoader.sourceComponent = audioUnitViewerComponent
             break
         case ViewerComponentType.Lv2:
-            viewLoader.sourceComponent = lv2ViewerComponent
+            viewerLoader.sourceComponent = lv2ViewerComponent
             break
         case ViewerComponentType.Vst:
-            viewLoader.sourceComponent = vstViewerComponent
+            viewerLoader.sourceComponent = vstViewerComponent
             break
         case ViewerComponentType.Builtin:
-            viewLoader.sourceComponent = builtinViewerComponent
+            viewerLoader.sourceComponent = builtinViewerComponent
             break
         case ViewerComponentType.Generated:
-            viewLoader.sourceComponent = generatedViewerComponent
+            viewerLoader.sourceComponent = generatedViewerComponent
             break
         default:
-            viewLoader.sourceComponent = null
+            viewerLoader.sourceComponent = null
         }
     }
 
@@ -188,7 +188,7 @@ EffectStyledDialogView {
             }
         }
         Loader {
-            id: viewLoader
+            id: viewerLoader
         }
     }
 }
