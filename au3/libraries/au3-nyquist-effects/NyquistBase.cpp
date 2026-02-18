@@ -2500,9 +2500,9 @@ FilePaths NyquistBase::GetNyquistSearchPath()
 
     for (size_t i = 0; i < audacityPathList.size(); i++) {
         wxString prefix = audacityPathList[i] + wxFILE_SEP_PATH;
-        FileNames::AddUniquePathToPathList(prefix + wxT("nyquist"), pathList);
+        FileNames::AddUniquePathToPathList(prefix + wxT("nyquist-runtime"), pathList);
         FileNames::AddUniquePathToPathList(prefix + wxT("plugins"), pathList);
-        FileNames::AddUniquePathToPathList(prefix + wxT("plug-ins"), pathList);
+        FileNames::AddUniquePathToPathList(prefix + wxT("nyquist-plug-ins"), pathList);
     }
     pathList.push_back(FileNames::PlugInDir());
 
