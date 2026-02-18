@@ -1,6 +1,6 @@
 /*
-* Audacity: A Digital Audio Editor
-*/
+ * Audacity: A Digital Audio Editor
+ */
 import QtQuick
 import QtQuick.Layouts
 
@@ -10,8 +10,8 @@ import Muse.UiComponents
 import Audacity.Effects
 import Audacity.BuiltinEffects
 import Audacity.Lv2
-import Audacity.Vst
 import Audacity.AudioUnit
+import Audacity.Vst
 
 EffectStyledDialogView {
     id: root
@@ -70,6 +70,14 @@ EffectStyledDialogView {
         loadViewer()
     }
 
+    // Listen to UI mode changes from the presets bar menu
+    Connections {
+        target: presetsBar.manageMenuModel
+        function onUseVendorUIChanged() {
+            viewerModel.refreshUIMode()
+        }
+    }
+
     Connections {
         target: viewerModel
         function onViewerComponentTypeChanged() {
@@ -82,30 +90,22 @@ EffectStyledDialogView {
         }
     }
 
-    // Listen to UI mode changes from the presets bar menu
-    Connections {
-        target: presetsBar.manageMenuModel
-        function onUseVendorUIChanged() {
-            viewerModel.refreshUIMode()
-        }
-    }
-
     function loadViewer() {
         switch (viewerModel.viewerComponentType) {
         case ViewerComponentType.AudioUnit:
-            viewerLoader.sourceComponent = audioUnitViewerComp
+            viewerLoader.sourceComponent = audioUnitViewerComponent
             break
         case ViewerComponentType.Lv2:
-            viewerLoader.sourceComponent = lv2ViewerComp
+            viewerLoader.sourceComponent = lv2ViewerComponent
             break
         case ViewerComponentType.Vst:
-            viewerLoader.sourceComponent = vstViewerComp
+            viewerLoader.sourceComponent = vstViewerComponent
             break
         case ViewerComponentType.Builtin:
-            viewerLoader.sourceComponent = builtinViewerComp
+            viewerLoader.sourceComponent = builtinViewerComponent
             break
         case ViewerComponentType.Generated:
-            viewerLoader.sourceComponent = generatedViewerComp
+            viewerLoader.sourceComponent = generatedViewerComponent
             break
         default:
             viewerLoader.sourceComponent = null
@@ -292,24 +292,7 @@ EffectStyledDialogView {
     }
 
     Component {
-        id: builtinViewerComp
-        BuiltinEffectViewer {
-            instanceId: root.instanceId
-            dialogView: root
-            usedDestructively: true
-        }
-    }
-
-    Component {
-        id: lv2ViewerComp
-        Lv2Viewer {
-            instanceId: root.instanceId
-            title: root.title
-        }
-    }
-
-    Component {
-        id: audioUnitViewerComp
+        id: audioUnitViewerComponent
         AudioUnitViewer {
             height: implicitHeight
 
@@ -322,7 +305,15 @@ EffectStyledDialogView {
     }
 
     Component {
-        id: vstViewerComp
+        id: lv2ViewerComponent
+        Lv2Viewer {
+            instanceId: root.instanceId
+            title: root.title
+        }
+    }
+
+    Component {
+        id: vstViewerComponent
         VstViewer {
             height: implicitHeight
 
@@ -335,7 +326,16 @@ EffectStyledDialogView {
     }
 
     Component {
-        id: generatedViewerComp
+        id: builtinViewerComponent
+        BuiltinEffectViewer {
+            instanceId: root.instanceId
+            dialogView: root
+            usedDestructively: true
+        }
+    }
+
+    Component {
+        id: generatedViewerComponent
         GeneratedEffectViewer {
             instanceId: root.instanceId
         }
