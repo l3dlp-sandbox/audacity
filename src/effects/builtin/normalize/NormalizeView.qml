@@ -79,11 +79,5 @@ BuiltinEffectBase {
             enabled: normalize.normalizePeakAmplitude
             checked: normalize.normalizeStereoChannelsIndependently
         }
-
-        Item {
-            id: spacer
-            height: 16 - column.spacing
-            width: 1
-        }
     }
 }

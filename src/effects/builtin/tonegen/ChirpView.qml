@@ -263,9 +263,5 @@ BuiltinEffectBase {
                 }
             }
         }
-
-        Item {
-            Layout.fillHeight: true
-        }
     }
 }

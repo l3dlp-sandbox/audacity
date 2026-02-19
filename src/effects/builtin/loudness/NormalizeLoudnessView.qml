@@ -19,7 +19,6 @@ BuiltinEffectBase {
         id: column
 
         spacing: 16
-        bottomPadding: 16
 
         Row {
             spacing: 6

@@ -239,11 +239,5 @@ BuiltinEffectBase {
                 }
             }
         }
-
-        Item {
-            id: spacer
-            width: 1
-            height: 16
-        }
     }
 }
