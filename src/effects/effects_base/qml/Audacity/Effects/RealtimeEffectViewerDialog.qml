@@ -123,10 +123,10 @@ EffectStyledDialogView {
             rightPadding: prv.padding
             bottomPadding: prv.padding
 
-            property alias instanceId: viewer.instanceId
+            property alias instanceId: builtinViewer.instanceId
 
             BuiltinEffectViewer {
-                id: viewer
+                id: builtinViewer
                 instanceId: root.instanceId
                 usedDestructively: false
             }
