@@ -32,9 +32,9 @@ EffectStyledDialogView {
         property alias viewer: viewerLoader.item
 
         property int minimumWidth: viewerModel.effectFamily === EffectFamily.LV2 ? 500 : 250
-        property int panelMargins: viewerModel.effectFamily == EffectFamily.Builtin ? 16 : 4
-        property int viewMargins: viewerModel.effectFamily == EffectFamily.Builtin ? 16 : 0
-        property int separatorHeight: viewerModel.effectFamily == EffectFamily.Builtin ? separator.height + prv.panelMargins : 0
+        property int panelMargins: (viewerModel.effectFamily == EffectFamily.Builtin || viewerModel.viewerComponentType == ViewerComponentType.Generated) ? 16 : 4
+        property int viewMargins: (viewerModel.effectFamily == EffectFamily.Builtin || viewerModel.viewerComponentType == ViewerComponentType.Generated) ? 16 : 0
+        property int separatorHeight: (viewerModel.effectFamily == EffectFamily.Builtin || viewerModel.viewerComponentType == ViewerComponentType.Generated) ? separator.height + prv.panelMargins : 0
         property bool isApplyAllowed: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.isApplyAllowed)
         property bool showPresets: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.usesPresets)
 
@@ -212,7 +212,7 @@ EffectStyledDialogView {
                     anchors.left: parent.left
                     anchors.right: parent.right
 
-                    visible: viewerModel.effectFamily == EffectFamily.Builtin
+                    visible: (viewerModel.effectFamily == EffectFamily.Builtin || viewerModel.viewerComponentType == ViewerComponentType.Generated)
                 }
             }
         }
