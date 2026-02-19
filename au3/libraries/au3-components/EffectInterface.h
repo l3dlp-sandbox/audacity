@@ -69,6 +69,21 @@ typedef enum EffectType : int
     EffectTypeTool,
 } EffectType;
 
+enum class EffectGroup {
+    Unspecified = -1,
+    None,
+    VolumeAndCompression,
+    Fading,
+    PitchAndTempo,
+    EqAndFilters,
+    NoiseRemovalAndRepair,
+    DelayAndReverb,
+    DistortionAndModulation,
+    Special,
+    SpectralTools,
+    Legacy,
+};
+
 using EffectFamilySymbol = ComponentInterfaceSymbol;
 
 //! Non-polymorphic package of settings values common to many effects
@@ -264,6 +279,8 @@ public:
 
     //! Determines which menu it appears in; default same as GetType().
     virtual EffectType GetClassification() const;
+
+    virtual EffectGroup GetGroup() const { return EffectGroup::Unspecified; }
 
     //! Report identifier and user-visible name of the effect protocol
     virtual EffectFamilySymbol GetFamily() const = 0;

@@ -1,7 +1,7 @@
 $nyquist plug-in
 $version 4
-$type process
-$name (_ "Crossfade Tracks")
+$type process fading
+$name (_ "Crossfade tracks")
 $debugbutton disabled
 $preview selection
 $author (_ "Steve Daulton")

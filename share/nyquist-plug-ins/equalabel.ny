@@ -1,9 +1,9 @@
 $nyquist plug-in
 $version 4
-$type tool analyze
+$type tool nogroup
 $debugbutton false
 $debugflags trace
-$name (_ "Regular Interval Labels")
+$name (_ "Regular interval labels")
 $author (_ "Steve Daulton")
 $release 2.3.1-2
 $copyright (_ "GNU General Public License v2.0 or later")

@@ -22,6 +22,7 @@ public:
 
     ComponentInterfaceSymbol GetSymbol() const override;
     EffectFamilySymbol GetFamily() const override;
+    EffectGroup GetGroup() const override { return EffectGroup::None; }
 
     wxString& commandText() { return mInputCmd; }
 

@@ -1,6 +1,6 @@
 $nyquist plug-in
 $version 4
-$type process
+$type process delayandreverb
 $preview linear
 $name (_ "Delay")
 $debugbutton false

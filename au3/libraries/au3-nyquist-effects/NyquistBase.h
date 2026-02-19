@@ -131,6 +131,7 @@ public:
     // EffectDefinitionInterface implementation
 
     EffectType GetType() const override;
+    EffectGroup GetGroup() const override;
     EffectType GetClassification() const override;
     EffectFamilySymbol GetFamily() const override;
     bool IsInteractive() const override;
@@ -244,7 +245,6 @@ protected:
     bool mTrace; // True when *tracenable* or *sal-traceback* are enabled
     bool mIsSal;
     bool mExternal;
-    bool mIsSpectral;
     bool mIsTool;
     /** True if the code to execute is obtained interactively from the user via
      * the "Nyquist Effect Prompt", or "Nyquist Prompt", false for all other
@@ -273,6 +273,7 @@ protected:
     FilePath mHelpPage;
     EffectType mType;
     EffectType mPromptType; // If a prompt, need to remember original type.
+    EffectGroup mGroup = EffectGroup::Unspecified;
 
     bool mEnablePreview;
     bool mDebugButton; // Set to false to disable Debug button.

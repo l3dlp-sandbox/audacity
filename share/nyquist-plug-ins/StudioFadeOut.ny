@@ -1,7 +1,7 @@
 $nyquist plug-in
 $version 4
-$type process
-$name (_ "Studio Fade Out")
+$type process fading
+$name (_ "Studio fade out")
 $author (_ "Steve Daulton")
 $release 3.7.4
 $copyright (_ "GNU General Public License v2.0 or later")

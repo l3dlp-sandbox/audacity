@@ -61,6 +61,7 @@ public:
     // EffectDefinitionInterface implementation
 
     ::EffectType GetType() const override;
+    EffectGroup GetGroup() const override { return EffectGroup::DelayAndReverb; }
     RegistryPaths GetFactoryPresets() const override;
     OptionalMessage LoadFactoryPreset(int id, EffectSettings& settings) const override;
 

@@ -1,6 +1,6 @@
 $nyquist plug-in
 $version 4
-$type generate
+$type generate nogroup
 $name (_ "Pluck")
 $debugbutton false
 $preview linear

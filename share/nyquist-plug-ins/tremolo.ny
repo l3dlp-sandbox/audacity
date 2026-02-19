@@ -1,6 +1,6 @@
 $nyquist plug-in
 $version 4
-$type process
+$type process distortionandmodulation
 $preview linear
 $name (_ "Tremolo")
 $debugbutton disabled

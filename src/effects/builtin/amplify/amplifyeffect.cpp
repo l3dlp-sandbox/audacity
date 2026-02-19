@@ -134,6 +134,11 @@ bool AmplifyEffect::isApplyAllowed() const
     return EffectTypeProcess;
 }
 
+::EffectGroup AmplifyEffect::GetGroup() const
+{
+    return EffectGroup::VolumeAndCompression;
+}
+
 unsigned AmplifyEffect::GetAudioInCount() const
 {
     return 1;

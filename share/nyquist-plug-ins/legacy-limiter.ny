@@ -1,7 +1,7 @@
 $nyquist plug-in
 $version 4
-$type process
-$name (_ "Legacy Limiter")
+$type process legacy
+$name (_ "Legacy limiter")
 $debugbutton false
 $preview enabled
 $author (_ "Steve Daulton")

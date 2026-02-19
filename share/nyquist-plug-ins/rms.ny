@@ -1,6 +1,6 @@
 ;nyquist plug-in
 ;version 4
-;type analyze
+;type analyze nogroup
 ;name "Measure RMS"
 ;debugbutton false
 ;author "Steve Daulton"

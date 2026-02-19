@@ -1,7 +1,7 @@
 $nyquist plug-in
 $version 4
-$type analyze
-$name (_ "Beat Finder")
+$type analyze nogroup
+$name (_ "Beat finder")
 $debugbutton false
 $author (_ "Audacity")
 $release 2.3.2-2

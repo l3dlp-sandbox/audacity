@@ -45,7 +45,7 @@ const EffectParameterMethods& ClickRemovalEffect::Parameters() const
     return parameters;
 }
 
-const ComponentInterfaceSymbol ClickRemovalEffect::Symbol { XO("Click Removal") };
+const ComponentInterfaceSymbol ClickRemovalEffect::Symbol { XO("Click removal") };
 
 ClickRemovalEffect::ClickRemovalEffect()
 {
@@ -69,7 +69,7 @@ ComponentInterfaceSymbol ClickRemovalEffect::GetSymbol() const
 
 TranslatableString ClickRemovalEffect::GetDescription() const
 {
-    return XO("Click Removal is designed to remove clicks on audio tracks");
+    return XO("Click removal is designed to remove clicks on audio tracks");
 }
 
 ManualPageID ClickRemovalEffect::ManualPage() const

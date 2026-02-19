@@ -1,9 +1,9 @@
 $nyquist plug-in
 $version 4
-$type process
+$type process fading
 $preview linear
 $preview selection
-$name (_ "Adjustable Fade")
+$name (_ "Adjustable fade")
 $debugbutton false
 $author (_ "Steve Daulton")
 $release 3.0.4-2

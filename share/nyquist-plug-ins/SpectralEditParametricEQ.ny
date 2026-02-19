@@ -1,8 +1,8 @@
 $nyquist plug-in
 $version 4
-$type process spectral
+$type process spectraltools
 $preview linear
-$name (_ "Spectral Edit Parametric EQ")
+$name (_ "Spectral edit parametric EQ")
 $debugbutton false
 $author (_ "Paul Licameli")
 $release 2.3.0-2

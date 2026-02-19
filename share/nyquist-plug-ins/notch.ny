@@ -1,8 +1,8 @@
 $nyquist plug-in
 $version 4
-$type process
+$type process eqandfilters
 $preview linear
-$name (_ "Notch Filter")
+$name (_ "Notch filter")
 $debugbutton false
 $author (_ "Steve Daulton and Bill Wharrie")
 $release 2.3.0-2

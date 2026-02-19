@@ -1,8 +1,8 @@
 $nyquist plug-in
 $version 4
-$type process
+$type process eqandfilters
 $preview linear
-$name (_ "High-Pass Filter")
+$name (_ "High-pass filter")
 $debugbutton disabled
 $author (_ "Dominic Mazzoni")
 $release 2.3.0-2

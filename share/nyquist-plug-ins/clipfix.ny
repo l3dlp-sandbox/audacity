@@ -1,8 +1,8 @@
 $nyquist plug-in
 $version 4
-$type process
+$type process noiseremovalandrepair
 $preview enabled
-$name (_ "Clip Fix")
+$name (_ "Clip fix")
 $debugbutton false
 $author (_ "Benjamin Schwartz and Steve Daulton")
 $release 2.3.0-2

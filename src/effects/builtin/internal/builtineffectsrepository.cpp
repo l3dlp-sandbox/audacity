@@ -16,6 +16,7 @@
 #include "general/generalviewmodel.h"
 
 #include "effects/effects_base/effectstypes.h"
+#include "effects/effects_base/internal/au3/au3effectsutils.h"
 #include "effects/effects_base/internal/effectsutils.h"
 #include "effects/effects_base/view/effectsviewutils.h"
 
@@ -117,12 +118,11 @@ void BuiltinEffectsRepository::updateEffectMetaList()
 
     auto regMeta
         = [this](const ::PluginDescriptor& desc, const muse::String& title, const muse::String& description,
-                 BuiltinEffectCategoryId category,
                  bool supportsMultipleClipSelection) {
         EffectMeta meta;
         meta.id = au3::wxToString(desc.GetID());
         meta.family = EffectFamily::Builtin;
-        meta.category = utils::builtinEffectCategoryIdString(category);
+        meta.category = utils::builtinEffectCategoryIdString(toAu4EffectCategory(desc.GetEffectGroup()));
         meta.title = title;
         meta.description = description;
         meta.isRealtimeCapable = desc.IsEffectRealtime();
@@ -163,7 +163,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Amplify"),
                     muse::mtrc("effects", "Increases or decreases the volume of the audio you have selected"),
-                    BuiltinEffectCategoryId::VolumeAndCompression,
                     false
                     );
         } else if (symbol == NormalizeLoudnessEffect::Symbol) {
@@ -172,7 +171,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Loudness normalization"),
                     muse::mtrc("effects", "Sets the loudness of one or more tracks"),
-                    BuiltinEffectCategoryId::VolumeAndCompression,
                     true
                     );
         } else if (symbol == GraphicEq::Symbol) {
@@ -182,16 +180,14 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Graphic EQ"),
                     muse::mtrc("effects", "Adjusts the balance between frequency components"),
-                    BuiltinEffectCategoryId::EqAndFilters,
                     true
                     );
         } else if (symbol == ClickRemovalEffect::Symbol) {
             REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(ClickRemovalViewModelFactory);
             regView(ClickRemovalEffect::Symbol, u"qrc:/clickremoval/ClickRemovalView.qml");
             regMeta(desc,
-                    muse::mtrc("effects", "Click Removal"),
-                    muse::mtrc("effects", "Click Removal is designed to remove clicks on audio tracks"),
-                    BuiltinEffectCategoryId::NoiseRemovalAndRepair,
+                    muse::mtrc("effects", "Click removal"),
+                    muse::mtrc("effects", "Click removal is designed to remove clicks on audio tracks"),
                     true
                     );
         } else if (symbol == CompressorEffect::Symbol) {
@@ -202,7 +198,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Compressor"),
                     muse::mtrc("effects", "Reduces \"dynamic range\", or differences between loud and quiet parts"),
-                    BuiltinEffectCategoryId::VolumeAndCompression,
                     true
                     );
         } else if (symbol == LimiterEffect::Symbol) {
@@ -213,7 +208,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Limiter"),
                     muse::mtrc("effects", "Augments loudness while minimizing distortion"),
-                    BuiltinEffectCategoryId::VolumeAndCompression,
                     true
                     );
         } else if (symbol == NormalizeEffect::Symbol) {
@@ -222,51 +216,44 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Normalize"),
                     muse::mtrc("effects", "Sets the peak amplitude of a one or more tracks"),
-                    BuiltinEffectCategoryId::VolumeAndCompression,
                     false
                     );
         } else if (symbol == FadeInEffect::Symbol) {
             regMeta(desc,
                     muse::mtrc("effects", "Fade in"),
                     muse::mtrc("effects", "Applies a linear fade-in to the selected audio"),
-                    BuiltinEffectCategoryId::Fading,
                     true
                     );
         } else if (symbol == FadeOutEffect::Symbol) {
             regMeta(desc,
                     muse::mtrc("effects", "Fade out"),
                     muse::mtrc("effects", "Applies a linear fade-out to the selected audio"),
-                    BuiltinEffectCategoryId::Fading,
                     true
                     );
         } else if (symbol == InvertEffect::Symbol) {
             regMeta(desc,
                     muse::mtrc("effects", "Invert"),
                     muse::mtrc("effects", "Flips the audio samples upside-down, reversing their polarity"),
-                    BuiltinEffectCategoryId::Special,
                     true
                     );
         } else if (symbol == Repair::Symbol) {
             regMeta(desc,
                     muse::mtrc("effects", "Repair"),
                     muse::mtrc("effects", "Sets the peak amplitude of a one or more tracks"),
-                    BuiltinEffectCategoryId::NoiseRemovalAndRepair,
                     false
                     );
         } else if (symbol == ReverseEffect::Symbol) {
             regMeta(desc,
                     muse::mtrc("effects", "Reverse"),
                     muse::mtrc("effects", "Reverses the selected audio"),
-                    BuiltinEffectCategoryId::Special,
                     true
                     );
         } else if (symbol == TruncateSilenceEffect::Symbol) {
             REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(TruncateSilenceViewModelFactory);
             regView(TruncateSilenceEffect::Symbol, u"qrc:/truncatesilence/TruncateSilenceView.qml");
             regMeta(desc,
-                    muse::mtrc("effects", "Truncate Silence"),
+                    muse::mtrc("effects", "Truncate silence"),
                     muse::mtrc("effects", "Automatically reduces the length of passages where the volume is below a specified level"),
-                    BuiltinEffectCategoryId::Special,
                     true
                     );
         }
@@ -277,7 +264,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Change pitch"),
                     muse::mtrc("effects", "Changes the pitch of a track without changing its tempo"),
-                    BuiltinEffectCategoryId::PitchAndTempo,
                     true
                     );
         }
@@ -287,7 +273,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Chirp"),
                     muse::mtrc("effects", "Generates an ascending or descending tone of one of four types"),
-                    BuiltinEffectCategoryId::None,
                     false
                     );
         } else if (symbol == ToneEffect::Symbol) {
@@ -296,7 +281,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Tone"),
                     muse::mtrc("effects", "Generates a constant frequency tone of one of four types"),
-                    BuiltinEffectCategoryId::None,
                     false
                     );
         } else if (symbol == ReverbEffect::Symbol) {
@@ -305,7 +289,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Reverb"),
                     muse::mtrc("effects", "Reverb effect"),
-                    BuiltinEffectCategoryId::DelayAndReverb,
                     true
                     );
         } else if (symbol == NyquistPromptEffect::Symbol) {
@@ -314,7 +297,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects", "Nyquist prompt"),
                     muse::mtrc("effects", "Nyquist prompt effect"),
-                    BuiltinEffectCategoryId::None,
                     true
                     );
         } else if (symbol == NoiseGenerator::Symbol) {
@@ -323,16 +305,14 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects/noise", "Noise"),
                     muse::mtrc("effects/noise", "Generates noise"),
-                    BuiltinEffectCategoryId::None,
                     false
                     );
         } else if (symbol == NoiseReductionEffect::Symbol) {
             REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(NoiseReductionViewModelFactory);
             regView(NoiseReductionEffect::Symbol, u"qrc:/noisereduction/NoiseReductionView.qml");
             regMeta(desc,
-                    muse::mtrc("effects/noisereduction", "Noise Reduction"),
+                    muse::mtrc("effects/noisereduction", "Noise reduction"),
                     muse::mtrc("effects/noisereduction", "Reduces noise in the audio"),
-                    BuiltinEffectCategoryId::NoiseRemovalAndRepair,
                     false
                     );
         } else if (symbol == DtmfGenerator::Symbol) {
@@ -341,7 +321,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects/dtmf", "DTMF tones"),
                     muse::mtrc("effects/dtmf", "Generates DTMF signal"),
-                    BuiltinEffectCategoryId::None,
                     false
                     );
         } else if (symbol == SilenceGenerator::Symbol) {
@@ -350,7 +329,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             regMeta(desc,
                     muse::mtrc("effects/silence", "Silence"),
                     muse::mtrc("effects/silence", "Generates silence"),
-                    BuiltinEffectCategoryId::None,
                     false
                     );
         } else {

@@ -1,9 +1,9 @@
 $nyquist plug-in
 $version 4
-$type generate
+$type generate nogroup
 $preview linear
 $i18n-hint named for Jean-Claude Risset (silent t)
-$name (_ "Risset Drum")
+$name (_ "Risset drum")
 $debugbutton false
 $author (_ "Steven Jones")
 $release 2.3.0-2

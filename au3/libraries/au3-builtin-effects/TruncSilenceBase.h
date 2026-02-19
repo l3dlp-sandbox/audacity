@@ -44,6 +44,7 @@ public:
     // EffectDefinitionInterface implementation
 
     EffectType GetType() const override;
+    EffectGroup GetGroup() const override { return EffectGroup::Special; }
     bool LoadSettings(
         const CommandParameters& parms, EffectSettings& settings) const override;
 

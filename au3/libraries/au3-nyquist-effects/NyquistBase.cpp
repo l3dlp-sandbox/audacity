@@ -185,6 +185,11 @@ EffectType NyquistBase::GetType() const
     return mType;
 }
 
+EffectGroup NyquistBase::GetGroup() const
+{
+    return mGroup;
+}
+
 EffectType NyquistBase::GetClassification() const
 {
     if (mIsTool) {
@@ -464,7 +469,7 @@ bool NyquistBase::Init()
         mName = mPromptName;
         // Reset effect type each time we call the Nyquist Prompt.
         mType = mPromptType;
-        mIsSpectral = false;
+        mGroup = EffectGroup::Unspecified;
         mDebugButton = true; // Debug button always enabled for Nyquist Prompt.
         mEnablePreview
             =true; // Preview button always enabled for Nyquist Prompt.
@@ -476,7 +481,7 @@ bool NyquistBase::Init()
     // least one frequency bound and Spectral Selection is enabled for the
     // selected track(s) - (but don't apply to Nyquist Prompt).
 
-    if (!mIsPrompt && mIsSpectral) {
+    if (!mIsPrompt && mGroup == EffectGroup::SpectralTools) {
         // Completely skip the spectral editing limitations if there is no
         // project because that is editing of macro parameters
         if (const auto project = FindProject()) {
@@ -1947,8 +1952,33 @@ bool NyquistBase::Parse(
             mType = EffectTypeAnalyze;
         }
 
-        if (len >= 3 && tokens[2] == wxT("spectral")) {
-            mIsSpectral = true;
+        if (len >= 3) {
+            const auto& tok = tokens[2];
+            if (tok == wxT("nogroup")) {
+                mGroup = EffectGroup::None;
+            } else if (tok == wxT("volumeandcompression")) {
+                mGroup = EffectGroup::VolumeAndCompression;
+            } else if (tok == wxT("fading")) {
+                mGroup = EffectGroup::Fading;
+            } else if (tok == wxT("pitchandtempo")) {
+                mGroup = EffectGroup::PitchAndTempo;
+            } else if (tok == wxT("eqandfilters")) {
+                mGroup = EffectGroup::EqAndFilters;
+            } else if (tok == wxT("noiseremovalandrepair")) {
+                mGroup = EffectGroup::NoiseRemovalAndRepair;
+            } else if (tok == wxT("delayandreverb")) {
+                mGroup = EffectGroup::DelayAndReverb;
+            } else if (tok == wxT("distortionandmodulation")) {
+                mGroup = EffectGroup::DistortionAndModulation;
+            } else if (tok == wxT("special")) {
+                mGroup = EffectGroup::Special;
+            } else if (tok == wxT("spectral") || tok == wxT("spectraltools")) {
+                mGroup = EffectGroup::SpectralTools;
+            } else if (tok == wxT("legacy")) {
+                mGroup = EffectGroup::Legacy;
+            } else {
+                mGroup = EffectGroup::Unspecified;
+            }
         }
         return true;
     }
@@ -2265,9 +2295,8 @@ bool NyquistBase::ParseProgram(wxInputStream& stream)
     mIsSal = false;
     mControls.clear();
     mCategories.clear();
-    mIsSpectral = false;
-    mManPage = wxEmptyString; // If not wxEmptyString, must be a page in the
-                              // Audacity manual.
+    mGroup = EffectGroup::Unspecified;
+    mManPage = wxEmptyString; // If not wxEmptyString, must be a page in the Audacity manual.
     mHelpFile
         =wxEmptyString; // If not wxEmptyString, must be a valid HTML help file.
     mHelpFileExists = false;

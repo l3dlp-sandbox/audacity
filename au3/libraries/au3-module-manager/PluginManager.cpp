@@ -192,6 +192,7 @@ const PluginID& PluginManager::RegisterPlugin(
 
     plug.SetEffectType(effect->GetClassification());
     plug.SetEffectFamily(effect->GetFamily().Internal());
+    plug.SetEffectGroup(effect->GetGroup());
     plug.SetEffectInteractive(effect->IsInteractive());
     plug.SetEffectDefault(effect->IsDefault());
     plug.SetRealtimeSupport(effect->RealtimeSupport());

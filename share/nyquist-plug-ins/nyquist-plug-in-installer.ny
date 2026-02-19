@@ -1,7 +1,7 @@
 $nyquist plug-in
 $version 4
-$type tool
-$name (_ "Nyquist Plugin Installer")
+$type tool nogroup
+$name (_ "Nyquist plugin installer")
 $debugbutton false
 $preview disabled
 $author "Steve Daulton"

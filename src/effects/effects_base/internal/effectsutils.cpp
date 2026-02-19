@@ -3,12 +3,32 @@
  */
 
 #include "effectsutils.h"
-#include "effects/builtin/internal/builtineffectsrepository.h"
-#include "log.h"
+#include "effectstypes.h"
+#include "framework/global/log.h"
+
+namespace au::effects::utils {
+namespace {
+constexpr const char* effectFamilyString(EffectFamily family)
+{
+    switch (family) {
+    case EffectFamily::Builtin: return "Audacity";
+    case EffectFamily::VST3: return "VST3";
+    case EffectFamily::LV2: return "LV2";
+    case EffectFamily::AudioUnit: return "AudioUnit";
+    case EffectFamily::Nyquist: return "Nyquist";
+    default:
+        assert(false);
+        return "Unknown";
+    }
+}
+}
+}
 
 muse::String au::effects::utils::builtinEffectCategoryIdString(BuiltinEffectCategoryId category)
 {
     switch (category) {
+    case BuiltinEffectCategoryId::Unspecified:
+        return muse::String{ "Third-party" };
     case BuiltinEffectCategoryId::None:
         return muse::String{ "" };
     case BuiltinEffectCategoryId::VolumeAndCompression:
@@ -27,6 +47,8 @@ muse::String au::effects::utils::builtinEffectCategoryIdString(BuiltinEffectCate
         return muse::String{ "Distortion and modulation" };
     case BuiltinEffectCategoryId::Special:
         return muse::String{ "Special" };
+    case BuiltinEffectCategoryId::SpectralTools:
+        return muse::String{ "Spectral tools" };
     case BuiltinEffectCategoryId::Legacy:
         return muse::String{ "Legacy" };
     default:
@@ -48,7 +70,9 @@ int au::effects::utils::builtinEffectCategoryIdOrder(const muse::String& categor
         { builtinEffectCategoryIdString(BuiltinEffectCategoryId::DelayAndReverb), 6 },
         { builtinEffectCategoryIdString(BuiltinEffectCategoryId::DistortionAndModulation), 7 },
         { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Special), 8 },
-        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Legacy), 9 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::SpectralTools), 9 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Legacy), 10 },
+        { builtinEffectCategoryIdString(BuiltinEffectCategoryId::Unspecified), 11 },
     };
     auto it = categoryOrder.find(category);
     return it == categoryOrder.end() ? INT_MAX : it->second;
@@ -87,6 +111,13 @@ using CiStringSet = std::set<CiString>;
 using EffectMetaSet = std::unordered_set<const EffectMeta*>;
 using AmbiguousTitleEntries = std::map<CiString /*effect title*/, CiStringSet>;
 
+bool shippedByAudacity(const EffectMeta& meta)
+{
+    return meta.family == EffectFamily::Builtin
+           || (meta.family == EffectFamily::Nyquist
+               && meta.category != utils::builtinEffectCategoryIdString(BuiltinEffectCategoryId::Unspecified));
+}
+
 MenuItemList makeItemsOrDisambiguationSubmenus(const AmbiguousTitleEntries& entries, IEffectMenuItemFactory& effectMenu)
 {
     MenuItemList items;
@@ -124,13 +155,11 @@ MenuItem* makeRealtimeBuiltinEffectSubmenu(const EffectMetaList& effects, IEffec
     return makeEffectSubmenu(muse::String { "Audacity" }, ids, effectMenu);
 }
 
-MenuItemList makeDestructiveBuiltinEffectSubmenu(const EffectMetaList& effects, IEffectMenuItemFactory& effectMenu)
+MenuItemList audacityDestructiveEffectsGroup(const EffectMetaList& effects, IEffectMenuItemFactory& effectMenu)
 {
     std::map<muse::String /*category*/, CiStringSet> categories;
     for (const EffectMeta& meta : effects) {
-        if (meta.family == EffectFamily::Builtin) {
-            categories[meta.category].insert(CiString { meta.id });
-        }
+        categories[meta.category].insert(CiString { meta.id });
     }
 
     std::vector<std::pair<muse::String, CiStringSet> > categoriesSorted;
@@ -147,38 +176,19 @@ MenuItemList makeDestructiveBuiltinEffectSubmenu(const EffectMetaList& effects, 
             for (const auto& effectId : effectIds) {
                 items << effectMenu.makeMenuEffectItem(effectId);
             }
+        } else {
+            items << makeEffectSubmenu(CiString { category }, effectIds, effectMenu);
         }
-        items << makeEffectSubmenu(CiString { category }, effectIds, effectMenu);
     }
     return items;
 }
 
-namespace {
-constexpr const char* effectFamiliyString(EffectFamily family)
-{
-    switch (family) {
-    case EffectFamily::Builtin: return "Audacity";
-    case EffectFamily::VST3: return "VST3";
-    case EffectFamily::LV2: return "LV2";
-    case EffectFamily::AudioUnit: return "AudioUnit";
-    case EffectFamily::Nyquist: return "Nyquist";
-    default:
-        assert(false);
-        return "Unknown";
-    }
-}
-} // namespace
-
-MenuItemList makeNonBuiltinEffectSubmenus(const EffectMetaList& effects, IEffectMenuItemFactory& effectMenu)
+MenuItemList thirdPartyGroup(const EffectMetaList& effects, IEffectMenuItemFactory& effectMenu)
 {
     std::map<CiString /*family*/, std::map<CiString /*publisher*/, std::map<CiString /*title*/, EffectMetaSet> > > families;
 
     for (const EffectMeta& meta : effects) {
-        if (meta.family == EffectFamily::Builtin) {
-            // Built-in effects are handled separately
-            continue;
-        }
-        families[CiString{ muse::String{ effectFamiliyString(meta.family) } }][CiString{ meta.vendor }][CiString{ meta.title }].insert(
+        families[CiString{ muse::String{ utils::effectFamilyString(meta.family) } }][CiString{ meta.vendor }][CiString{ meta.title }].insert(
             &meta);
     }
 
@@ -215,19 +225,39 @@ MenuItemList makeNonBuiltinEffectSubmenus(const EffectMetaList& effects, IEffect
     return items;
 }
 
+struct EffectGroups {
+    EffectMetaList audacityEffects;
+    EffectMetaList thirdPartyEffects;
+};
+
+EffectGroups splitEffects(const EffectMetaList& effects)
+{
+    EffectGroups groups;
+    for (const EffectMeta& meta : effects) {
+        if (shippedByAudacity(meta)) {
+            groups.audacityEffects.push_back(meta);
+        } else {
+            groups.thirdPartyEffects.push_back(meta);
+        }
+    }
+    return groups;
+}
+
 MenuItemList realtimeEffectMenu(const EffectMetaList& effects, IEffectMenuItemFactory& effectMenu)
 {
+    const EffectGroups groups = splitEffects(effects);
     MenuItemList items;
-    items << makeRealtimeBuiltinEffectSubmenu(effects, effectMenu);
-    items << makeNonBuiltinEffectSubmenus(effects, effectMenu);
+    items << makeRealtimeBuiltinEffectSubmenu(groups.audacityEffects, effectMenu);
+    items << thirdPartyGroup(groups.thirdPartyEffects, effectMenu);
     return items;
 }
 
-MenuItemList destructiveEffectMenu(const EffectMetaList& effects, IEffectMenuItemFactory& effectMenu)
+MenuItemList destructiveEffectMenu(EffectMetaList effects, IEffectMenuItemFactory& effectMenu)
 {
+    const EffectGroups groups = splitEffects(effects);
     MenuItemList items;
-    items << makeDestructiveBuiltinEffectSubmenu(effects, effectMenu);
-    items << makeNonBuiltinEffectSubmenus(effects, effectMenu);
+    items << audacityDestructiveEffectsGroup(groups.audacityEffects, effectMenu);
+    items << thirdPartyGroup(groups.thirdPartyEffects, effectMenu);
     return items;
 }
 

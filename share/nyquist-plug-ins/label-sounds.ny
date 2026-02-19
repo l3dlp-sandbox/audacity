@@ -1,8 +1,8 @@
 $nyquist plug-in
 $version 4
-$type analyze
+$type analyze nogroup
 ;i18n-hint: Name of effect that labels sounds
-$name (_ "Label Sounds")
+$name (_ "Label sounds")
 $debugbutton false
 $author (_ "Steve Daulton")
 $release 3.0.4-2

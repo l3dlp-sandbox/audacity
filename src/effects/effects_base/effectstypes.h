@@ -154,6 +154,7 @@ public:
 using EffectFamily = EffectFamilies::EffectFamily;
 
 enum class BuiltinEffectCategoryId {
+    Unspecified = -1,
     None,
     VolumeAndCompression,
     Fading,
@@ -163,6 +164,7 @@ enum class BuiltinEffectCategoryId {
     DelayAndReverb,
     DistortionAndModulation,
     Special,
+    SpectralTools,
     Legacy,
 };
 

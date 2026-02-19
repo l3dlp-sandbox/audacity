@@ -1,7 +1,7 @@
 $nyquist plug-in
 $version 4
-$type tool analyze
-$name (_ "Sample Data Export")
+$type tool nogroup
+$name (_ "Sample data export")
 $debugbutton false
 $author (_ "Steve Daulton")
 $release 3.0.4-2

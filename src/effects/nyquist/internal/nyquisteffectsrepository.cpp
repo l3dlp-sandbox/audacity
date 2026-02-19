@@ -3,8 +3,11 @@
 */
 #include "nyquisteffectsrepository.h"
 
-#include "au3-module-manager/PluginManager.h"
+#include "effects/effects_base/internal/au3/au3effectsutils.h"
+#include "effects/effects_base/internal/effectsutils.h"
 #include "au3wrap/internal/wxtypes_convert.h"
+
+#include "au3-module-manager/PluginManager.h"
 
 au::effects::NyquistEffectsRepository::NyquistEffectsRepository(const muse::modularity::ContextPtr& ctx)
     : muse::Injectable(ctx), m_helper(ctx, m_module, muse::audio::AudioResourceType::NyquistPlugin)
@@ -41,6 +44,7 @@ au::effects::EffectMetaList au::effects::NyquistEffectsRepository::effectMetaLis
         au::effects::EffectMeta meta;
         meta.id = muse::String(info.meta.id.c_str());
         meta.family = au::effects::EffectFamily::Nyquist;
+        meta.category = utils::builtinEffectCategoryIdString(toAu4EffectCategory(desc.GetEffectGroup()));
         meta.title = muse::String::fromStdString(desc.GetSymbol().Msgid().Translation().ToStdString());
         meta.isRealtimeCapable = desc.IsEffectRealtime();
         meta.vendor = muse::String::fromStdString(info.meta.vendor);

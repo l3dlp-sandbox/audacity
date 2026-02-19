@@ -1,7 +1,7 @@
 $nyquist plug-in
 $version 4
-$type generate
-$name (_ "Rhythm Track")
+$type generate nogroup
+$name (_ "Rhythm track")
 $debugbutton false
 $preview linear
 $author (_ "Dominic Mazzoni, David R. Sky and Steve Daulton")

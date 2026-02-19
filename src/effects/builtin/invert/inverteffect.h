@@ -28,6 +28,7 @@ public:
 
     // EffectDefinitionInterface implementation
     ::EffectType GetType() const override;
+    EffectGroup GetGroup() const override { return EffectGroup::Special; }
     bool IsInteractive() const override;
 
     unsigned GetAudioInCount() const override;

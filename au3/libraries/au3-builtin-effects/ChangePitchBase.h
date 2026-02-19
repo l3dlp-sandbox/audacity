@@ -45,6 +45,7 @@ public:
     // EffectDefinitionInterface implementation
 
     EffectType GetType() const override;
+    EffectGroup GetGroup() const override { return EffectGroup::PitchAndTempo; }
     OptionalMessage LoadFactoryDefaults(EffectSettings& settings) const override;
     OptionalMessage DoLoadFactoryDefaults(EffectSettings& settings);
 

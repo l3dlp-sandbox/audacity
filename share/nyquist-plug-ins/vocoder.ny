@@ -1,6 +1,6 @@
 $nyquist plug-in
 $version 4
-$type process
+$type process distortionandmodulation
 $preview enabled
 $name (_ "Vocoder")
 $debugbutton false

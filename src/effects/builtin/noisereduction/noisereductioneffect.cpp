@@ -195,7 +195,7 @@ public:
 };
 
 const ComponentInterfaceSymbol NoiseReductionEffect::Symbol { XO(
-                                                                  "Noise Reduction") };
+                                                                  "Noise reduction") };
 
 NoiseReductionEffect::~NoiseReductionEffect()
 {

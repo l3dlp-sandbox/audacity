@@ -1,7 +1,7 @@
 $nyquist plug-in
 $version 4
-$type tool generate
-$name (_ "Sample Data Import")
+$type tool nogroup
+$name (_ "Sample data Import")
 $debugbutton false
 $author (_ "Steve Daulton")
 $release 3.0.4-1

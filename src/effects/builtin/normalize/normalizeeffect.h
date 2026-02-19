@@ -39,6 +39,7 @@ public:
     // EffectDefinitionInterface implementation
 
     ::EffectType GetType() const override;
+    EffectGroup GetGroup() const override { return EffectGroup::VolumeAndCompression; }
 
     // Effect implementation
 

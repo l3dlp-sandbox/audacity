@@ -22,6 +22,7 @@ public:
     ManualPageID ManualPage() const override;
 
     ::EffectType GetType() const override;
+    EffectGroup GetGroup() const override { return EffectGroup::VolumeAndCompression; }
     RealtimeSince RealtimeSupport() const override;
     RegistryPaths GetFactoryPresets() const override;
     OptionalMessage LoadFactoryPreset(int id, EffectSettings& settings) const override;

@@ -1,7 +1,7 @@
 $nyquist plug-in
 $version 4
-$type process
-$name (_ "Noise Gate")
+$type process noiseremovalandrepair
+$name (_ "Noise gate")
 $debugbutton false
 $preview enabled
 $author (_ "Steve Daulton")

@@ -1,8 +1,8 @@
 $nyquist plug-in
 $version 4
-$type process
+$type process eqandfilters
 $preview linear
-$name (_ "Shelf Filter")
+$name (_ "Shelf filter")
 $debugbutton disabled
 $author (_ "Steve Daulton")
 $release 2.4.0-1

@@ -58,7 +58,7 @@ RetVal<audio::AudioResourceMetaList> NyquistPluginsMetaReader::readMeta(const io
 
         muse::audio::AudioResourceMetaList metaList;
         wxString wxPluginPath = au3::wxFromString(pluginPath.toString());
-        TranslatableString errorMessage{};
+        ::TranslatableString errorMessage{};
 
         // Discover the plugin to get its metadata
         int numPlugins = module.DiscoverPluginsAtPath(

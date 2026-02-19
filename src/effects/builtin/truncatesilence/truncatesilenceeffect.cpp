@@ -5,7 +5,7 @@
 #include "au3-effects/LoadEffects.h"
 
 namespace au::effects {
-const ComponentInterfaceSymbol TruncateSilenceEffect::Symbol { XO("Truncate Silence") };
+const ComponentInterfaceSymbol TruncateSilenceEffect::Symbol { XO("Truncate silence") };
 
 TruncateSilenceEffect::TruncateSilenceEffect()
 {

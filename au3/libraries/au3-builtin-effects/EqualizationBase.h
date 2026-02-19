@@ -38,6 +38,7 @@ public:
     // EffectDefinitionInterface implementation
 
     EffectType GetType() const override;
+    EffectGroup GetGroup() const override { return EffectGroup::EqAndFilters; }
     OptionalMessage LoadFactoryDefaults(EffectSettings& settings) const override;
     OptionalMessage DoLoadFactoryDefaults(EffectSettings& settings);
 

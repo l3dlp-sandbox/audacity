@@ -87,8 +87,7 @@ static const double DEF_MinTruncMs = 0.001;
 // Typical fraction of total time taken by detection (better to guess low)
 const double detectFrac = 0.4;
 
-const ComponentInterfaceSymbol TruncSilenceBase::Symbol { XO(
-                                                              "Truncate Silence") };
+const ComponentInterfaceSymbol TruncSilenceBase::Symbol { XO("Truncate silence") };
 
 TruncSilenceBase::TruncSilenceBase()
 {
