@@ -51,8 +51,8 @@ EffectStyledDialogView {
         target: viewerModel
         function onViewerComponentTypeChanged() {
             // For Audio Units, reload the view instead of switching components
-            if (viewerModel.viewerComponentType === ViewerComponentType.AudioUnit && viewer) {
-                viewer.reload()
+            if (viewerModel.viewerComponentType === ViewerComponentType.AudioUnit && prv.viewer) {
+                prv.viewer.reload()
             } else {
                 loadViewer()
             }
