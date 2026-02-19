@@ -18,16 +18,25 @@ EffectStyledDialogView {
 
     property int effectFamily: EffectFamily.Unknown
 
+    title: viewerModel.title
+
+    contentWidth: Math.max(viewerLoader.width + prv.viewMargins * 2, prv.minimumWidth)
+    contentHeight: {
+        let height = viewerLoader.height + bottomPanel.height
+        height += prv.showPresets ? topPanel.height : prv.viewMargins
+        return height
+    }
+
     QtObject {
         id: prv
         property alias viewer: viewerLoader.item
-        property bool isApplyAllowed: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.isApplyAllowed)
-        property bool showPresets: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.usesPresets)
 
         property int minimumWidth: viewerModel.effectFamily === EffectFamily.LV2 ? 500 : 250
         property int panelMargins: viewerModel.effectFamily == EffectFamily.Builtin ? 16 : 4
         property int viewMargins: viewerModel.effectFamily == EffectFamily.Builtin ? 16 : 0
         property int separatorHeight: viewerModel.effectFamily == EffectFamily.Builtin ? separator.height + prv.panelMargins : 0
+        property bool isApplyAllowed: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.isApplyAllowed)
+        property bool showPresets: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.usesPresets)
 
         function closeWindow(accept) {
             if (prv.viewer) {
@@ -50,15 +59,6 @@ EffectStyledDialogView {
                 prv.viewer.stopPreview()
             }
         }
-    }
-
-    title: viewerModel.title
-
-    contentWidth: Math.max(viewerLoader.width + prv.viewMargins * 2, prv.minimumWidth)
-    contentHeight: {
-        let height = viewerLoader.height + bottomPanel.height
-        height += prv.showPresets ? topPanel.height : prv.viewMargins
-        return height
     }
 
     Component.onCompleted: {
