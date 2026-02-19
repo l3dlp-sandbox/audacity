@@ -150,15 +150,17 @@ EffectStyledDialogView {
             window: Window {
                 id: win
 
-                color: ui.theme.backgroundPrimaryColor
-
-                height: headerBar.implicitHeight + prv.padding * 2
                 width: headerBar.implicitWidth
+                height: headerBar.implicitHeight + prv.padding * 2
+
+                color: ui.theme.backgroundPrimaryColor
 
                 RowLayout {
                     id: headerBar
+
                     anchors.fill: parent
                     anchors.margins: prv.padding
+
                     spacing: presetsBar.spacing
 
                     BypassEffectButton {
@@ -186,6 +188,7 @@ EffectStyledDialogView {
                 }
             }
         }
+
         Loader {
             id: viewerLoader
         }
