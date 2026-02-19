@@ -117,6 +117,56 @@ EffectStyledDialogView {
         instanceId: root.instanceId
     }
 
+    Component {
+        id: audioUnitViewerComponent
+        AudioUnitViewer {
+            height: implicitHeight
+
+            instanceId: root.instanceId
+            topPadding: topPanel.height
+            bottomPadding: bbox.implicitHeight + prv.panelMargins * 2
+            sidePadding: prv.viewMargins
+            minimumWidth: prv.minimumWidth
+        }
+    }
+
+    Component {
+        id: lv2ViewerComponent
+        Lv2Viewer {
+            instanceId: root.instanceId
+            title: root.title
+        }
+    }
+
+    Component {
+        id: vstViewerComponent
+        VstViewer {
+            height: implicitHeight
+
+            instanceId: root.instanceId
+            topPadding: topPanel.height
+            bottomPadding: bbox.implicitHeight + prv.panelMargins * 2
+            sidePadding: prv.viewMargins
+            minimumWidth: prv.minimumWidth
+        }
+    }
+
+    Component {
+        id: builtinViewerComponent
+        BuiltinEffectViewer {
+            instanceId: root.instanceId
+            dialogView: root
+            usedDestructively: true
+        }
+    }
+
+    Component {
+        id: generatedViewerComponent
+        GeneratedEffectViewer {
+            instanceId: root.instanceId
+        }
+    }
+
     Column {
         id: column
         anchors.fill: parent
@@ -289,55 +339,5 @@ EffectStyledDialogView {
 
         visible: prv.viewer && prv.viewer.isPreviewing
         effectFamily: root.effectFamily
-    }
-
-    Component {
-        id: audioUnitViewerComponent
-        AudioUnitViewer {
-            height: implicitHeight
-
-            instanceId: root.instanceId
-            topPadding: topPanel.height
-            bottomPadding: bbox.implicitHeight + prv.panelMargins * 2
-            sidePadding: prv.viewMargins
-            minimumWidth: prv.minimumWidth
-        }
-    }
-
-    Component {
-        id: lv2ViewerComponent
-        Lv2Viewer {
-            instanceId: root.instanceId
-            title: root.title
-        }
-    }
-
-    Component {
-        id: vstViewerComponent
-        VstViewer {
-            height: implicitHeight
-
-            instanceId: root.instanceId
-            topPadding: topPanel.height
-            bottomPadding: bbox.implicitHeight + prv.panelMargins * 2
-            sidePadding: prv.viewMargins
-            minimumWidth: prv.minimumWidth
-        }
-    }
-
-    Component {
-        id: builtinViewerComponent
-        BuiltinEffectViewer {
-            instanceId: root.instanceId
-            dialogView: root
-            usedDestructively: true
-        }
-    }
-
-    Component {
-        id: generatedViewerComponent
-        GeneratedEffectViewer {
-            instanceId: root.instanceId
-        }
     }
 }
