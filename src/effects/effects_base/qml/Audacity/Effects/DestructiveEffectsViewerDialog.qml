@@ -19,6 +19,7 @@ EffectStyledDialogView {
     property int effectFamily: EffectFamily.Unknown
 
     title: viewerModel.title
+    navigationSection.name: title
 
     contentWidth: Math.max(viewerLoader.width + prv.viewMargins * 2, prv.minimumWidth)
     contentHeight: {
