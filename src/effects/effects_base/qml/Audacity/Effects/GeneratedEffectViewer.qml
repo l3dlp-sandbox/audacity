@@ -17,16 +17,16 @@ Rectangle {
 
     implicitWidth: prv.dialogWidth
     implicitHeight: {
-        // why 5 times spaceXL?
-        // -> 5 * spaceXL accounts for the combined vertical margins and spacing:
+        // why 2 times spaceXL? and 2 times spaceM?
+        // -> 2 * spaceXL and 2 * spaceM account for the combined vertical margins and spacing:
         // Calculate total height needed:
-        // - Top margin: prv.spaceXL (1)
-        // - Flickable top margin: prv.spaceXL (3)
+        // - Flickable top margin: prv.spaceXL (1)
+        // - Flickable inner margin: prv.spaceM (1')
         // - Content: parametersColumn.height
-        // - Flickable bottom margin: prv.spaceXL (4)
-        // - Bottom margin: prv.spaceXL (5)
+        // - Flickable inner margin: prv.spaceM (2')
+        // - Flickable bottom margin: prv.spaceXL (2)
         // - Border: 2 * prv.borderWidth
-        var totalHeight = prv.spaceXL * 4 + parametersColumn.height + 2 * prv.borderWidth
+        var totalHeight = prv.spaceXL * 2 + prv.spaceM * 2 + parametersColumn.height + 2 * prv.borderWidth
         // we automatically size the height to fit the content for plugins with few parameters
         // we limit the height to avoid making the dialog too tall
         return Math.min(totalHeight, prv.maxDialogHeight)
@@ -60,7 +60,6 @@ Rectangle {
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
-        anchors.margins: prv.spaceXL
         spacing: prv.spaceXL
 
         Rectangle {
