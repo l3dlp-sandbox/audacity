@@ -168,7 +168,6 @@ EffectStyledDialogView {
     }
 
     Column {
-        id: column
         anchors.fill: parent
 
         WindowContainer {
@@ -187,8 +186,6 @@ EffectStyledDialogView {
 
                     anchors.fill: parent
                     anchors.margins: prv.panelMargins
-
-                    spacing: prv.panelMargins
 
                     EffectPresetsBar {
                         id: presetsBar
