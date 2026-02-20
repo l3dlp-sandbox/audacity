@@ -22,8 +22,10 @@ EffectStyledDialogView {
 
     contentWidth: Math.max(viewerLoader.width + prv.viewMargins * 2, prv.minimumWidth)
     contentHeight: {
-        let height = viewerLoader.height + bottomPanel.height
-        height += prv.showPresets ? topPanel.height : prv.viewMargins
+        let height = 0
+        height += prv.showTopPanel ? topPanel.height : prv.viewMargins
+        height += viewerLoader.height
+        height += prv.showBottomPanel ? bottomPanel.height : prv.viewMargins
         return height
     }
 
@@ -32,11 +34,13 @@ EffectStyledDialogView {
         property alias viewer: viewerLoader.item
 
         property int minimumWidth: viewerModel.effectFamily === EffectFamily.LV2 ? 500 : 250
-        property int panelMargins: (viewerModel.effectFamily == EffectFamily.Builtin || viewerModel.viewerComponentType == ViewerComponentType.Generated) ? 16 : 4
-        property int viewMargins: (viewerModel.effectFamily == EffectFamily.Builtin || viewerModel.viewerComponentType == ViewerComponentType.Generated) ? 16 : 0
-        property int separatorHeight: (viewerModel.effectFamily == EffectFamily.Builtin || viewerModel.viewerComponentType == ViewerComponentType.Generated) ? separator.height + prv.panelMargins : 0
+        property int panelMargins: (viewerModel.effectFamily === EffectFamily.Builtin || viewerModel.viewerComponentType === ViewerComponentType.Generated) ? 16 : 4
+        property int viewMargins: (viewerModel.effectFamily === EffectFamily.Builtin || viewerModel.viewerComponentType === ViewerComponentType.Generated) ? 16 : 0
+        property int separatorHeight: (viewerModel.effectFamily === EffectFamily.Builtin || viewerModel.viewerComponentType === ViewerComponentType.Generated) ? separator.height + prv.panelMargins : 0
+        property bool showTopPanel: viewerModel.effectFamily !== EffectFamily.Builtin || (viewer && viewer.usesPresets)
+        property bool showBottomPanel: true
+
         property bool isApplyAllowed: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.isApplyAllowed)
-        property bool showPresets: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.usesPresets)
 
         function closeWindow(accept) {
             if (prv.viewer) {
@@ -171,7 +175,7 @@ EffectStyledDialogView {
         anchors.fill: parent
 
         WindowContainer {
-            visible: prv.showPresets
+            visible: prv.showTopPanel
 
             window: Window {
                 id: topPanel
@@ -217,7 +221,7 @@ EffectStyledDialogView {
         Item {
             id: spacer
 
-            visible: !prv.showPresets
+            visible: !prv.showTopPanel
 
             width: parent.width
             height: prv.viewMargins
