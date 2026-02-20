@@ -185,9 +185,9 @@ EffectStyledDialogView {
 
                 color: ui.theme.backgroundPrimaryColor
 
-                Column {
-                    id: presetsBarContainer
-
+                Row {
+                    id: headerBar
+                    spacing: 4
                     anchors.fill: parent
                     anchors.margins: prv.panelMargins
 
@@ -209,7 +209,7 @@ EffectStyledDialogView {
                 SeparatorLine {
                     id: separator
 
-                    anchors.top: presetsBarContainer.bottom
+                    anchors.top: headerBar.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
 
