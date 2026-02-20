@@ -21,23 +21,33 @@ EffectStyledDialogView {
     title: viewerModel.title + " - " + viewerModel.trackName
     navigationSection.name: title
 
-    contentWidth: Math.max(viewerLoader.width, prv.minimumWidth)
-    contentHeight: 2 * prv.padding + viewerLoader.height + presetsBar.height
-
-    alwaysOnTop: true
+    contentWidth: Math.max(viewerLoader.width + prv.viewMargins * 2, prv.minimumWidth)
+    contentHeight: {
+        let height = 0
+        height += prv.showTopPanel ? topPanel.height : prv.viewMargins
+        height += viewerLoader.height
+        height += prv.showBottomPanel ? bottomPanel.height : prv.viewMargins
+        return height
+    }
 
     QtObject {
         id: prv
         property alias viewer: viewerLoader.item
 
-        property int minimumWidth: viewerModel.effectFamily === EffectFamily.LV2 ? 500 : 270
-        property int padding: viewerModel.effectFamily == EffectFamily.Builtin ? 16 : 4
+        property int minimumWidth: viewerModel.effectFamily === EffectFamily.LV2 ? 500 : 250
+        property int panelMargins: (viewerModel.effectFamily === EffectFamily.Builtin || viewerModel.viewerComponentType === ViewerComponentType.Generated) ? 16 : 4
+        property int viewMargins: (viewerModel.effectFamily === EffectFamily.Builtin || viewerModel.viewerComponentType === ViewerComponentType.Generated) ? 16 : 0
+        property int separatorHeight: (viewerModel.effectFamily === EffectFamily.Builtin || viewerModel.viewerComponentType === ViewerComponentType.Generated) ? separator.height + prv.panelMargins : 0
+        property bool showTopPanel: true
+        property bool showBottomPanel: false
     }
 
     Component.onCompleted: {
         viewerModel.load()
         loadViewer()
     }
+
+    alwaysOnTop: true
 
     // Listen to UI mode changes from the presets bar menu
     Connections {
@@ -92,7 +102,7 @@ EffectStyledDialogView {
         id: audioUnitViewerComponent
         AudioUnitViewer {
             instanceId: root.instanceId
-            topPadding: headerBar.y + headerBar.height + prv.padding
+            topPadding: topPanel.height
             minimumWidth: prv.minimumWidth
         }
     }
@@ -101,7 +111,7 @@ EffectStyledDialogView {
         id: lv2ViewerComponent
         Lv2Viewer {
             instanceId: root.instanceId
-            effectState: root.effectState
+            effectState: root.effectState // TODO: check if this is really needed !?
             title: root.title
         }
     }
@@ -110,26 +120,17 @@ EffectStyledDialogView {
         id: vstViewerComponent
         VstViewer {
             instanceId: root.instanceId
-            topPadding: headerBar.y + headerBar.height + prv.padding
+            topPadding: topPanel.height
             minimumWidth: prv.minimumWidth
         }
     }
 
     Component {
         id: builtinViewerComponent
-        Column {
-            topPadding: 0
-            leftPadding: prv.padding
-            rightPadding: prv.padding
-            bottomPadding: prv.padding
-
-            property alias instanceId: builtinViewer.instanceId
-
-            BuiltinEffectViewer {
-                id: builtinViewer
-                instanceId: root.instanceId
-                usedDestructively: false
-            }
+        BuiltinEffectViewer {
+            instanceId: root.instanceId
+            //dialogView: root // TODO: check if this has to be added !?
+            usedDestructively: false
         }
     }
 
@@ -140,28 +141,25 @@ EffectStyledDialogView {
         }
     }
 
-    ColumnLayout {
-        spacing: 0
+    Column {
         anchors.fill: parent
 
         WindowContainer {
-            Layout.fillWidth: true
+            visible: prv.showTopPanel
 
             window: Window {
-                id: win
+                id: topPanel
 
-                width: headerBar.implicitWidth
-                height: headerBar.implicitHeight + prv.padding * 2
+                width: root.contentWidth
+                height: presetsBar.height + prv.separatorHeight + prv.panelMargins * 2
 
                 color: ui.theme.backgroundPrimaryColor
 
-                RowLayout {
+                Row {
                     id: headerBar
-
+                    spacing: 4
                     anchors.fill: parent
-                    anchors.margins: prv.padding
-
-                    spacing: presetsBar.spacing
+                    anchors.margins: prv.panelMargins
 
                     BypassEffectButton {
                         id: bypassBtn
@@ -179,18 +177,44 @@ EffectStyledDialogView {
                     EffectPresetsBar {
                         id: presetsBar
 
-                        parentWindow: root.window
+                        anchors.left: bypassBtn.right
+                        anchors.leftMargin: headerBar.spacing
+                        anchors.right: parent.right
+
                         navigationPanel: root.navigationPanel
                         navigationOrder: 1
+
+                        parentWindow: root.window
                         instanceId: root.instanceId
-                        Layout.fillWidth: true
                     }
+                }
+
+                SeparatorLine {
+                    id: separator
+
+                    anchors.top: headerBar.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
+                    visible: (viewerModel.effectFamily == EffectFamily.Builtin || viewerModel.viewerComponentType == ViewerComponentType.Generated)
                 }
             }
         }
 
+        Item {
+            id: spacer
+
+            visible: !prv.showTopPanel
+
+            width: parent.width
+            height: prv.viewMargins
+        }
+
         Loader {
             id: viewerLoader
+
+            anchors.left: parent.left
+            anchors.margins: prv.viewMargins
         }
     }
 }
