@@ -43,7 +43,6 @@ BuiltinEffectBase {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: prv.spaceXL
         spacing: prv.spaceL
 
         RowLayout {
