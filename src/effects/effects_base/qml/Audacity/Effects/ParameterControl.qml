@@ -204,12 +204,14 @@ Item {
     Component {
         id: numericControl
 
-        RowLayout {
-            spacing: prv.spaceM
+        // Wrapper Item needed to properly communicate size to parent Loader via implicitWidth/Height
+        Item {
+            implicitWidth: numericInput.width
+            implicitHeight: numericInput.height
 
             IncrementalPropertyControl {
                 id: numericInput
-                Layout.preferredWidth: prv.numericControlWidth
+                width: prv.numericControlWidth
 
                 // Always use normalized values (0.0 to 1.0) like AU3 does
                 currentValue: parameterData ? parameterData.currentValue : 0
@@ -252,14 +254,6 @@ Item {
                     }
                 }
             }
-
-            // Display formatted value from plugin (like AU3 does)
-            StyledTextLabel {
-                Layout.preferredWidth: prv.valueDisplayWidth
-                Layout.alignment: Qt.AlignVCenter
-                text: parameterData ? parameterData.formattedValue : ""
-                horizontalAlignment: Text.AlignLeft
-            }
         }
     }
 
@@ -267,8 +261,10 @@ Item {
     Component {
         id: timeControl
 
-        RowLayout {
-            spacing: prv.spaceM
+        // Wrapper Item needed to properly communicate size to parent Loader via implicitWidth/Height
+        Item {
+            implicitWidth: timecode.width
+            implicitHeight: timecode.height
 
             Timecode {
                 id: timecode
@@ -292,15 +288,6 @@ Item {
                         root.gestureEnded(root.parameterId)
                     }
                 }
-            }
-
-            StyledTextLabel {
-                text: parameterData ? parameterData.formattedValue : ""
-                opacity: 0.7
-                wrapMode: Text.WordWrap
-                Layout.alignment: Qt.AlignVCenter
-                Layout.fillWidth: true // Fill remaining width so it adjusts when timecode width changes
-                horizontalAlignment: Text.AlignLeft
             }
         }
     }
