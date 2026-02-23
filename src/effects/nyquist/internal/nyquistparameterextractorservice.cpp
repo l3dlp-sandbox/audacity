@@ -26,7 +26,7 @@ ParameterType convertControlType(int nyqType)
     case NYQ_CTRL_CHOICE:
         return ParameterType::Dropdown;
     case NYQ_CTRL_STRING:
-        return ParameterType::Numeric; // String input field
+        return ParameterType::Text; // Free-form text input field
     case NYQ_CTRL_TIME:
         return ParameterType::Time;
     case NYQ_CTRL_TEXT: // Informational text, not editable

@@ -63,6 +63,7 @@ enum class ParameterType {
     ReadOnly,      // Display-only (meter, status, informational text)
     Time,          // Time value with timecode formatting
     File,          // File path with file picker
+    Text,          // Text input field (free-form string)
 };
 
 // Parameter metadata for auto-generated UI

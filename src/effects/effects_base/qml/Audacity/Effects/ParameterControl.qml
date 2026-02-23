@@ -84,6 +84,8 @@ Item {
                     return timeControl
                 case "file":
                     return fileControl
+                case "text":
+                    return textControl
                 default:
                     return unknownControl
                 }
@@ -334,6 +336,31 @@ Item {
                 root.gestureStarted(root.parameterId)
                 root.stringValueChanged(root.parameterId, newPath)
                 root.gestureEnded(root.parameterId)
+            }
+        }
+    }
+
+    // Text control (free-form string input)
+    Component {
+        id: textControl
+
+        // Wrapper Item needed to properly communicate size to parent Loader via implicitWidth/Height
+        Item {
+            implicitWidth: textField.width
+            implicitHeight: textField.height
+
+            TextInputField {
+                id: textField
+                width: prv.controlWidth
+
+                currentText: parameterData ? parameterData.currentValueString : ""
+                enabled: parameterData ? !parameterData.isReadOnly : false
+
+                onTextEdited: function (newTextValue) {
+                    root.gestureStarted(root.parameterId)
+                    root.stringValueChanged(root.parameterId, newTextValue)
+                    root.gestureEnded(root.parameterId)
+                }
             }
         }
     }

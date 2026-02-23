@@ -52,6 +52,7 @@ QVariant EffectParametersListModel::data(const QModelIndex& index, int role) con
         case ParameterType::ReadOnly: return QStringLiteral("readonly");
         case ParameterType::Time: return QStringLiteral("time");
         case ParameterType::File: return QStringLiteral("file");
+        case ParameterType::Text: return QStringLiteral("text");
         default: return QStringLiteral("unknown");
         }
     case MinValueRole:
