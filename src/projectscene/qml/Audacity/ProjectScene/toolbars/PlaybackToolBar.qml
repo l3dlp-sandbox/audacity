@@ -45,11 +45,13 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter
 
+        spacing: 2
+
         rowHeight: isMultiline ? 32 : 48
         topPadding: isMultiline ? 8 : 0
         bottomPadding: isMultiline ? 8 : 0
 
-        separatorHeight: 28
+        useSpacersAsSeparators: true
         maximumWidth: root.maximumWidth - prv.customizeButtonSpaceWidth
 
         model: PlaybackToolBarModel {
@@ -77,9 +79,12 @@ Item {
             id: controlComp
 
             StyledToolBarItem {
-                width: 32
+                width: 28
                 height: width
 
+                backgroundRadius: 2
+
+                iconFont: ui.theme.iconsFont
                 iconColor: Boolean(itemData) ? itemData.iconColor : ui.theme.fontPrimaryColor
                 accentColor: Boolean(itemData) ? itemData.backgroundColor : ui.theme.buttonColor
                 accentButton: Boolean(itemData) ? itemData.selected : false
@@ -92,6 +97,10 @@ Item {
             StyledToolBarItem {
                 width: 28
                 height: width
+
+                backgroundRadius: 2
+
+                iconFont: ui.theme.iconsFont
             }
         }
 
@@ -105,6 +114,8 @@ Item {
 
                 width: Boolean(itemData) ? Math.max(288, Math.min(itemData.meterSize, view.maximumWidth)) : 288
                 height: 28
+
+                backgroundRadius: 2
 
                 volumeLevel: Boolean(itemData) ? itemData.level : 0
                 leftCurrentVolumePressure: Boolean(itemData) ? itemData.leftChannelPressure : -145
@@ -231,9 +242,12 @@ Item {
                 width: 28
                 height: width
 
+                backgroundRadius: 2
+
                 meterStyle: Boolean(itemData) ? itemData.meterStyle : PlaybackMeterStyle.Default
 
                 icon: Boolean(itemData) ? itemData.icon : IconCode.NONE
+                iconFont: ui.theme.iconsFont
 
                 toolTipTitle: Boolean(itemData) ? itemData.title : ""
                 toolTipDescription: Boolean(itemData) ? itemData.description : ""
@@ -316,7 +330,7 @@ Item {
         height: width
 
         icon: IconCode.SETTINGS_COG
-        iconFont: ui.theme.toolbarIconsFont
+        iconFont: ui.theme.iconsFont
         toolTipTitle: qsTrc("projectscene", "Customize toolbar")
         toolTipDescription: qsTrc("projectscene", "Show/hide toolbar buttons")
 

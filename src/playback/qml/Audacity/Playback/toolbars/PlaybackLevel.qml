@@ -22,6 +22,8 @@ Item {
 
     property alias navigation: popupButton.navigation
 
+    property alias backgroundRadius: popupButton.backgroundRadius
+
     property bool isPlaying: false
 
     signal volumeLevelChangeRequested(var level)
