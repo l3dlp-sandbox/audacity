@@ -336,7 +336,9 @@ muse::String NyquistParameterExtractorService::getParameterValueString(EffectIns
     default:
         // For numeric types, format with appropriate precision
         if (ctrl->type == NYQ_CTRL_FLOAT || ctrl->type == NYQ_CTRL_FLOAT_TEXT) {
-            return String::number(value, 6);
+            // Use reasonable precision: 2 decimal places for most cases
+            // Could be made more sophisticated based on the range/stepSize in the future
+            return String::number(value, 2);
         }
         return String::number(value);
     }
