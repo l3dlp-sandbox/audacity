@@ -499,18 +499,15 @@ bool NyquistBase::Init()
             }
 
             if (!bAllowSpectralEditing || ((mF0 < 0.0) && (mF1 < 0.0))) {
-                using namespace BasicUI;
                 if (!hasSpectral) {
-                    ShowMessageBox(
-                        XO("Enable track spectrogram view before\n"
-                           "applying 'Spectral' effects."),
-                        MessageBoxOptions {}.IconStyle(Icon::Error));
+                    mLastError
+                        = XO("Enable track spectrogram view before\n"
+                             "applying 'Spectral' effects.").Translation().ToStdString();
                 } else {
-                    ShowMessageBox(
-                        XO("To use 'Spectral effects', enable 'Spectral Selection'\n"
-                           "in the track Spectrogram settings and select the\n"
-                           "frequency range for the effect to act on."),
-                        MessageBoxOptions {}.IconStyle(Icon::Error));
+                    mLastError
+                        = XO("To use 'Spectral effects', enable 'Spectral Selection'\n"
+                             "in the track Spectrogram settings and select the\n"
+                             "frequency range for the effect to act on.").Translation().ToStdString();
                 }
                 return false;
             }
@@ -839,10 +836,7 @@ bool NyquistBase::Process(EffectInstance&, EffectSettings& settings)
 
     // Nyquist Prompt does not require a selection, but effects do.
     if (!bOnePassTool && (mNumSelectedChannels == 0)) {
-        auto message = XO("Audio selection required.");
-        using namespace BasicUI;
-        BasicUI::ShowMessageBox(
-            message, MessageBoxOptions {}.IconStyle(Icon::Error));
+        mLastError = XO("Audio selection required.").Translation().ToStdString();
     }
 
     std::optional<TrackIterRange<WaveTrack> > pRange;
@@ -1438,12 +1432,22 @@ bool NyquistBase::ProcessOne(
     }
 
     if (rval == nyx_string) {
+        // True if not process type.
+        // If not returning audio from process effect,
+        // return first result then stop (disables preview)
+        // but allow all output from Nyquist Prompt.
+        const auto isOk = !GetType() != EffectTypeProcess || mIsPrompt;
+
         // Assume the string has already been translated within the Lisp runtime
         // if necessary, by one of the gettext functions defined below, before it
         // is communicated back to C++
         auto msg = Verbatim(NyquistToWxString(nyx_get_string()));
         if (!msg.empty()) { // Empty string may be used as a No-Op return value.
-            BasicUI::ShowMessageBox(msg);
+            if (!isOk) {
+                mLastError = msg.Translation().ToStdString();
+            } else {
+                BasicUI::ShowMessageBox(msg);
+            }
         } else if (GetType() == EffectTypeTool) {
             // ;tools may change the project with aud-do commands so
             // it is essential that the state is added to history.
@@ -1454,23 +1458,29 @@ bool NyquistBase::ProcessOne(
             return true;
         }
 
-        // True if not process type.
-        // If not returning audio from process effect,
-        // return first result then stop (disables preview)
-        // but allow all output from Nyquist Prompt.
-        return GetType() != EffectTypeProcess || mIsPrompt;
+        return isOk;
     }
 
     if (rval == nyx_double) {
         auto str = XO("Nyquist returned the value: %f").Format(nyx_get_double());
-        BasicUI::ShowMessageBox(str);
-        return GetType() != EffectTypeProcess || mIsPrompt;
+        const auto isOk = GetType() != EffectTypeProcess || mIsPrompt;
+        if (isOk) {
+            BasicUI::ShowMessageBox(str);
+        } else {
+            mLastError = str.Translation().ToStdString();
+        }
+        return isOk;
     }
 
     if (rval == nyx_int) {
         auto str = XO("Nyquist returned the value: %d").Format(nyx_get_int());
-        BasicUI::ShowMessageBox(str);
-        return GetType() != EffectTypeProcess || mIsPrompt;
+        const auto isOk = GetType() != EffectTypeProcess || mIsPrompt;
+        if (isOk) {
+            BasicUI::ShowMessageBox(str);
+        } else {
+            mLastError = str.Translation().ToStdString();
+        }
+        return isOk;
     }
 
     if (rval == nyx_labels) {
@@ -1510,19 +1520,18 @@ bool NyquistBase::ProcessOne(
 
     int outChannels = nyx_get_audio_num_channels();
     if (outChannels > (int)mCurNumChannels) {
-        BasicUI::ShowMessageBox(
-            XO("Nyquist returned too many audio channels.\n"));
+        mLastError = (
+            XO("Nyquist returned too many audio channels.\n")).Translation().ToStdString();
         return false;
     }
 
     if (outChannels == -1) {
-        BasicUI::ShowMessageBox(
-            XO("Nyquist returned one audio channel as an array.\n"));
+        mLastError = XO("Nyquist returned one audio channel as an array.\n").Translation().ToStdString();
         return false;
     }
 
     if (outChannels == 0) {
-        BasicUI::ShowMessageBox(XO("Nyquist returned an empty array.\n"));
+        mLastError = XO("Nyquist returned an empty array.\n").Translation().ToStdString();
         return false;
     }
 
@@ -1543,7 +1552,7 @@ bool NyquistBase::ProcessOne(
 
     mOutputDuration = out->GetEndTime();
     if (mOutputDuration <= 0) {
-        BasicUI::ShowMessageBox(XO("Nyquist returned nil audio.\n"));
+        mLastError = XO("Nyquist returned nil audio.\n").Translation().ToStdString();
         return false;
     }
 
@@ -2355,14 +2364,10 @@ bool NyquistBase::ParseProgram(wxInputStream& stream)
         using namespace BasicUI;
         /* i1n-hint: SAL and LISP are names for variant syntaxes for the
          Nyquist programming language.  Leave them, and 'return', untranslated. */
-        BasicUI::ShowMessageBox(
-            XO(
-                "Your code looks like SAL syntax, but there is no \'return\' statement.\n\
-For SAL, use a return statement such as:\n\treturn *track* * 0.1\n\
-or for LISP, begin with an open parenthesis such as:\n\t(mult *track* 0.1)\n ."),
-            MessageBoxOptions {}.IconStyle(Icon::Error));
-        /* i18n-hint: refers to programming "languages" */
-        mInitError = XO("Could not determine language");
+        mLastError = XO(
+            "Your code looks like SAL syntax, but there is no \'return\' statement.\n\
+            For SAL, use a return statement such as:\n\treturn *track* * 0.1\n\
+            or for LISP, begin with an open parenthesis such as:\n\t(mult *track* 0.1)\n .").Translation().ToStdString();
         return false;
         // Else just throw it at Nyquist to see what happens
     }
