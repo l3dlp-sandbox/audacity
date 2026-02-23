@@ -1,7 +1,7 @@
 set(TARGET libnyquist)
 add_library( ${TARGET} STATIC )
 
-set(TARGET_ROOT ${AUDACITY_ROOT}/lib-src/libnyquist)
+set(TARGET_ROOT ${AUDACITY_ROOT}/../thirdparty/libnyquist)
 
 # All source files from the original CMakeLists.txt
 list( APPEND SOURCES
