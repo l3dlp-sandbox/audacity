@@ -126,6 +126,14 @@ ParameterInfo convertControl(const NyqControl& ctrl)
         info.currentValueString = String::fromStdString(au::au3::wxToStdString(ctrl.valStr));
     }
 
+    // For float/slider controls, format the current value as string
+    // This is needed for the formattedValue display next to the slider in the UI
+    if (ctrl.type == NYQ_CTRL_FLOAT || ctrl.type == NYQ_CTRL_FLOAT_TEXT) {
+        // Use reasonable precision: 2 decimal places for most cases
+        // Could be made more sophisticated based on the range/stepSize in the future
+        info.currentValueString = String::number(ctrl.val, 2);
+    }
+
     return info;
 }
 
