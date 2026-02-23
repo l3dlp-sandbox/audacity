@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include "../common/builtineffectmodel.h"
+#include "effects/effects_base/view/builtineffectmodel.h"
 
 namespace au::effects {
 class GeneratorEffect;

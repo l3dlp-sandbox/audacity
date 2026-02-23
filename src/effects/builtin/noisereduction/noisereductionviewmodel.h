@@ -3,8 +3,9 @@
  */
 #pragma once
 
-#include "../common/builtineffectmodel.h"
 #include "../common/params.h"
+
+#include "effects/effects_base/view/builtineffectmodel.h"
 
 #include "framework/interactive/iinteractive.h"
 

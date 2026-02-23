@@ -3,9 +3,7 @@
 */
 #include "builtineffectmodel.h"
 
-#include "../view/builtineffectviewloader.h"
-
-#include "log.h"
+#include "framework/global/log.h"
 
 using namespace au::effects;
 

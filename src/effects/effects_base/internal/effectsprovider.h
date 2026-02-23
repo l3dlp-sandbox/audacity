@@ -10,7 +10,7 @@
 #include "context/iglobalcontext.h"
 #include "playback/iplayback.h"
 
-#include "effects/builtin/ibuiltineffectsrepository.h"
+#include "effects/effects_base/ibuiltineffectsrepository.h"
 #include "effects/lv2/ilv2effectsrepository.h"
 #include "effects/vst/ivsteffectsrepository.h"
 #include "effects/nyquist/inyquisteffectsrepository.h"

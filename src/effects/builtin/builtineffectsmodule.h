@@ -9,7 +9,8 @@
 #include "modularity/imodulesetup.h"
 
 namespace au::effects {
-class BuiltinEffectsRepository;
+class BuiltinEffectsLoader;
+
 class BuiltinEffectsModule : public muse::modularity::IModuleSetup
 {
 public:
@@ -25,8 +26,7 @@ public:
 class BuiltinEffectsContext : public muse::modularity::IContextSetup
 {
 public:
-    BuiltinEffectsContext(const muse::modularity::ContextPtr& ctx)
-        : muse::modularity::IContextSetup(ctx) {}
+    BuiltinEffectsContext(const muse::modularity::ContextPtr& ctx);
 
     void registerExports() override;
     void resolveImports() override;
@@ -34,6 +34,6 @@ public:
     void onDeinit() override;
 
 private:
-    std::shared_ptr<BuiltinEffectsRepository> m_builtinEffectsRepository;
+    const std::unique_ptr<BuiltinEffectsLoader> m_builtinEffectsLoader;
 };
 }

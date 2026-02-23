@@ -3,14 +3,11 @@
 */
 #include "builtineffectsmodule.h"
 
-#include "internal/builtineffectsrepository.h"
+#include "globalmodule.h"
+#include "internal/builtineffectsloader.h"
 #include "internal/builtinviewlauncher.h"
 
-#include "common/builtineffectmodel.h"
 #include "common/valuewarper/valuewarper.h"
-
-#include "view/builtineffectviewloader.h"
-#include "view/effectsviewregister.h"
 
 #include "effects/effects_base/ieffectviewlaunchregister.h"
 
@@ -30,7 +27,6 @@ std::string BuiltinEffectsModule::moduleName() const
 
 void BuiltinEffectsModule::registerExports()
 {
-    globalIoc()->registerExport<IEffectsViewRegister>(mname, new EffectsViewRegister());
 }
 
 void BuiltinEffectsModule::registerResources()
@@ -40,8 +36,6 @@ void BuiltinEffectsModule::registerResources()
 
 void BuiltinEffectsModule::registerUiTypes()
 {
-    qmlRegisterUncreatableType<BuiltinEffectModel>("Audacity.BuiltinEffects", 1, 0, "BuiltinEffectModel", "Not creatable abstract type");
-    qmlRegisterType<BuiltinEffectViewLoader>("Audacity.BuiltinEffects", 1, 0, "BuiltinEffectViewLoader");
     qmlRegisterType<ValueWarper>("Audacity.BuiltinEffects", 1, 0, "ValueWarper");
 }
 
@@ -49,7 +43,7 @@ void BuiltinEffectsModule::onPreInit(const muse::IApplication::RunMode&)
 {
     //! NOTE preInit() only creates static Registration objects (doesn't use `this`).
     //! Must run at module level before Au3WrapModule::onInit() sets sInitialized = true.
-    BuiltinEffectsRepository::preInit();
+    BuiltinEffectsLoader::preInit();
 }
 
 muse::modularity::IContextSetup* BuiltinEffectsModule::newContext(const muse::modularity::ContextPtr& ctx) const
@@ -61,11 +55,13 @@ muse::modularity::IContextSetup* BuiltinEffectsModule::newContext(const muse::mo
 // BuiltinEffectsContext
 // =====================================================
 
+BuiltinEffectsContext::BuiltinEffectsContext(const muse::modularity::ContextPtr& ctx)
+    : muse::modularity::IContextSetup(ctx), m_builtinEffectsLoader(std::make_unique<BuiltinEffectsLoader>(muse::modularity::globalCtx()))
+{
+}
+
 void BuiltinEffectsContext::registerExports()
 {
-    m_builtinEffectsRepository = std::make_shared<BuiltinEffectsRepository>(iocContext());
-
-    ioc()->registerExport<IBuiltinEffectsRepository>(mname, m_builtinEffectsRepository);
 }
 
 void BuiltinEffectsContext::resolveImports()
@@ -78,7 +74,7 @@ void BuiltinEffectsContext::resolveImports()
 
 void BuiltinEffectsContext::onInit(const muse::IApplication::RunMode&)
 {
-    m_builtinEffectsRepository->init();
+    m_builtinEffectsLoader->init();
 }
 
 void BuiltinEffectsContext::onDeinit()

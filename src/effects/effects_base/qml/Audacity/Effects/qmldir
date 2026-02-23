@@ -1,4 +1,6 @@
 module Audacity.Effects
+BuiltinEffectViewer 1.0 BuiltinEffectViewer.qml
+BuiltinEffectBase 1.0 BuiltinEffectBase.qml
 BypassEffectButton 1.0 BypassEffectButton.qml
 EffectControlsDisablingOverlay 1.0 EffectControlsDisablingOverlay.qml
 EffectPresetsBar 1.0 EffectPresetsBar.qml

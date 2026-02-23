@@ -3,7 +3,7 @@
 */
 #pragma once
 
-#include "../common/builtineffectmodel.h"
+#include "effects/effects_base/view/builtineffectmodel.h"
 #include "../common/params.h"
 
 namespace au::effects {

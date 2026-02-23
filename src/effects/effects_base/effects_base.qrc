@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/Audacity/Effects/qmldir</file>
+        <file>qml/Audacity/Effects/BuiltinEffectBase.qml</file>
+        <file>qml/Audacity/Effects/BuiltinEffectViewer.qml</file>
         <file>qml/Audacity/Effects/BypassEffectButton.qml</file>
         <file>qml/Audacity/Effects/EffectControlsDisablingOverlay.qml</file>
         <file>qml/Audacity/Effects/EffectPresetsBar.qml</file>

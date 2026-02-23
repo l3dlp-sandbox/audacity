@@ -1,9 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/Audacity/BuiltinEffects/qmldir</file>
-        <file>qml/Audacity/BuiltinEffects/BuiltinEffectViewer.qml</file>
         <file>qml/Audacity/BuiltinEffects/DynamicsEffectBase.qml</file>
-        <file>qml/Audacity/BuiltinEffects/BuiltinEffectBase.qml</file>
         <file>qml/Audacity/BuiltinEffects/SliderWithTextInput.qml</file>
         <file>qml/Audacity/BuiltinEffects/ParameterKnob.qml</file>
         <file>qml/Audacity/BuiltinEffects/BigParameterKnob.qml</file>
@@ -33,11 +31,9 @@
         <file>tonegen/ToneView.qml</file>
         <file>dtmfgen/DtmfView.qml</file>
         <file>silencegen/SilenceView.qml</file>
-        <file>general/GeneralEffectView.qml</file>
         <file>reverb/ReverbView.qml</file>
         <file>noisegen/NoiseView.qml</file>
         <file>noisereduction/NoiseReductionSlider.qml</file>
         <file>noisereduction/NoiseReductionView.qml</file>
-        <file>nyquistprompt/NyquistPromptView.qml</file>
     </qresource>
 </RCC>

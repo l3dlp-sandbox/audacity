@@ -1,7 +1,7 @@
 /*
 * Audacity: A Digital Audio Editor
 */
-#include "builtineffectsrepository.h"
+#include "builtineffectsloader.h"
 
 #include <QtQml>
 
@@ -12,8 +12,6 @@
 #include "au3-effects/LoadEffects.h"
 
 #include "au3wrap/internal/wxtypes_convert.h"
-
-#include "general/generalviewmodel.h"
 
 #include "effects/effects_base/effectstypes.h"
 #include "effects/effects_base/internal/au3/au3effectsutils.h"
@@ -43,8 +41,6 @@
 #include "tonegen/chirpeffect.h"
 #include "tonegen/toneeffect.h"
 #include "reverb/reverbeffect.h"
-#include "nyquistprompt/nyquistprompteffect.h"
-#include "nyquistprompt/nyquistpromptviewmodel.h"
 #include "reverb/reverbviewmodel.h"
 #include "tonegen/toneviewmodel.h"
 #include "dtmfgen/dtmfgenerator.h"
@@ -73,7 +69,7 @@
 
 using namespace au::effects;
 
-void BuiltinEffectsRepository::preInit()
+void BuiltinEffectsLoader::preInit()
 {
     static BuiltinEffectsModule::Registration< FadeInEffect > regFadeIn;
     static BuiltinEffectsModule::Registration< FadeOutEffect > regFadeOut;
@@ -98,20 +94,10 @@ void BuiltinEffectsRepository::preInit()
     static BuiltinEffectsModule::Registration< DtmfGenerator > regDtmf;
     static BuiltinEffectsModule::Registration< CompressorEffect > regCompressor;
     static BuiltinEffectsModule::Registration< LimiterEffect > regLimiter;
-    static BuiltinEffectsModule::Registration< NyquistPromptEffect > regNyquistPrompt;
 }
 
-void BuiltinEffectsRepository::init()
+void BuiltinEffectsLoader::init()
 {
-    updateEffectMetaList();
-}
-
-void BuiltinEffectsRepository::updateEffectMetaList()
-{
-    // For now, this method is called only once, so there is yet no need to clear the list and unregister the views.
-    // It will have to be implemented when we provide the user the possibility of rescanning the effects, though.
-    assert(m_metas.empty());
-
     auto regView = [this](const ::ComponentInterfaceSymbol& symbol, const muse::String& url) {
         effectsViewRegister()->regUrl(au3::wxToString(symbol.Internal()), url);
     };
@@ -147,12 +133,8 @@ void BuiltinEffectsRepository::updateEffectMetaList()
             assert(false);
         }
 
-        m_metas.insert({ desc.GetSymbol(), meta });
+        builtinEffectsRepository()->registerMeta(meta);
     };
-
-    // General
-    qmlRegisterUncreatableType<GeneralViewModel>("Audacity.Effects", 1, 0, "GeneralViewModel", "Not creatable from QML");
-    effectsViewRegister()->setDefaultUrl(u"qrc:/general/GeneralEffectView.qml");
 
     bool hasDynamicRangeProcessor = false;
     for (const PluginDescriptor& desc : PluginManager::Get().PluginsOfType(PluginTypeEffect)) {
@@ -291,14 +273,6 @@ void BuiltinEffectsRepository::updateEffectMetaList()
                     muse::mtrc("effects", "Reverb effect"),
                     true
                     );
-        } else if (symbol == NyquistPromptEffect::Symbol) {
-            REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(NyquistPromptViewModelFactory);
-            regView(NyquistPromptEffect::Symbol, u"qrc:/nyquistprompt/NyquistPromptView.qml");
-            regMeta(desc,
-                    muse::mtrc("effects", "Nyquist prompt"),
-                    muse::mtrc("effects", "Nyquist prompt effect"),
-                    true
-                    );
         } else if (symbol == NoiseGenerator::Symbol) {
             REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(NoiseViewModelFactory);
             regView(NoiseGenerator::Symbol, u"qrc:/noisegen/NoiseView.qml");
@@ -345,28 +319,4 @@ void BuiltinEffectsRepository::updateEffectMetaList()
         qmlRegisterType<Stopwatch>("Audacity.BuiltinEffects", 1, 0, "Stopwatch");
         qmlRegisterType<DynamicsPlayStateModel>("Audacity.BuiltinEffects", 1, 0, "DynamicsPlayStateModel");
     }
-
-    m_effectMetaListUpdated.notify();
-}
-
-muse::async::Notification BuiltinEffectsRepository::effectMetaListUpdated() const
-{
-    return m_effectMetaListUpdated;
-}
-
-EffectMeta BuiltinEffectsRepository::effectMeta(const ComponentInterfaceSymbol& symbol) const
-{
-    auto it = m_metas.find(symbol);
-    if (it == m_metas.end()) {
-        LOGW() << "not found effect meta for symbol: " << au3::wxToStdString(symbol.Internal());
-        return EffectMeta();
-    }
-    return it->second;
-}
-
-EffectMetaList BuiltinEffectsRepository::effectMetaList() const
-{
-    EffectMetaList list(m_metas.size());
-    std::transform(m_metas.begin(), m_metas.end(), list.begin(), [](const auto& pair) { return pair.second; });
-    return list;
 }

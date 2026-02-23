@@ -9,17 +9,13 @@ set(MODULE_SRC
     # common
     ${CMAKE_CURRENT_LIST_DIR}/builtineffectsmodule.cpp
     ${CMAKE_CURRENT_LIST_DIR}/builtineffectsmodule.h
-    ${CMAKE_CURRENT_LIST_DIR}/ibuiltineffectsrepository.h
-    ${CMAKE_CURRENT_LIST_DIR}/ieffectsviewregister.h
 
-    ${CMAKE_CURRENT_LIST_DIR}/internal/builtineffectsrepository.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/internal/builtineffectsrepository.h
+    ${CMAKE_CURRENT_LIST_DIR}/internal/builtineffectsloader.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/internal/builtineffectsloader.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/builtinviewlauncher.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/builtinviewlauncher.h
 
     ${CMAKE_CURRENT_LIST_DIR}/common/params.h
-    ${CMAKE_CURRENT_LIST_DIR}/common/builtineffectmodel.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/common/builtineffectmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/common/builtineffectsettingmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/common/builtineffectsettingmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/common/generatoreffect.cpp
@@ -33,14 +29,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/common/valuewarper/valuewarpertypes.h
     ${CMAKE_CURRENT_LIST_DIR}/common/valuewarper/warpingtransformer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/common/valuewarper/warpingtransformer.h
-
-    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.h
-    ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.h
-
-    ${CMAKE_CURRENT_LIST_DIR}/general/generalviewmodel.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/general/generalviewmodel.h
 
     # built-in effects
     ${CMAKE_CURRENT_LIST_DIR}/amplify/amplifyeffect.cpp
@@ -130,11 +118,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/noisereduction/noisereductioneffect.h
     ${CMAKE_CURRENT_LIST_DIR}/noisereduction/noisereductionviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/noisereduction/noisereductionviewmodel.h
-
-    ${CMAKE_CURRENT_LIST_DIR}/nyquistprompt/nyquistprompteffect.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/nyquistprompt/nyquistprompteffect.h
-    ${CMAKE_CURRENT_LIST_DIR}/nyquistprompt/nyquistpromptviewmodel.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/nyquistprompt/nyquistpromptviewmodel.h
 
     ${CMAKE_CURRENT_LIST_DIR}/fade/fadeeffect.cpp
     ${CMAKE_CURRENT_LIST_DIR}/fade/fadeeffect.h
