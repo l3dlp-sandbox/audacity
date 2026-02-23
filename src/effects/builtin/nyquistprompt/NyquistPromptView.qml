@@ -75,7 +75,7 @@ BuiltinEffectBase {
 
             hint: qsTrc("effects", "Enter Nyquist code here...")
 
-            onTextChanged: function (newText) {
+            onTextEditingFinished: function (newText) {
                 viewModel.commandText = newText
             }
         }
