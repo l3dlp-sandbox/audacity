@@ -2,16 +2,12 @@ set( TARGET libnyquist )
 
 add_library( ${TARGET} STATIC )
 
-def_vars()
-
 set( SOURCES
    PRIVATE
       # libnyquist
-
       nyx.c
 
       # libnyquist/nyquist/cmt
-
       nyquist/cmt/cext.c
       nyquist/cmt/cleanup.c
       nyquist/cmt/cmdline.c
@@ -31,19 +27,16 @@ set( SOURCES
       nyquist/cmt/userio.c
 
       # libnyquist/nyquist/cmupv
-
       nyquist/cmupv/src/cmupv.c
       nyquist/cmupv/src/cmupvdbg.c
       nyquist/cmupv/src/internal.c
 
       # libnyquist/nyquist/ffts
-
       nyquist/ffts/src/fftext.c
       nyquist/ffts/src/fftlib.c
       nyquist/ffts/src/matlib.c
 
       # libnyquist/nyquist/nyqsrc
-
       nyquist/nyqsrc/add.c
       nyquist/nyqsrc/avg.c
       nyquist/nyqsrc/compose.c
@@ -83,7 +76,6 @@ set( SOURCES
       nyquist/nyqsrc/yin.c
 
       # libnyquist/nyquist/nyqstk
-
       nyquist/nyqstk/instr.cpp
       nyquist/nyqstk/stkinit.cpp
       nyquist/nyqstk/stkint.cpp
@@ -129,7 +121,10 @@ set( SOURCES
 
 
       # libnyquist/nyquist/sys
-
+      # those files have been removed from SOURCES in 2021
+      # but apparently there are still some INCLUDES dir setup below with some of them
+      # also strangely nyquist-runtime needs nyquist/sys/win/msvc/system.lsp
+      # this would need more investigation before removing them completely
       #nyquist/sys/mac/macaboutbox.c
       #nyquist/sys/mac/MacAE.c
       #nyquist/sys/mac/MacCommandWin.c
@@ -151,7 +146,6 @@ set( SOURCES
       #nyquist/sys/win/wingui/xlispfns.c
 
       # libnyquist/nyquist/tran
-
       nyquist/tran/abs.c
       nyquist/tran/allpoles.c
       nyquist/tran/alpass.c
@@ -234,7 +228,6 @@ set( SOURCES
       nyquist/tran/white.c
 
       # libnyquist/nyquist/xlisp
-
       nyquist/xlisp/extern.c
       nyquist/xlisp/path.c
       nyquist/xlisp/security.c
@@ -291,6 +284,8 @@ set( DEFINES
 set( OPTIONS
    PRIVATE
       $<$<PLATFORM_ID:Darwin>:-fno-common>
+      $<$<CXX_COMPILER_ID:AppleClang,Clang,GNU>:-w>
+      $<$<CXX_COMPILER_ID:MSVC>:/w>
 )
 
 set( LIBRARIES
@@ -299,10 +294,12 @@ set( LIBRARIES
       SndFile::sndfile
 )
 
-set_target_properties( ${TARGET} PROPERTIES FOLDER "lib-src" )
-set_target_properties( ${TARGET} PROPERTIES POSITION_INDEPENDENT_CODE On)
+list( APPEND PROPERTIES
+    FOLDER "thirdparty"
+    POSITION_INDEPENDENT_CODE On
+)
 
-organize_source( "${CMAKE_CURRENT_SOURCE_DIR}" "" "${SOURCES}" )
+set_target_properties( ${TARGET} PROPERTIES ${PROPERTIES} )
 
 target_sources( ${TARGET} PRIVATE ${SOURCES} )
 target_compile_definitions( ${TARGET} PRIVATE ${DEFINES} )

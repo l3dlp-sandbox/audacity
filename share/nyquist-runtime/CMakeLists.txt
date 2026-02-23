@@ -87,7 +87,7 @@ foreach( source ${RUNTIME_FILES} )
    # Fix this when reorganizing the Nyquist sources
    if( source STREQUAL "system.lsp" )
       if( CMAKE_SYSTEM_NAME MATCHES "Windows" )
-         set( src "${CMAKE_SOURCE_DIR}/au3/lib-src/libnyquist/nyquist/sys/win/msvc/system.lsp" )
+         set( src "${CMAKE_SOURCE_DIR}/thirdparty/libnyquist/nyquist/sys/win/msvc/system.lsp" )
       endif()
    endif()
 
