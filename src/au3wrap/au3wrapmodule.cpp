@@ -60,14 +60,17 @@ void Au3WrapModule::onInit(const muse::IApplication::RunMode&)
 
     FFmpegStartup();
 
-    ModuleManager::Get().Initialize();
-    Importer::Get().Initialize();
-    ExportPluginRegistry::Get().Initialize();
-
     muse::String tempDir = projectConfiguration()->temporaryDir().toString();
     UpdateDefaultPath(FileNames::Operation::Temp, wxFromString(tempDir));
 
     (void)BasicUI::Install(m_au3BasicUi.get());
+}
+
+void Au3WrapModule::onAllInited(const muse::IApplication::RunMode& mode)
+{
+    ModuleManager::Get().Initialize();
+    Importer::Get().Initialize();
+    ExportPluginRegistry::Get().Initialize();
 }
 
 void Au3WrapModule::onDeinit()

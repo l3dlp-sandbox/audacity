@@ -26,6 +26,7 @@ public:
     void registerExports() override;
     void onPreInit(const muse::IApplication::RunMode&) override;
     void onInit(const muse::IApplication::RunMode& mode) override;
+    void onAllInited(const muse::IApplication::RunMode& mode) override;
     void onDeinit() override;
 
 private:
