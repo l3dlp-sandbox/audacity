@@ -29,6 +29,9 @@ static void nyquist_init_qrc()
     Q_INIT_RESOURCE(nyquist);
 }
 
+au::effects::NyquistEffectsModule::NyquistEffectsModule()
+    : m_nyquistMetaReader(std::make_shared<NyquistPluginsMetaReader>()) {}
+
 std::string au::effects::NyquistEffectsModule::moduleName() const
 {
     return mname;
@@ -39,6 +42,24 @@ void au::effects::NyquistEffectsModule::registerResources()
     nyquist_init_qrc();
 }
 
+void au::effects::NyquistEffectsModule::resolveImports()
+{
+    auto metaReaderRegister = globalIoc()->resolve<muse::audioplugins::IAudioPluginMetaReaderRegister>(mname);
+    if (metaReaderRegister) {
+        metaReaderRegister->registerReader(m_nyquistMetaReader);
+    }
+}
+
+void au::effects::NyquistEffectsModule::onInit(const muse::IApplication::RunMode& runMode)
+{
+    m_nyquistMetaReader->init(runMode);
+}
+
+void au::effects::NyquistEffectsModule::onDeinit()
+{
+    m_nyquistMetaReader->deinit();
+}
+
 muse::modularity::IContextSetup* au::effects::NyquistEffectsModule::newContext(const muse::modularity::ContextPtr& ctx) const
 {
     return new NyquistEffectsContext(ctx);
@@ -46,7 +67,6 @@ muse::modularity::IContextSetup* au::effects::NyquistEffectsModule::newContext(c
 
 au::effects::NyquistEffectsContext::NyquistEffectsContext(const muse::modularity::ContextPtr& ctx)
     : muse::modularity::IContextSetup(ctx),
-    m_nyquistMetaReader(std::make_shared<NyquistPluginsMetaReader>()),
     m_nyquistPromptLoader(std::make_unique<NyquistPromptLoader>(iocContext()))
 {
 }
@@ -72,11 +92,6 @@ void au::effects::NyquistEffectsContext::resolveImports()
         scannerRegister->registerScanner(std::make_shared<NyquistPluginsScanner>());
     }
 
-    auto metaReaderRegister = ioc()->resolve<muse::audioplugins::IAudioPluginMetaReaderRegister>(mname);
-    if (metaReaderRegister) {
-        metaReaderRegister->registerReader(m_nyquistMetaReader);
-    }
-
     auto paramExtractorRegistry = ioc()->resolve<IParameterExtractorRegistry>(mname);
     if (paramExtractorRegistry) {
         paramExtractorRegistry->registerExtractor(std::make_shared<NyquistParameterExtractorService>());
@@ -90,11 +105,9 @@ void au::effects::NyquistEffectsContext::resolveImports()
 
 void au::effects::NyquistEffectsContext::onInit(const muse::IApplication::RunMode& runMode)
 {
-    m_nyquistMetaReader->init(runMode);
     m_nyquistPromptLoader->init();
 }
 
 void au::effects::NyquistEffectsContext::onDeinit()
 {
-    m_nyquistMetaReader->deinit();
 }
