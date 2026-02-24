@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include "effects/builtin/collection/common/effectsettingmodelimpl.h"
+#include "../../common/effectsettingmodelimpl.h"
 #include "limitereffect.h"
 
 namespace au::effects {

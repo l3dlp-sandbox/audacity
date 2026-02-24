@@ -3,7 +3,7 @@
 #include "au3-components/SettingsVisitor.h" // EffectParameter
 #include "au3-effects/PerTrackEffect.h"
 
-#include "common/generatoreffect.h"
+#include "../common/generatoreffect.h"
 #include <array>
 
 namespace au::effects {

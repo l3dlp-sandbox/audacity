@@ -2,7 +2,7 @@
 
 #include "au3-effects/PerTrackEffect.h"
 #include "au3-components/SettingsVisitor.h"
-#include "common/generatoreffect.h"
+#include "../common/generatoreffect.h"
 
 namespace au::effects {
 struct NoiseSettings
