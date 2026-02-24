@@ -129,9 +129,11 @@ void PluginRegistrationApp::finish()
             s->onDeinit();
         }
         qDeleteAll(c.setups);
+        modularity::removeIoC(c.ctx);
     }
     m_contexts.clear();
 
+    // Delete modules
     qDeleteAll(m_modules);
     m_modules.clear();
 }
