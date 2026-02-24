@@ -1,11 +1,11 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type process delayandreverb
 $preview linear
 $name (_ "Delay")
 $debugbutton false
 $author (_ "Steve Daulton")
-$release 2.4.2-2
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0")
 
 

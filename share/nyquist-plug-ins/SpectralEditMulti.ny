@@ -1,9 +1,9 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type process spectraltools
 $name (_ "Spectral edit multi tool")
 $author (_ "Paul Licameli")
-$release 2.3.0-1
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0")
 
 ;; License: GPL v2

@@ -1,9 +1,9 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type process fading
 $name (_ "Studio fade out")
 $author (_ "Steve Daulton")
-$release 3.7.4
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0 or later")
 
 ;; Produce a smooth and musical sounding fade out.

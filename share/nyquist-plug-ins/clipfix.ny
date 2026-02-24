@@ -1,11 +1,11 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type process noiseremovalandrepair
 $preview enabled
 $name (_ "Clip fix")
 $debugbutton false
 $author (_ "Benjamin Schwartz and Steve Daulton")
-$release 2.3.0-2
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0")
 
 ;; License: GPL v2

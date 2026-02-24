@@ -1,10 +1,10 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type analyze nogroup
 $name (_ "Beat finder")
 $debugbutton false
 $author (_ "Audacity")
-$release 2.3.2-2
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0")
 
 ;; License: GPL v2

@@ -1,11 +1,11 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type process distortionandmodulation
 $preview linear
 $name (_ "Tremolo")
 $debugbutton disabled
 $author (_ "Steve Daulton")
-$release 2.4.0
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0 or later")
 
 ;; tremolo.ny by Steve Daulton (www.easyspacepro.com) July 2012.

@@ -1,11 +1,11 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type tool nogroup
 $name (_ "Nyquist plugin installer")
 $debugbutton false
 $preview disabled
 $author "Steve Daulton"
-$release 2.4.0-2
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0 or later")
 
 ;; License: GPL v2+

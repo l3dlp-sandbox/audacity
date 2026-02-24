@@ -1,11 +1,11 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type generate nogroup
 $name (_ "Rhythm track")
 $debugbutton false
 $preview linear
 $author (_ "Dominic Mazzoni, David R. Sky and Steve Daulton")
-$release 3.0.0-2
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0")
 
 

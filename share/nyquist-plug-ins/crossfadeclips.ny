@@ -1,11 +1,11 @@
 $nyquist plugin
-$version 4
+$version 5
 $type process fading
 $mergeclips 1
 $restoresplits 0
 $name (_ "Crossfade clips")
 $author (_ "Steve Daulton")
-$release 3.0.4-1
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0 or later") 
 
 

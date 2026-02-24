@@ -1,11 +1,11 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type process eqandfilters
 $preview linear
 $name (_ "Shelf filter")
 $debugbutton disabled
 $author (_ "Steve Daulton")
-$release 2.4.0-1
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0")
 
 ;; License: GPL v2

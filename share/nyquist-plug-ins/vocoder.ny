@@ -1,11 +1,11 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type process distortionandmodulation
 $preview enabled
 $name (_ "Vocoder")
 $debugbutton false
 $author (_ "Edgar-RFT and Steve Daulton")
-$release 3.1.2-1
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0")
 
 

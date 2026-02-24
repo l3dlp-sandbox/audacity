@@ -1,11 +1,11 @@
 $nyquist plug-in
-$version 4
+$version 5
 $type generate nogroup
 $name (_ "Pluck")
 $debugbutton false
 $preview linear
 $author (_ "David R.Sky")
-$release 2.4.2
+$release 4.0.0
 $copyright (_ "GNU General Public License v2.0")
 
 
