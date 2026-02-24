@@ -125,6 +125,9 @@ void PluginRegistrationApp::finish()
 
     // Delete contexts
     for (auto& c : m_contexts) {
+        for (modularity::IContextSetup* s : c.setups) {
+            s->onDeinit();
+        }
         qDeleteAll(c.setups);
     }
     m_contexts.clear();
