@@ -45,7 +45,7 @@ void ProjectSceneActionsController::init()
     globalContext()->currentProjectChanged().onNotify(this, [this]() {
         const auto prj = globalContext()->currentProject();
         if (prj) {
-            prj->viewState()->globalSpectrogramViewToggleChanged().onNotify(this, [this]() {
+            prj->viewState()->globalSpectrogramToggleIsOnChanged().onNotify(this, [this]() {
                 m_actionEnabledChanged.send(TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE);
             });
         }
@@ -187,16 +187,9 @@ Channel<ActionCode> ProjectSceneActionsController::actionCheckedChanged() const
     return m_actionCheckedChanged;
 }
 
-bool ProjectSceneActionsController::canReceiveAction(const ActionCode& actionCode) const
+bool ProjectSceneActionsController::canReceiveAction(const ActionCode&) const
 {
-    const auto prj = globalContext()->currentProject();
-    if (!prj) {
-        return false;
-    } else if (actionCode == TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE) {
-        return prj->viewState()->globalSpectrogramViewToggleIsActive();
-    } else {
-        return true;
-    }
+    return globalContext()->currentProject() != nullptr;
 }
 
 Channel<ActionCode> ProjectSceneActionsController::actionEnabledChanged() const
