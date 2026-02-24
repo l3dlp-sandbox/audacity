@@ -42,7 +42,7 @@
 #include "toast/toastmodule.h"
 #include "effects/effects_base/effectsmodule.h"
 #include "effects/builtin/builtineffectsmodule.h"
-#include "effects/builtin/collection/builtineffectscollectionmodule.h"
+#include "effects/builtin_collection/builtineffectscollectionmodule.h"
 #include "importexport/import/importermodule.h"
 #include "importexport/export/exportermodule.h"
 #include "importexport/labels/labelsmodule.h"

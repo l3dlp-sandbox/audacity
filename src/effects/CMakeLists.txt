@@ -4,6 +4,7 @@
 
 add_subdirectory(effects_base)
 add_subdirectory(builtin)
+add_subdirectory(builtin_collection)
 
 if (AU_MODULE_EFFECTS_LV2)
     add_subdirectory(lv2)
