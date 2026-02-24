@@ -18,7 +18,6 @@ void ProjectToolBarModel::load()
     AbstractToolBarModel::load();
 
     muse::actions::ActionCodeList itemsCodes = {
-        "toggle-mixer",
         "audio-setup",
         "get-effects"
     };

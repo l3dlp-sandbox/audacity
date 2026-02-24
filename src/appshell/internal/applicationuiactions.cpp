@@ -173,14 +173,6 @@ const UiActionList ApplicationUiActions::m_actions = {
              TranslatableString("action", "Show/hide timeline"),
              Checkable::Yes
              ),
-    UiAction("toggle-mixer",
-             au::context::UiCtxUnknown,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Mixer"),
-             TranslatableString("action", "Show/hide mixer"),
-             IconCode::Code::MIXER,
-             Checkable::Yes
-             ),
     UiAction("toggle-piano-keyboard",
              au::context::UiCtxProjectOpened,
              au::context::CTX_ANY,
@@ -394,7 +386,6 @@ const QMap<muse::actions::ActionCode, DockName>& ApplicationUiActions::toggleDoc
         { TOGGLE_BRAILLE_ACTION_CODE, NOTATION_BRAILLE_PANEL_NAME },
 
         { "toggle-timeline", TIMELINE_PANEL_NAME },
-        { "toggle-mixer", MIXER_PANEL_NAME },
         { "toggle-piano-keyboard", PIANO_KEYBOARD_PANEL_NAME },
 
         { "toggle-statusbar", PROJECT_STATUSBAR_NAME },
