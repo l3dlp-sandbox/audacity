@@ -24,6 +24,7 @@ class GeneratedEffectViewerModel : public AbstractEffectViewModel
     Q_PROPERTY(double tempo READ tempo NOTIFY timeSignatureChanged FINAL)
     Q_PROPERTY(int upperTimeSignature READ upperTimeSignature NOTIFY timeSignatureChanged FINAL)
     Q_PROPERTY(int lowerTimeSignature READ lowerTimeSignature NOTIFY timeSignatureChanged FINAL)
+    Q_PROPERTY(bool isPreviewAllowed READ isPreviewAllowed CONSTANT FINAL)
 
     muse::Inject<IEffectsProvider> effectsProvider{ this };
     muse::Inject<IParameterExtractorRegistry> parameterExtractorRegistry{ this };
@@ -52,6 +53,7 @@ protected:
     void doInit() override;
     void doStartPreview() override;
     void doStopPreview() override;
+    bool isPreviewAllowed() const;
 
 private:
     static QString computeEffectName(EffectInstanceId instanceId, IEffectsProvider* provider, IEffectInstancesRegister* instancesRegister);

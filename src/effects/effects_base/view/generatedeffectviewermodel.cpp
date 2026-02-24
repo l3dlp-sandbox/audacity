@@ -150,3 +150,15 @@ void GeneratedEffectViewerModel::doStopPreview()
 {
     effectsProvider()->stopPreview();
 }
+
+bool GeneratedEffectViewerModel::isPreviewAllowed() const
+{
+    const EffectId effectId = instancesRegister()->effectIdByInstanceId(instanceId());
+    const EffectMeta meta = effectsProvider()->meta(effectId);
+
+    // Analyze and Tool effects don't support preview
+    if (meta.type == EffectType::Analyzer || meta.type == EffectType::Tool) {
+        return false;
+    }
+    return true;
+}

@@ -152,6 +152,7 @@ Rectangle {
     }
 
     property bool isApplyAllowed: true
+    property bool isPreviewAllowed: viewModel.isPreviewAllowed
     property bool usesPresets: true
     property bool isPreviewing: viewModel.isPreviewing
 }

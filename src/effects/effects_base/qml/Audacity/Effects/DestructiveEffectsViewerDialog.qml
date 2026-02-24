@@ -42,6 +42,7 @@ EffectStyledDialogView {
         property bool showBottomPanel: true
 
         property bool isApplyAllowed: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.isApplyAllowed)
+        property bool isPreviewAllowed: !viewer || viewer.isPreviewAllowed !== false
 
         function closeWindow(accept) {
             if (prv.viewer) {
@@ -273,6 +274,7 @@ EffectStyledDialogView {
                             height: presetsBar.height
                             minWidth: 80
                             isLeftSide: true
+                            visible: prv.isPreviewAllowed
 
                             text: (prv.viewer && prv.viewer.isPreviewing) ?
                             //: Shown on a button that stops effect preview
