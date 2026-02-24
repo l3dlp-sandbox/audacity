@@ -326,7 +326,7 @@ StyledDialogView {
 
                                 checked: exportPreferencesModel.exportChannelsType == ExportChannels.CUSTOM
                                 text: qsTrc("export", "Custom mapping")
-                                enabled: exportPreferencesModel.maxExportChannels > 2 // TODO: disable when master FX are on the stack
+                                enabled: exportPreferencesModel.maxExportChannels > 2
 
                                 spacing: 8
 

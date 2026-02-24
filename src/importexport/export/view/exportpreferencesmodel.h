@@ -6,15 +6,16 @@
 #include <QObject>
 
 #include "framework/global/async/asyncable.h"
+
 #include "framework/global/modularity/ioc.h"
 #include "framework/global/io/ifilesystem.h"
 #include "framework/actions/iactionsdispatcher.h"
 #include "framework/interactive/iinteractive.h"
-
 #include "appshell/iappshellconfiguration.h"
+#include "importexport/export/iexportconfiguration.h"
 #include "context/iglobalcontext.h"
-#include "iexportconfiguration.h"
-#include "iexporter.h"
+#include "importexport//export/iexporter.h"
+#include "effects/effects_base/irealtimeeffectservice.h"
 #include "playback/iplaybackcontroller.h"
 #include "trackedit/iselectioncontroller.h"
 
@@ -24,13 +25,13 @@ class ExportPreferencesModel : public QObject, public muse::async::Asyncable, pu
     Q_OBJECT
 
     muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<appshell::IAppShellConfiguration> configuration;
-    muse::GlobalInject<IExportConfiguration> exportConfiguration;
-
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
     muse::Inject<muse::IInteractive> interactive{ this };
+    muse::GlobalInject<appshell::IAppShellConfiguration> configuration;
+    muse::GlobalInject<IExportConfiguration> exportConfiguration;
     muse::Inject<context::IGlobalContext> globalContext{ this };
     muse::Inject<IExporter> exporter{ this };
+    muse::Inject<effects::IRealtimeEffectService> realtimeEffectService{ this };
     muse::Inject<au::playback::IPlaybackController> playbackController{ this };
     muse::Inject<trackedit::ISelectionController> selectionController{ this };
 
@@ -101,6 +102,12 @@ public:
     bool oggFormatOptionsVisible();
     bool hasMetadata();
     int optionsCount();
+
+    bool needToDisableMasterFxBeforeExport() const;
+    void enableMasterFx() const;
+    bool masterFxEnabled() const;
+    bool customMappingEnabled() const;
+    muse::Ret warnAndDisableMasterFxBeforeExport() const;
 
 signals:
     void currentProcessChanged();
