@@ -23,8 +23,8 @@ void NyquistPromptLoader::init()
                                                                 [] (QQmlEngine*, QJSEngine*) -> QObject* {
             return new NyquistPromptViewModelFactory();
         });
-        effectsViewRegister()->regUrl(au3::wxToString(
-                                          NyquistPromptEffect::Symbol.Internal()), u"qrc:/nyquistprompt/NyquistPromptView.qml");
+        const auto effectName = au3::wxToString(NyquistPromptEffect::Symbol.Internal());
+        builtinEffectsViewRegister()->regUrl(effectName, u"qrc:/nyquistprompt/NyquistPromptView.qml");
 
         EffectMeta meta;
         meta.id = au3::wxToString(desc.GetID());

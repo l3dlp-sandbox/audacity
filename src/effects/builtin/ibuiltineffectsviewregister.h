@@ -9,12 +9,12 @@
 
 namespace au::effects {
 //! TODO Move to builtin module
-class IEffectsViewRegister : MODULE_EXPORT_INTERFACE
+class IBuiltinEffectsViewRegister : MODULE_EXPORT_INTERFACE
 {
-    INTERFACE_ID(IEffectsViewRegister)
+    INTERFACE_ID(IBuiltinEffectsViewRegister)
 
 public:
-    virtual ~IEffectsViewRegister() = default;
+    virtual ~IBuiltinEffectsViewRegister() = default;
 
     virtual void setDefaultUrl(const muse::String& viewUrl) = 0;
     virtual void regUrl(const muse::String& effectName, const muse::String& viewUrl) = 0;

@@ -5,7 +5,7 @@
 
 #include "modularity/ioc.h"
 
-#include "effects/builtin/ieffectsviewregister.h"
+#include "effects/builtin/ibuiltineffectsviewregister.h"
 #include "effects/builtin/ibuiltineffectsrepository.h"
 #include "modularity/ioc.h"
 
@@ -13,7 +13,7 @@ namespace au::effects {
 class BuiltinEffectsLoader : public muse::Injectable
 {
     // TODO all this should be global
-    muse::Inject<IEffectsViewRegister> effectsViewRegister { this };
+    muse::Inject<IBuiltinEffectsViewRegister> builtinEffectsViewRegister { this };
     muse::Inject<IBuiltinEffectsRepository> builtinEffectsRepository { this };
 
 public:

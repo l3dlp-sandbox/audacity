@@ -4,7 +4,7 @@
 #pragma once
 
 #include "framework/global/modularity/ioc.h"
-#include "effects/builtin/ieffectsviewregister.h"
+#include "effects/builtin/ibuiltineffectsviewregister.h"
 #include "effects/builtin/ibuiltineffectsrepository.h"
 
 class WaveChannel;
@@ -12,7 +12,7 @@ class WaveChannel;
 namespace au::effects {
 class NyquistPromptLoader : public muse::Injectable
 {
-    muse::Inject<IEffectsViewRegister> effectsViewRegister { this };
+    muse::Inject<IBuiltinEffectsViewRegister> builtinEffectsViewRegister { this };
     muse::Inject<IBuiltinEffectsRepository> builtinEffectsRepository { this };
 
 public:

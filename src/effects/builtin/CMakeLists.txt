@@ -12,7 +12,7 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/builtineffectsmodule.cpp
     ${CMAKE_CURRENT_LIST_DIR}/builtineffectsmodule.h
     ${CMAKE_CURRENT_LIST_DIR}/ibuiltineffectsrepository.h
-    ${CMAKE_CURRENT_LIST_DIR}/ieffectsviewregister.h
+    ${CMAKE_CURRENT_LIST_DIR}/ibuiltineffectsviewregister.h
 
     # internal
     ${CMAKE_CURRENT_LIST_DIR}/internal/builtineffectsrepository.cpp
@@ -23,8 +23,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.h
-    ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectsviewregister.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectsviewregister.h
     )
 
 # AU3

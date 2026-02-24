@@ -99,7 +99,7 @@ void BuiltinEffectsLoader::preInit()
 void BuiltinEffectsLoader::init()
 {
     auto regView = [this](const ::ComponentInterfaceSymbol& symbol, const muse::String& url) {
-        effectsViewRegister()->regUrl(au3::wxToString(symbol.Internal()), url);
+        builtinEffectsViewRegister()->regUrl(au3::wxToString(symbol.Internal()), url);
     };
 
     auto regMeta

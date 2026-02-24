@@ -7,7 +7,7 @@
 
 #include "view/builtineffectmodel.h"
 #include "view/builtineffectviewloader.h"
-#include "view/effectsviewregister.h"
+#include "view/builtineffectsviewregister.h"
 
 using namespace au::effects;
 
@@ -23,7 +23,7 @@ std::string BuiltinEffectsModule::moduleName() const
 
 void BuiltinEffectsModule::registerExports()
 {
-    globalIoc()->registerExport<IEffectsViewRegister>(moduleName(), new EffectsViewRegister());
+    globalIoc()->registerExport<IBuiltinEffectsViewRegister>(moduleName(), new BuiltinEffectsViewRegister());
     globalIoc()->registerExport<IBuiltinEffectsRepository>(moduleName(), new BuiltinEffectsRepository());
 }
 

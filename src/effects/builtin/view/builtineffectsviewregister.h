@@ -5,13 +5,13 @@
 
 #include <map>
 
-#include "../ieffectsviewregister.h"
+#include "../ibuiltineffectsviewregister.h"
 
 namespace au::effects {
-class EffectsViewRegister : public IEffectsViewRegister
+class BuiltinEffectsViewRegister : public IBuiltinEffectsViewRegister
 {
 public:
-    EffectsViewRegister() = default;
+    BuiltinEffectsViewRegister() = default;
 
     void setDefaultUrl(const muse::String& viewUrl) override;
     void regUrl(const muse::String& effectName, const muse::String& viewUrl) override;
