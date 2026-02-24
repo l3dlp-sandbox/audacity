@@ -3,7 +3,7 @@
 */
 import QtQuick
 
-import Audacity.BuiltinEffectsCollection
+import Audacity.BuiltinEffects
 
 Rectangle {
     id: root

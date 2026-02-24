@@ -3,7 +3,6 @@
 */
 #include "builtineffectscollectionmodule.h"
 
-#include "globalmodule.h"
 #include "internal/builtineffectsloader.h"
 #include "internal/builtinviewlauncher.h"
 

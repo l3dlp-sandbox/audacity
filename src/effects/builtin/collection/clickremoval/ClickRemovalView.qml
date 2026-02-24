@@ -1,6 +1,7 @@
 import QtQuick
 import Muse.UiComponents
 import Audacity.Effects
+import Audacity.BuiltinEffects
 import Audacity.BuiltinEffectsCollection
 
 BuiltinEffectBase {

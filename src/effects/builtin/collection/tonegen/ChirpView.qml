@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Muse.Ui
 import Muse.UiComponents
 import Audacity.Effects
+import Audacity.BuiltinEffects
 import Audacity.BuiltinEffectsCollection
 import Audacity.UiComponents
 

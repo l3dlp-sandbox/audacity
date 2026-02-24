@@ -5,8 +5,8 @@
 
 #include "modularity/ioc.h"
 
-#include "effects/effects_base/ieffectsviewregister.h"
-#include "effects/effects_base/ibuiltineffectsrepository.h"
+#include "effects/builtin/ieffectsviewregister.h"
+#include "effects/builtin/ibuiltineffectsrepository.h"
 #include "modularity/ioc.h"
 
 namespace au::effects {

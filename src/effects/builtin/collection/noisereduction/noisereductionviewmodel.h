@@ -5,7 +5,7 @@
 
 #include "../common/params.h"
 
-#include "effects/effects_base/view/builtineffectmodel.h"
+#include "effects/builtin/view/builtineffectmodel.h"
 
 #include "framework/interactive/iinteractive.h"
 

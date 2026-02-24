@@ -13,12 +13,10 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/effectsmodule.cpp
     ${CMAKE_CURRENT_LIST_DIR}/effectsmodule.h
     ${CMAKE_CURRENT_LIST_DIR}/effectstypes.h
-    ${CMAKE_CURRENT_LIST_DIR}/ibuiltineffectsrepository.h
     ${CMAKE_CURRENT_LIST_DIR}/ieffectsprovider.h
     ${CMAKE_CURRENT_LIST_DIR}/ieffectsmenuprovider.h
     ${CMAKE_CURRENT_LIST_DIR}/ieffectsconfiguration.h
     ${CMAKE_CURRENT_LIST_DIR}/ieffectsuiengine.h
-    ${CMAKE_CURRENT_LIST_DIR}/ieffectsviewregister.h
     ${CMAKE_CURRENT_LIST_DIR}/ieffectinstancesregister.h
     ${CMAKE_CURRENT_LIST_DIR}/ieffectexecutionscenario.h
     ${CMAKE_CURRENT_LIST_DIR}/irealtimeeffectservice.h
@@ -36,8 +34,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/internal/abstractaudiopluginmetareader.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/abstractviewlauncher.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/abstractviewlauncher.h
-    ${CMAKE_CURRENT_LIST_DIR}/internal/builtineffectsrepository.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/internal/builtineffectsrepository.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/effectconfigsettings.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/effectconfigsettings.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/effectsconfiguration.cpp
@@ -81,18 +77,12 @@ set(MODULE_SRC
     # view
     ${CMAKE_CURRENT_LIST_DIR}/view/abstracteffectviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/abstracteffectviewmodel.h
-    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectmodel.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectmodel.h
-    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.h
     ${CMAKE_CURRENT_LIST_DIR}/view/effectmanagemenu.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/effectmanagemenu.h
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsuiengine.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsuiengine.h
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewtypes.h
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewutils.h
-    ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.h
     ${CMAKE_CURRENT_LIST_DIR}/view/destructiveeffectviewerdialogmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/destructiveeffectviewerdialogmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/realtimeeffectviewerdialogmodel.cpp

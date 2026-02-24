@@ -1,6 +1,7 @@
 import QtQuick
 import Muse.Ui
 import Audacity.Effects
+import Audacity.BuiltinEffects
 import Audacity.BuiltinEffectsCollection
 
 import "../../../dynamics/timeline"

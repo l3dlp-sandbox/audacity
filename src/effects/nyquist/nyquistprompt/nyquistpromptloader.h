@@ -4,8 +4,8 @@
 #pragma once
 
 #include "framework/global/modularity/ioc.h"
-#include "effects/effects_base/ieffectsviewregister.h"
-#include "effects/effects_base/ibuiltineffectsrepository.h"
+#include "effects/builtin/ieffectsviewregister.h"
+#include "effects/builtin/ibuiltineffectsrepository.h"
 
 class WaveChannel;
 

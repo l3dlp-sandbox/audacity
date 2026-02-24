@@ -10,8 +10,8 @@
 #include "global/async/asyncable.h"
 #include "modularity/ioc.h"
 
+#include "effects/builtin/ieffectsviewregister.h"
 #include "effects/effects_base/ieffectsuiengine.h"
-#include "effects/effects_base/ieffectsviewregister.h"
 #include "effects/effects_base/ieffectinstancesregister.h"
 
 namespace au::effects {

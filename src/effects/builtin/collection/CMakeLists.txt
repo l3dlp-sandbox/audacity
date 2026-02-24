@@ -1,7 +1,7 @@
 #
 # Audacity: A Digital Audio Editor
 #
-declare_module(effects_builtin)
+declare_module(effects_builtin_collection)
 
 set(MODULE_QRC builtin_effects_collection.qrc)
 

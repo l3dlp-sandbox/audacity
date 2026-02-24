@@ -9,7 +9,6 @@
 #include "framework/interactive/iinteractiveuriregister.h"
 #include "framework/diagnostics/idiagnosticspathsregister.h"
 
-#include "internal/builtineffectsrepository.h"
 #include "internal/effectconfigsettings.h"
 #include "internal/effectsprovider.h"
 #include "internal/effectsmenuprovider.h"
@@ -24,11 +23,8 @@
 #include "internal/effectparametersprovider.h"
 #include "internal/parameterextractorregistry.h"
 
-#include "view/builtineffectmodel.h"
-#include "view/builtineffectviewloader.h"
 #include "view/effectmanagemenu.h"
 #include "view/effectsuiengine.h"
-#include "view/effectsviewregister.h"
 #include "view/effectsviewutils.h"
 #include "view/destructiveeffectviewerdialogmodel.h"
 #include "view/realtimeeffectviewerdialogmodel.h"
@@ -52,8 +48,6 @@ void EffectsModule::registerExports()
 {
     m_configuration = std::make_shared<EffectsConfiguration>();
 
-    globalIoc()->registerExport<IEffectsViewRegister>(mname, new EffectsViewRegister());
-    globalIoc()->registerExport<IBuiltinEffectsRepository>(mname, new BuiltinEffectsRepository());
     globalIoc()->registerExport<IEffectsConfiguration>(mname, m_configuration);
     globalIoc()->registerExport<IParameterExtractorRegistry>(mname, new ParameterExtractorRegistry());
 }
@@ -75,8 +69,6 @@ void EffectsModule::registerResources()
 
 void EffectsModule::registerUiTypes()
 {
-    qmlRegisterUncreatableType<BuiltinEffectModel>("Audacity.Effects", 1, 0, "BuiltinEffectModel", "Not creatable abstract type");
-    qmlRegisterType<BuiltinEffectViewLoader>("Audacity.Effects", 1, 0, "BuiltinEffectViewLoader");
     qmlRegisterType<EffectManageMenu>("Audacity.Effects", 1, 0, "EffectManageMenu");
     qmlRegisterType<DestructiveEffectViewerDialogModel>("Audacity.Effects", 1, 0, "DestructiveEffectViewerDialogModel");
     qmlRegisterType<RealtimeEffectViewerDialogModel>("Audacity.Effects", 1, 0, "RealtimeEffectViewerDialogModel");

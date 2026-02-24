@@ -41,6 +41,7 @@
 #include "uicomponents/uicomponentsmodule.h"
 #include "toast/toastmodule.h"
 #include "effects/effects_base/effectsmodule.h"
+#include "effects/builtin/builtineffectsmodule.h"
 #include "effects/builtin/collection/builtineffectscollectionmodule.h"
 #include "importexport/import/importermodule.h"
 #include "importexport/export/exportermodule.h"
@@ -156,6 +157,7 @@ std::shared_ptr<muse::IApplication> AppFactory::newGuiApp(const CommandLineParse
     app->addModule(new au::au3::Au3WrapModule());
     app->addModule(new au::au3cloud::Au3CloudModule());
     app->addModule(new au::effects::EffectsModule());
+    app->addModule(new au::effects::BuiltinEffectsModule());
     app->addModule(new au::effects::BuiltinEffectsCollectionModule());
 
     return app;

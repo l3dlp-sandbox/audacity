@@ -1,6 +1,6 @@
 #pragma once
 
-#include "effects/effects_base/view/builtineffectmodel.h"
+#include "effects/builtin/view/builtineffectmodel.h"
 
 namespace au::effects {
 class ReverbEffect;

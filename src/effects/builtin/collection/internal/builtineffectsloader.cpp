@@ -312,11 +312,11 @@ void BuiltinEffectsLoader::init()
 
     if (hasDynamicRangeProcessor) {
         // These types are used by both Compressor and Limiter, so register them only if at least one of these effects is present.
-        qmlRegisterType<DynamicsTimeline>("Audacity.BuiltinEffects", 1, 0, "DynamicsTimeline");
-        qmlRegisterType<TimelineSourceModel>("Audacity.BuiltinEffects", 1, 0, "TimelineSourceModel");
-        qmlRegisterType<CompressionDbMeterModel>("Audacity.BuiltinEffects", 1, 0, "CompressionDbMeterModel");
-        qmlRegisterType<OutputDbMeterModel>("Audacity.BuiltinEffects", 1, 0, "OutputDbMeterModel");
-        qmlRegisterType<Stopwatch>("Audacity.BuiltinEffects", 1, 0, "Stopwatch");
-        qmlRegisterType<DynamicsPlayStateModel>("Audacity.BuiltinEffects", 1, 0, "DynamicsPlayStateModel");
+        qmlRegisterType<DynamicsTimeline>("Audacity.BuiltinEffectsCollection", 1, 0, "DynamicsTimeline");
+        qmlRegisterType<TimelineSourceModel>("Audacity.BuiltinEffectsCollection", 1, 0, "TimelineSourceModel");
+        qmlRegisterType<CompressionDbMeterModel>("Audacity.BuiltinEffectsCollection", 1, 0, "CompressionDbMeterModel");
+        qmlRegisterType<OutputDbMeterModel>("Audacity.BuiltinEffectsCollection", 1, 0, "OutputDbMeterModel");
+        qmlRegisterType<Stopwatch>("Audacity.BuiltinEffectsCollection", 1, 0, "Stopwatch");
+        qmlRegisterType<DynamicsPlayStateModel>("Audacity.BuiltinEffectsCollection", 1, 0, "DynamicsPlayStateModel");
     }
 }

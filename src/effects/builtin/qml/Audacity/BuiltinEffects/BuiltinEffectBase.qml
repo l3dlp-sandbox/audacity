@@ -1,10 +1,6 @@
 import QtQuick
-import QtQuick.Layouts
 
-import Muse.Ui
-import Muse.UiComponents
-
-import Audacity.BuiltinEffectsCollection
+import Audacity.BuiltinEffects
 
 Rectangle {
     id: root

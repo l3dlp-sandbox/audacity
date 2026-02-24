@@ -8,6 +8,7 @@ import Muse.Ui 1.0
 import Muse.UiComponents
 
 import Audacity.Effects
+import Audacity.BuiltinEffects
 import Audacity.BuiltinEffectsCollection
 
 BuiltinEffectBase {
