@@ -8,7 +8,7 @@ import Muse.Ui
 import Muse.UiComponents
 
 import Audacity.Effects
-import Audacity.BuiltinEffects
+import Audacity.BuiltinEffectsCollection
 import Audacity.Lv2
 import Audacity.AudioUnit
 import Audacity.Vst
