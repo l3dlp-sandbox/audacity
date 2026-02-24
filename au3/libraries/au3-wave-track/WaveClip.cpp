@@ -2035,9 +2035,15 @@ sampleCount WaveClip::GetVisibleSampleCount() const
            - TimeToSamples(mTrimRight) - TimeToSamples(mTrimLeft);
 }
 
-void WaveClip::SetTrimLeft(double trim)
+bool WaveClip::SetTrimLeft(double trim)
 {
-    mTrimLeft = std::max(.0, trim);
+    const auto newTrim = std::max(.0, trim);
+    if (mTrimLeft == newTrim) {
+        return false;
+    }
+
+    mTrimLeft = newTrim;
+    return true;
 }
 
 double WaveClip::GetTrimLeft() const noexcept
@@ -2045,9 +2051,15 @@ double WaveClip::GetTrimLeft() const noexcept
     return mTrimLeft;
 }
 
-void WaveClip::SetTrimRight(double trim)
+bool WaveClip::SetTrimRight(double trim)
 {
-    mTrimRight = std::max(.0, trim);
+    const auto newTrim = std::max(.0, trim);
+    if (mTrimRight == newTrim) {
+        return false;
+    }
+
+    mTrimRight = newTrim;
+    return true;
 }
 
 double WaveClip::GetTrimRight() const noexcept
@@ -2055,14 +2067,14 @@ double WaveClip::GetTrimRight() const noexcept
     return mTrimRight;
 }
 
-void WaveClip::TrimLeft(double deltaTime)
+bool WaveClip::TrimLeft(double deltaTime)
 {
-    SetTrimLeft(mTrimLeft + deltaTime);
+    return SetTrimLeft(mTrimLeft + deltaTime);
 }
 
-void WaveClip::TrimRight(double deltaTime)
+bool WaveClip::TrimRight(double deltaTime)
 {
-    SetTrimRight(mTrimRight + deltaTime);
+    return SetTrimRight(mTrimRight + deltaTime);
 }
 
 void WaveClip::TrimQuarternotesFromRight(double quarters)

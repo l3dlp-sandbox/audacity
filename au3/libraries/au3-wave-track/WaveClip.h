@@ -483,19 +483,19 @@ public:
     sampleCount GetVisibleSampleCount() const override;
 
     //! Sets the play start offset in seconds from the beginning of the underlying sequence
-    void SetTrimLeft(double trim);
+    bool SetTrimLeft(double trim);
     //! Returns the play start offset in seconds from the beginning of the underlying sequence
     double GetTrimLeft() const noexcept;
 
     //! Sets the play end offset in seconds from the ending of the underlying sequence
-    void SetTrimRight(double trim);
+    bool SetTrimRight(double trim);
     //! Returns the play end offset in seconds from the ending of the underlying sequence
     double GetTrimRight() const noexcept;
 
     //! Moves play start position by deltaTime
-    void TrimLeft(double deltaTime);
+    bool TrimLeft(double deltaTime);
     //! Moves play end position by deltaTime
-    void TrimRight(double deltaTime);
+    bool TrimRight(double deltaTime);
     //! Same as `TrimRight`, but expressed as quarter notes
     void TrimQuarternotesFromRight(double quarters);
 
