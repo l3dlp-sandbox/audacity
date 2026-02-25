@@ -42,6 +42,7 @@ std::string Lv2EffectsModule::moduleName() const
 
 void Lv2EffectsModule::registerExports()
 {
+    globalIoc()->registerExport<ILv2EffectsRepository>(mname, std::make_shared<Lv2EffectsRepository>());
 }
 
 void Lv2EffectsModule::resolveImports()
@@ -93,7 +94,6 @@ muse::modularity::IContextSetup* Lv2EffectsModule::newContext(const muse::modula
 
 void Lv2EffectsContext::registerExports()
 {
-    ioc()->registerExport<ILv2EffectsRepository>(mname, std::make_shared<Lv2EffectsRepository>(iocContext()));
 }
 
 void Lv2EffectsContext::resolveImports()

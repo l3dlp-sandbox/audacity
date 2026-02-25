@@ -45,10 +45,13 @@ std::string VstEffectsModule::moduleName() const
 void VstEffectsModule::registerExports()
 {
     m_museVstModulesRepository = std::make_shared<MuseVstModulesRepository>();
+    m_vstEffectsRepository = std::make_shared<VstEffectsRepository>();
 
     // for muse
     globalIoc()->registerExport<muse::vst::IVstInstancesRegister>(mname, new MuseVstInstancesRegister());
     globalIoc()->registerExport<muse::vst::IVstModulesRepository>(mname, m_museVstModulesRepository);
+
+    globalIoc()->registerExport<IVstEffectsRepository>(mname, m_vstEffectsRepository);
 }
 
 void VstEffectsModule::resolveImports()
@@ -101,9 +104,6 @@ muse::modularity::IContextSetup* VstEffectsModule::newContext(const muse::modula
 
 void VstEffectsContext::registerExports()
 {
-    m_vstEffectsRepository = std::make_shared<VstEffectsRepository>(iocContext());
-
-    ioc()->registerExport<IVstEffectsRepository>(mname, m_vstEffectsRepository);
 }
 
 void VstEffectsContext::resolveImports()

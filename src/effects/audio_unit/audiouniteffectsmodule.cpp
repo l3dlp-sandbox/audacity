@@ -37,6 +37,7 @@ std::string au::effects::AudioUnitEffectsModule::moduleName() const
 
 void au::effects::AudioUnitEffectsModule::registerExports()
 {
+    globalIoc()->registerExport<IAudioUnitEffectsRepository>(mname, std::make_shared<AudioUnitEffectsRepository>());
 }
 
 void au::effects::AudioUnitEffectsModule::resolveImports()
@@ -79,7 +80,6 @@ muse::modularity::IContextSetup* au::effects::AudioUnitEffectsModule::newContext
 
 void au::effects::AudioUnitEffectsContext::registerExports()
 {
-    ioc()->registerExport<IAudioUnitEffectsRepository>(mname, std::make_shared<AudioUnitEffectsRepository>(iocContext()));
 }
 
 void au::effects::AudioUnitEffectsContext::resolveImports()

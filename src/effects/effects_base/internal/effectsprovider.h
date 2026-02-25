@@ -32,17 +32,17 @@ namespace au::effects {
 class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable, public muse::Injectable
 {
     muse::GlobalInject<IEffectsConfiguration> configuration;
+    muse::GlobalInject<muse::audioplugins::IKnownAudioPluginsRegister> knownPluginsRegister;
+    muse::GlobalInject<IAudioUnitEffectsRepository> audioUnitEffectsRepository;
+    muse::GlobalInject<IBuiltinEffectsRepository> builtinEffectsRepository;
+    muse::GlobalInject<ILv2EffectsRepository> lv2EffectsRepository;
+    muse::GlobalInject<INyquistEffectsRepository> nyquistEffectsRepository;
+    muse::GlobalInject<IVstEffectsRepository> vstEffectsRepository;
 
     muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<IBuiltinEffectsRepository> builtinEffectsRepository{ this };
-    muse::Inject<ILv2EffectsRepository> lv2EffectsRepository{ this };
-    muse::Inject<IVstEffectsRepository> vstEffectsRepository{ this };
-    muse::Inject<INyquistEffectsRepository> nyquistEffectsRepository{ this };
-    muse::Inject<IAudioUnitEffectsRepository> audioUnitEffectsRepository{ this };
     muse::Inject<muse::IInteractive> interactive{ this };
     muse::Inject<playback::IPlayback> playback{ this };
     muse::Inject<IEffectViewLaunchRegister> viewLaunchRegister{ this };
-    muse::Inject<muse::audioplugins::IKnownAudioPluginsRegister> knownPluginsRegister{ this };
 
 public:
     EffectsProvider(const muse::modularity::ContextPtr& ctx)
