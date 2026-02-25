@@ -45,11 +45,12 @@ RowLayout {
         }
     }
     property alias navigationColumnEnd: menuBtn.navigation.column
+    property alias navigationRow: menuBtn.navigation.row
 
     property string accessibleName: ""
 
     signal valueChangeRequested(var newValue)
-    signal valueEditingFinished()
+    signal valueEditingFinished
 
     height: 28
 
@@ -129,7 +130,7 @@ RowLayout {
                         navigation.row: root.navigation.row
                         navigation.column: root.navigation.column + 1 + model.index
 
-                        navigation.onNavigationEvent: function(event) {
+                        navigation.onNavigationEvent: function (event) {
                             if (event.type === NavigationEvent.Escape) {
                                 prv.isFieldsNavigationEnabled = false
 
@@ -151,7 +152,9 @@ RowLayout {
                 }
             }
 
-            NavigationFocusBorder { navigationCtrl: root.navigation }
+            NavigationFocusBorder {
+                navigationCtrl: root.navigation
+            }
         }
     }
 
@@ -172,7 +175,7 @@ RowLayout {
         navigation.row: root.navigation.row
         navigation.column: root.navigation.column + 1 + repeater.count + 1
 
-        onHandleMenuItem: function(itemId) {
+        onHandleMenuItem: function (itemId) {
             root.model.currentFormat = parseInt(itemId)
         }
     }

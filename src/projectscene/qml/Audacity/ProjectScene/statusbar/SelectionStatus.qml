@@ -89,7 +89,7 @@ Row {
         enabled: selectionModel.isEnabled
 
         navigation.panel: root.navigationPanel
-        navigation.row: 1
+        navigation.row: startEndTimeCode.navigationRow
         navigation.column: startEndTimeCode.navigationColumnEnd + 1
 
         accessibleName: durationLabel.text

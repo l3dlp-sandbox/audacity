@@ -25,6 +25,7 @@ RowLayout {
 
     property NavigationPanel navigationPanel: null
     property alias navigationColumnEnd: endTimecode.navigationColumnEnd
+    property alias navigationRow: endTimecode.navigationRow
 
     property string accessibleName: ""
 
