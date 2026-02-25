@@ -4,6 +4,7 @@
 #include "projectpagemodel.h"
 
 #include "framework/global/log.h"
+#include "framework/global/async/async.h"
 
 #include "internal/applicationuiactions.h"
 #include "projectscene/internal/projectsceneuiactions.h"
@@ -77,7 +78,9 @@ void ProjectPageModel::updatePlaybackMeterVisibility()
         const bool meterPanelVisible = it->show
                                        && (playbackConfiguration()->playbackMeterPosition()
                                            == playback::PlaybackMeterPosition::MeterPosition::SideBar);
-        dispatcher()->dispatch("dock-set-open", ActionData::make_arg2<QString, bool>(playbackMeterPanelName(), meterPanelVisible));
+        muse::async::Async::call(this, [this, meterPanelVisible]() {
+            dispatcher()->dispatch("dock-set-open", ActionData::make_arg2<QString, bool>(playbackMeterPanelName(), meterPanelVisible));
+        });
     }
 }
 

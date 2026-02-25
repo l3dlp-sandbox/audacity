@@ -42,13 +42,13 @@ GuiApp::GuiApp(const CommandLineParser::Options& options, const muse::modularity
 int GuiApp::lastId()
 {
     // TODO: should be provided by AppFactory
-#ifndef MUSE_MULTICONTEXT_WIP
-    static int lastId = -1;
+    static int id = 0;
+
+#ifdef MUSE_MULTICONTEXT_WIP
+    return id++;
 #else
-    static int lastId = 0;
-    lastId++;
+    return id;
 #endif
-    return lastId;
 }
 
 void GuiApp::addModule(modularity::IModuleSetup* module)
