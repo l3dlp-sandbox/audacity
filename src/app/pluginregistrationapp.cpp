@@ -131,8 +131,6 @@ void PluginRegistrationApp::finish()
 
     qDeleteAll(m_modules);
     m_modules.clear();
-
-    removeIoC();
 }
 
 std::vector<muse::modularity::IContextSetup*>& PluginRegistrationApp::contextSetups(const muse::modularity::ContextPtr& ctx)

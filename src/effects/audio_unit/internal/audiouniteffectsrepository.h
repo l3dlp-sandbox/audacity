@@ -10,10 +10,10 @@
 #include "au3-audio-unit/AudioUnitEffectsModule.h"
 
 namespace au::effects {
-class AudioUnitEffectsRepository : public IAudioUnitEffectsRepository, public muse::Injectable
+class AudioUnitEffectsRepository : public IAudioUnitEffectsRepository
 {
 public:
-    AudioUnitEffectsRepository(const muse::modularity::ContextPtr& ctx);
+    AudioUnitEffectsRepository();
 
     EffectMetaList effectMetaList() const override;
     bool ensurePluginIsLoaded(const EffectId& effectId) const override;

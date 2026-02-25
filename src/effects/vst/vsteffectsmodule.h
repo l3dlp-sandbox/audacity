@@ -31,6 +31,7 @@ private:
 
     const std::shared_ptr<Vst3PluginsMetaReader> m_vstMetaReader;
     std::shared_ptr<MuseVstModulesRepository> m_museVstModulesRepository;
+    std::shared_ptr<VstEffectsRepository> m_vstEffectsRepository;
 };
 
 class VstEffectsContext : public muse::modularity::IContextSetup
@@ -44,6 +45,5 @@ public:
     void onDeinit() override;
 
 private:
-    std::shared_ptr<VstEffectsRepository> m_vstEffectsRepository;
 };
 }

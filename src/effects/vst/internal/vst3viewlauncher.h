@@ -13,7 +13,7 @@
 namespace au::effects {
 class Vst3ViewLauncher final : public AbstractViewLauncher
 {
-    muse::Inject<muse::vst::IVstInstancesRegister> museInstancesRegister{ this };
+    muse::GlobalInject<muse::vst::IVstInstancesRegister> museInstancesRegister;
 
 public:
     Vst3ViewLauncher(const muse::modularity::ContextPtr& ctx)
