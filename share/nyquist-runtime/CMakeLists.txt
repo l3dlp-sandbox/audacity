@@ -67,8 +67,8 @@ elseif(OS_IS_LIN)
    set(NYQUIST_INSTALL_DEST "${CMAKE_INSTALL_PREFIX}/share/audacity/")
    set(NYQUIST_BUILD_DEST "${CMAKE_BINARY_DIR}/share/audacity/")
 else()
-   set(NYQUIST_INSTALL_DEST "${CMAKE_INSTALL_PREFIX}")
-   set(NYQUIST_BUILD_DEST "${CMAKE_BINARY_DIR}/")
+   set(NYQUIST_INSTALL_DEST "${AU4_SHARE_NAME}${AU4_INSTALL_NAME}bin")
+   set(NYQUIST_BUILD_DEST "${CMAKE_BINARY_DIR}/${AU4_SHARE_NAME}${AU4_INSTALL_NAME}/")
 endif()
 
 # Install Nyquist runtime files for release builds
