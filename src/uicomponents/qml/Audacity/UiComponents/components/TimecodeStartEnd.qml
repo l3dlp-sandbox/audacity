@@ -24,8 +24,9 @@ RowLayout {
     property int currentFormat: 0
 
     property NavigationPanel navigationPanel: null
-    property string accessibleName: ""
     property alias navigationColumnEnd: endTimecode.navigationColumnEnd
+
+    property string accessibleName: ""
 
     signal startValueChangeRequested(var newValue)
     signal endValueChangeRequested(var newValue)
@@ -73,6 +74,8 @@ RowLayout {
         navigation.panel: root.navigationPanel
         navigation.row: startTimecode.navigation.row
         navigation.column: startTimecode.navigationColumnEnd + 1
+
+        accessibleName: root.accessibleName
 
         onValueChangeRequested: function (newValue) {
             root.endValueChangeRequested(newValue)
