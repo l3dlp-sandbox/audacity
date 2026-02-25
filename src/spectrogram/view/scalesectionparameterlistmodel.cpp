@@ -11,7 +11,16 @@
 
 namespace au::spectrogram {
 ScaleSectionParameterListModel::ScaleSectionParameterListModel(QObject* parent)
-    : AbstractSectionParametersListModel(parent) {}
+    : AbstractSectionParametersListModel(parent), muse::Injectable(muse::iocCtxForQmlObject(this)) {}
+
+void ScaleSectionParameterListModel::setTrackId(int trackId)
+{
+    if (trackId == m_trackId) {
+        return;
+    }
+    m_trackId = trackId;
+    emit trackIdChanged();
+}
 
 void ScaleSectionParameterListModel::onSettingsModelSet(AbstractSpectrogramSettingsModel&)
 {
@@ -65,12 +74,12 @@ QString ScaleSectionParameterListModel::controlLabel(Control control) const
 
 int ScaleSectionParameterListModel::controlMinValue(Control) const
 {
-    return m_settingsModel ? m_settingsModel->frequencyHardMinimum() : 0;
+    return 0;
 }
 
 int ScaleSectionParameterListModel::controlMaxValue(Control) const
 {
-    return m_settingsModel ? m_settingsModel->frequencyHardMaximum() : 0;
+    return m_trackId == -1 ? 1e6 : spectrogramService()->frequencyHardMaximum(m_trackId);
 }
 
 int ScaleSectionParameterListModel::controlCurrentValue(Control control) const

@@ -11,12 +11,11 @@
 
 namespace au::spectrogram {
 AbstractSpectrogramSettingsModel::AbstractSpectrogramSettingsModel(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
-{}
+    : QObject(parent) {}
 
 void AbstractSpectrogramSettingsModel::setMinFreq(int value)
 {
-    doSetMinFreq(std::clamp(value, frequencyHardMinimum(), frequencyHardMaximum()));
+    doSetMinFreq(value);
     if (maxFreq() <= minFreq()) {
         doSetMaxFreq(minFreq());
     }
@@ -24,16 +23,10 @@ void AbstractSpectrogramSettingsModel::setMinFreq(int value)
 
 void AbstractSpectrogramSettingsModel::setMaxFreq(int value)
 {
-    doSetMaxFreq(std::clamp(value, frequencyHardMinimum(), frequencyHardMaximum()));
+    doSetMaxFreq(value);
     if (minFreq() >= maxFreq()) {
         doSetMinFreq(maxFreq());
     }
-}
-
-int AbstractSpectrogramSettingsModel::frequencyHardMaximum() const
-{
-    const auto sampleRates = audioDevicesProvider()->sampleRates();
-    return static_cast<int>(*std::max_element(sampleRates.begin(), sampleRates.end()) / 2);
 }
 
 QString AbstractSpectrogramSettingsModel::colorSchemeName(int scheme) const

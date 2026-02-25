@@ -57,6 +57,10 @@ double SpectrogramService::trackSampleRate(int trackId) const
     return waveTrack->GetRate();
 }
 
+double SpectrogramService::frequencyHardMaximum(int trackId) const
+{
+    return trackSampleRate(trackId) / 2;
+}
 
 double SpectrogramService::yToFrequency(int trackId, double spectrogramY, double spectrogramHeight) const
 {
