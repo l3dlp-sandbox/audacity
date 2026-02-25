@@ -55,6 +55,10 @@ public:
     MOCK_METHOD(void, setSelectionTimecodeFormat, (int precision), (override));
     MOCK_METHOD(muse::async::Notification, selectionTimecodeFormatChanged, (), (const, override));
 
+    MOCK_METHOD(int, durationTimecodeFormat, (), (const, override));
+    MOCK_METHOD(void, setDurationTimecodeFormat, (int format), (override));
+    MOCK_METHOD(muse::async::Notification, durationTimecodeFormatChanged, (), (const, override));
+
     MOCK_METHOD(bool, playbackOnRulerClickEnabled, (), (const, override));
     MOCK_METHOD(void, setPlaybackOnRulerClickEnabled, (bool enabled), (override));
     MOCK_METHOD(muse::async::Notification, playbackOnRulerClickEnabledChanged, (), (const, override));

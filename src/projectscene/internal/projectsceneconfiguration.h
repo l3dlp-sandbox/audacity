@@ -65,6 +65,10 @@ public:
     void setSelectionTimecodeFormat(int format) override;
     muse::async::Notification selectionTimecodeFormatChanged() const override;
 
+    int durationTimecodeFormat() const override;
+    void setDurationTimecodeFormat(int format) override;
+    muse::async::Notification durationTimecodeFormatChanged() const override;
+
     bool playbackOnRulerClickEnabled() const override;
     void setPlaybackOnRulerClickEnabled(bool enabled) override;
     muse::async::Notification playbackOnRulerClickEnabledChanged() const override;
@@ -91,6 +95,7 @@ private:
     muse::async::Notification m_asymmetricStereoHeightsChanged;
     muse::async::Notification m_asymmetricStereoHeightsWorkspacesChanged;
     muse::async::Notification m_selectionTimecodeFormatChanged;
+    muse::async::Notification m_durationTimecodeFormatChanged;
     muse::async::Notification m_playbackOnRulerClickEnabledChanged;
     muse::async::Notification m_updateDisplayWhilePlayingEnabledChanged;
     muse::async::Notification m_pinnedPlayHeadEnabledChanged;

@@ -31,6 +31,7 @@ static const muse::Settings::Key CLIP_STYLE(moduleName, "projectscene/clipStyle"
 static const muse::Settings::Key STEREO_HEIGHTS_PREF(moduleName, "projectscene/asymmetricStereoHeights");
 static const muse::Settings::Key ASYMMETRIC_STEREO_HEIGHTS_WORKSPACES(moduleName, "projectscene/asymmetricStereoHeightsWorkspaces");
 static const muse::Settings::Key SELECTION_TIMECODE_FORMAT(moduleName, "projectscene/selectionTimecodeFormat");
+static const muse::Settings::Key DURATION_TIMECODE_FORMAT(moduleName, "projectscene/durationTimecodeFormat");
 static const muse::Settings::Key PLAYBACK_ON_RULER_CLICK_ENABLED(moduleName, "projectscene/playbackOnRulerClickEnabled");
 static const muse::Settings::Key LABEL_EDITOR_COLUMN_FORMAT(moduleName, "projectscene/labelEditorColumnFormat");
 static const muse::Settings::Key UPDATE_DISPLAY_WHILE_PLAYING_ENABLED(moduleName, "projectscene/updateDisplayWhilePlayingEnabled");
@@ -77,6 +78,12 @@ void ProjectSceneConfiguration::init()
     muse::settings()->valueChanged(SELECTION_TIMECODE_FORMAT).onReceive(nullptr, [this](const muse::Val& val) {
         UNUSED(val);
         m_selectionTimecodeFormatChanged.notify();
+    });
+
+    muse::settings()->setDefaultValue(DURATION_TIMECODE_FORMAT, muse::Val(au::uicomponents::TimecodeFormatType::HHMMSSHundredths));
+    muse::settings()->valueChanged(DURATION_TIMECODE_FORMAT).onReceive(nullptr, [this](const muse::Val& val) {
+        UNUSED(val);
+        m_durationTimecodeFormatChanged.notify();
     });
 
     muse::settings()->setDefaultValue(PLAYBACK_ON_RULER_CLICK_ENABLED, muse::Val(DEFAULT_PLAYBACK_ON_RULER_CLICK_ENABLED));
@@ -286,6 +293,21 @@ void ProjectSceneConfiguration::setSelectionTimecodeFormat(int format)
 muse::async::Notification ProjectSceneConfiguration::selectionTimecodeFormatChanged() const
 {
     return m_selectionTimecodeFormatChanged;
+}
+
+int ProjectSceneConfiguration::durationTimecodeFormat() const
+{
+    return muse::settings()->value(DURATION_TIMECODE_FORMAT).toInt();
+}
+
+void ProjectSceneConfiguration::setDurationTimecodeFormat(int format)
+{
+    muse::settings()->setSharedValue(DURATION_TIMECODE_FORMAT, muse::Val(format));
+}
+
+muse::async::Notification ProjectSceneConfiguration::durationTimecodeFormatChanged() const
+{
+    return m_durationTimecodeFormatChanged;
 }
 
 bool ProjectSceneConfiguration::playbackOnRulerClickEnabled() const
