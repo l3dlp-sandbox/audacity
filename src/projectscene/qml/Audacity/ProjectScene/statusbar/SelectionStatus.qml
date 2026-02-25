@@ -63,6 +63,8 @@ Row {
     }
 
     StyledTextLabel {
+        id: durationLabel
+
         anchors.verticalCenter: parent.verticalCenter
 
         text: qsTrc("projectscene", "Duration")
@@ -89,6 +91,8 @@ Row {
         navigation.panel: root.navigationPanel
         navigation.row: 1
         navigation.column: startEndTimeCode.navigationColumnEnd + 1
+
+        accessibleName: durationLabel.text
 
         onValueChangeRequested: function (newValue) {
             selectionModel.endTime = selectionModel.startTime + newValue
