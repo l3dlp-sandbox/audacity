@@ -279,13 +279,15 @@ const UiActionList ProjectUiActions::m_actions = {
              au::context::UiCtxAny,
              au::context::CTX_ANY,
              TranslatableString("action", "Zoom in"),
-             TranslatableString("action", "Zoom in")
+             TranslatableString("action", "Zoom in"),
+             IconCode::Code::ZOOM_IN
              ),
     UiAction("zoom-out",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
              TranslatableString("action", "Zoom out"),
-             TranslatableString("action", "Zoom out")
+             TranslatableString("action", "Zoom out"),
+             IconCode::Code::ZOOM_OUT
              ),
     UiAction("zoom-to-selection",
              au::context::UiCtxAny,
