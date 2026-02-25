@@ -60,9 +60,8 @@ public:
     virtual muse::ValCh<trackedit::TrackViewType> trackViewType(const trackedit::TrackId& trackId) const = 0;
     virtual void setTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType) = 0;
     virtual void toggleGlobalSpectrogramView() = 0;
-    virtual bool globalSpectrogramViewIsOn() const = 0;
-    virtual bool globalSpectrogramViewToggleIsActive() const = 0;
-    virtual muse::async::Notification globalSpectrogramViewToggleChanged() const = 0;
+    virtual bool globalSpectrogramToggleIsOn() const = 0;
+    virtual muse::async::Notification globalSpectrogramToggleIsOnChanged() const = 0;
 
     virtual muse::ValCh<int> trackRulerType(const trackedit::TrackId& trackId) const = 0;
     virtual void setTrackRulerType(const trackedit::TrackId& trackId, int rulerType) = 0;

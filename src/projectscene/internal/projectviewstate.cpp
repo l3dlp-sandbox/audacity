@@ -220,10 +220,6 @@ void ProjectViewState::init(const std::shared_ptr<au3::IAu3Project>& project)
         saveProjectZoomState(au3Project, zoomState);
     });
 
-    m_spectrogramToggledTracks.ch.onReceive(this, [this](auto) {
-        m_globalSpectrogramViewToggleChanged.notify();
-    });
-
     globalContext()->currentTrackeditProjectChanged().onNotify(this, [this](){
         auto prj = globalContext()->currentTrackeditProject();
         if (!prj) {
@@ -804,17 +800,11 @@ void ProjectViewState::setTrackViewType(const trackedit::TrackId& trackId, track
         return;
     }
 
-    if (m_spectrogramToggledTracks.val.find(trackId) != m_spectrogramToggledTracks.val.end()) {
-        auto map = std::move(m_spectrogramToggledTracks.val);
-        map.erase(trackId);
-        m_spectrogramToggledTracks.set(std::move(map));
-    }
-
     const auto it = m_tracks.find(trackId);
     if (it != m_tracks.end()) {
         it->second.viewType.set(viewType);
         ::setTrackViewType(project, trackId, viewType);
-        m_globalSpectrogramViewToggleChanged.notify();
+        m_globalSpectrogramToggleIsOnChanged.notify();
         projectHistory()->modifyState();
         projectHistory()->markUnsaved();
     }
@@ -826,33 +816,31 @@ void ProjectViewState::toggleGlobalSpectrogramView()
     IF_ASSERT_FAILED(prj) {
         return;
     }
-    auto set = m_spectrogramToggledTracks.val;
     auto changed = false;
     using namespace trackedit;
-    if (set.empty()) {
+
+    if (!m_globalSpectrogramToggleIsOn) {
+        // Enable spectrogram view: convert ALL waveform and multi-view tracks to spectrogram
         for (auto& [trackId, trackData] : m_tracks) {
-            if (trackData.viewType.val != TrackViewType::Waveform) {
-                continue;
+            if (trackData.viewType.val == TrackViewType::Waveform || trackData.viewType.val == TrackViewType::WaveformAndSpectrogram) {
+                changed = true;
+                trackData.viewType.set(TrackViewType::Spectrogram);
+                ::setTrackViewType(prj, trackId, TrackViewType::Spectrogram);
             }
-            changed = true;
-            trackData.viewType.set(TrackViewType::Spectrogram);
-            ::setTrackViewType(prj, trackId, TrackViewType::Spectrogram);
-            set.insert(trackId);
         }
     } else {
-        for (const auto& trackId : set) {
-            const auto it = m_tracks.find(trackId);
-            if (it == m_tracks.end() || it->second.viewType.val == TrackViewType::Waveform) {
-                continue;
+        // Disable spectrogram view: convert ALL spectrogram and multi-view tracks back to waveform
+        for (auto& [trackId, trackData] : m_tracks) {
+            if (trackData.viewType.val == TrackViewType::Spectrogram || trackData.viewType.val == TrackViewType::WaveformAndSpectrogram) {
+                changed = true;
+                trackData.viewType.set(TrackViewType::Waveform);
+                ::setTrackViewType(prj, trackId, TrackViewType::Waveform);
             }
-            changed = true;
-            it->second.viewType.set(TrackViewType::Waveform);
-            ::setTrackViewType(prj, trackId, TrackViewType::Waveform);
         }
-        set.clear();
     }
 
-    m_spectrogramToggledTracks.set(std::move(set));
+    m_globalSpectrogramToggleIsOn = !m_globalSpectrogramToggleIsOn;
+    m_globalSpectrogramToggleIsOnChanged.notify();
 
     if (changed) {
         projectHistory()->modifyState();
@@ -860,25 +848,14 @@ void ProjectViewState::toggleGlobalSpectrogramView()
     }
 }
 
-bool ProjectViewState::globalSpectrogramViewToggleIsActive() const
+bool ProjectViewState::globalSpectrogramToggleIsOn() const
 {
-    if (globalSpectrogramViewIsOn()) {
-        return true;
-    }
-    return std::any_of(m_tracks.begin(), m_tracks.end(),
-                       [](const auto& pair) {
-        return pair.second.viewType.val == trackedit::TrackViewType::Waveform;
-    });
+    return m_globalSpectrogramToggleIsOn;
 }
 
-bool ProjectViewState::globalSpectrogramViewIsOn() const
+muse::async::Notification ProjectViewState::globalSpectrogramToggleIsOnChanged() const
 {
-    return !m_spectrogramToggledTracks.val.empty();
-}
-
-muse::async::Notification ProjectViewState::globalSpectrogramViewToggleChanged() const
-{
-    return m_globalSpectrogramViewToggleChanged;
+    return m_globalSpectrogramToggleIsOnChanged;
 }
 
 muse::ValCh<int> ProjectViewState::trackRulerType(const trackedit::TrackId& trackId) const
