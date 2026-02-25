@@ -104,15 +104,6 @@ void TrackSpectrogramSettingsModel::setTrackId(int value)
     emit trackIdChanged();
 }
 
-QString TrackSpectrogramSettingsModel::trackTitle() const
-{
-    const ITrackeditProjectPtr project = globalContext()->currentTrackeditProject();
-    if (!project) {
-        return QString();
-    }
-    return QString::fromStdString(project->trackName(m_trackId).value_or(""));
-}
-
 bool TrackSpectrogramSettingsModel::useGlobalSettings() const
 {
     return m_trackConfig ? m_trackConfig->useGlobalSettings() : false;

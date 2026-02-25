@@ -18,10 +18,11 @@ StyledDialogView {
         if (!root.settingsModel)
             return qsTrc("trackedit/preferences", "Spectrogram settings")
         else
-            return qsTrc("trackedit/preferences", "Spectrogram settings - %1").arg(root.settingsModel.trackTitle)
+            return qsTrc("trackedit/preferences", "Spectrogram settings - %1").arg(root.trackTitle)
     }
 
     property int trackId: -1
+    property string trackTitle: ""
 
     property var settingsModel: TrackSpectrogramSettingsModel {
         trackId: root.trackId

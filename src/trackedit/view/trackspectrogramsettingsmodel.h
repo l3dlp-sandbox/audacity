@@ -19,7 +19,6 @@ class TrackSpectrogramSettingsModel : public spectrogram::AbstractSpectrogramSet
     Q_OBJECT
 
     Q_PROPERTY(int trackId READ trackId WRITE setTrackId NOTIFY trackIdChanged)
-    Q_PROPERTY(QString trackTitle READ trackTitle NOTIFY trackIdChanged)
     Q_PROPERTY(bool useGlobalSettings READ useGlobalSettings WRITE setUseGlobalSettings NOTIFY useGlobalSettingsChanged)
 
     muse::GlobalInject<spectrogram::IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
@@ -35,8 +34,6 @@ public:
 
     int trackId() const { return m_trackId; }
     void setTrackId(int value);
-
-    QString trackTitle() const;
 
     bool useGlobalSettings() const;
     void setUseGlobalSettings(bool value);
