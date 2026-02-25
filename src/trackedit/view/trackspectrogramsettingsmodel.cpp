@@ -37,12 +37,12 @@ TrackSpectrogramSettingsModel::TrackSpectrogramSettingsModel(QObject* parent)
     : spectrogram::AbstractSpectrogramSettingsModel(parent)
 {}
 
-TrackSpectrogramSettingsModel::~TrackSpectrogramSettingsModel()
+void TrackSpectrogramSettingsModel::aboutToDestroy()
 {
     if (m_initialTrackConfig) {
         spectrogramService()->copyConfiguration(*m_initialTrackConfig, *m_trackConfig);
         m_trackConfig->setUseGlobalSettings(m_initialTrackConfig->useGlobalSettings());
-        sendRepaintRequest();
+        emit updateRequested();
     }
 }
 
@@ -68,26 +68,13 @@ void TrackSpectrogramSettingsModel::componentComplete()
     emit zeroPaddingFactorChanged();
     emit useGlobalSettingsChanged();
 
-    sendRepaintRequest();
+    emit updateRequested();
 }
 
 void TrackSpectrogramSettingsModel::onSettingChanged()
 {
     setUseGlobalSettings(false);
-    sendRepaintRequest();
-}
-
-void TrackSpectrogramSettingsModel::sendRepaintRequest()
-{
-    const ITrackeditProjectPtr project = globalContext()->currentTrackeditProject();
-    IF_ASSERT_FAILED(project) {
-        return;
-    }
-    const auto track = project->track(m_trackId);
-    IF_ASSERT_FAILED(track) {
-        return;
-    }
-    project->notifyAboutTrackChanged(*track);
+    emit updateRequested();
 }
 
 void TrackSpectrogramSettingsModel::accept()
@@ -131,7 +118,8 @@ void TrackSpectrogramSettingsModel::setUseGlobalSettings(bool value)
         emit windowTypeChanged();
         emit windowSizeChanged();
         emit zeroPaddingFactorChanged();
-        sendRepaintRequest();
+
+        emit updateRequested();
     }
     emit useGlobalSettingsChanged();
 }

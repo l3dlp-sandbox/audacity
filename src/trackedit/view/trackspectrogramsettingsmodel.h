@@ -23,14 +23,14 @@ class TrackSpectrogramSettingsModel : public spectrogram::AbstractSpectrogramSet
 
     muse::GlobalInject<spectrogram::IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
 
-    muse::Inject<au::context::IGlobalContext> globalContext { this };
     muse::Inject<spectrogram::ISpectrogramService> spectrogramService { this };
 
 public:
     TrackSpectrogramSettingsModel(QObject* parent = nullptr);
-    ~TrackSpectrogramSettingsModel() override;
+    ~TrackSpectrogramSettingsModel() override = default;
 
     Q_INVOKABLE void accept();
+    Q_INVOKABLE void aboutToDestroy();
 
     int trackId() const { return m_trackId; }
     void setTrackId(int value);
@@ -74,13 +74,13 @@ public:
 signals:
     void trackIdChanged();
     void useGlobalSettingsChanged();
+    void updateRequested();
 
 private:
     void classBegin() override {}
     void componentComplete() override;
 
     void onSettingChanged();
-    void sendRepaintRequest();
 
     int m_trackId = -1;
 
