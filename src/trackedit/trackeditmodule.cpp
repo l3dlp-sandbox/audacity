@@ -40,7 +40,6 @@
 #include "view/deletebehaviorpanelmodel.h"
 #include "view/pastebehaviorpanelmodel.h"
 #include "view/tracknavigationmodel.h"
-#include "view/trackspectrogramsettingsmodel.h"
 #include "view/trackspectrogramsettingsdialogmodel.h"
 
 #include "internal/au3/au3trackeditproject.h"
@@ -86,7 +85,6 @@ void TrackeditModule::registerUiTypes()
     qmlRegisterType<DeleteBehaviorPanelModel>("Audacity.TrackEdit", 1, 0, "DeleteBehaviorPanelModel");
     qmlRegisterType<PasteBehaviorPanelModel>("Audacity.TrackEdit", 1, 0, "PasteBehaviorPanelModel");
     qmlRegisterType<TrackNavigationModel>("Audacity.TrackEdit", 1, 0, "TrackNavigationModel");
-    qmlRegisterType<TrackSpectrogramSettingsModel>("Audacity.TrackEdit", 1, 0, "TrackSpectrogramSettingsModel");
     qmlRegisterType<TrackSpectrogramSettingsDialogModel>("Audacity.TrackEdit", 1, 0, "TrackSpectrogramSettingsDialogModel");
 }
 

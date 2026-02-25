@@ -6,7 +6,7 @@
 
 #include "framework/global/log.h"
 
-namespace au::trackedit {
+namespace au::spectrogram {
 namespace {
 constexpr auto isPowerOfTwo(int x) -> bool
 {
@@ -34,7 +34,7 @@ static_assert(logTwo(8) == 3);
 }
 
 TrackSpectrogramSettingsModel::TrackSpectrogramSettingsModel(QObject* parent)
-    : spectrogram::AbstractSpectrogramSettingsModel(parent)
+    : AbstractSpectrogramSettingsModel(parent)
 {}
 
 void TrackSpectrogramSettingsModel::aboutToDestroy()
@@ -207,7 +207,7 @@ int TrackSpectrogramSettingsModel::colorScheme() const
 
 void TrackSpectrogramSettingsModel::setColorScheme(int value)
 {
-    const auto scheme = static_cast<spectrogram::SpectrogramColorScheme>(value);
+    const auto scheme = static_cast<SpectrogramColorScheme>(value);
     if (m_trackConfig->colorScheme() == scheme) {
         return;
     }
@@ -223,7 +223,7 @@ int TrackSpectrogramSettingsModel::scale() const
 
 void TrackSpectrogramSettingsModel::setScale(int value)
 {
-    const auto scale = static_cast<spectrogram::SpectrogramScale>(value);
+    const auto scale = static_cast<SpectrogramScale>(value);
     if (m_trackConfig->scale() == scale) {
         return;
     }
@@ -239,7 +239,7 @@ int TrackSpectrogramSettingsModel::algorithm() const
 
 void TrackSpectrogramSettingsModel::setAlgorithm(int value)
 {
-    const auto algorithm = static_cast<spectrogram::SpectrogramAlgorithm>(value);
+    const auto algorithm = static_cast<SpectrogramAlgorithm>(value);
     if (m_trackConfig->algorithm() == algorithm) {
         return;
     }
@@ -255,7 +255,7 @@ int TrackSpectrogramSettingsModel::windowType() const
 
 void TrackSpectrogramSettingsModel::setWindowType(int value)
 {
-    const auto windowType = static_cast<spectrogram::SpectrogramWindowType>(value);
+    const auto windowType = static_cast<SpectrogramWindowType>(value);
     if (m_trackConfig->windowType() == windowType) {
         return;
     }

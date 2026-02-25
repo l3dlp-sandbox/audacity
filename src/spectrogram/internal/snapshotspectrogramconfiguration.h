@@ -7,8 +7,8 @@
 
 #include <cassert>
 
-namespace au::trackedit {
-class SnapshotSpectrogramConfiguration final : public spectrogram::ITrackSpectrogramConfiguration
+namespace au::spectrogram {
+class SnapshotSpectrogramConfiguration final : public ITrackSpectrogramConfiguration
 {
 public:
     SnapshotSpectrogramConfiguration(const ITrackSpectrogramConfiguration& config)
@@ -44,17 +44,17 @@ public:
     int colorHighBoostDbPerDec() const override { return m_colorHighBoostDbPerDec; }
     void setColorHighBoostDbPerDec(int) override { assert(false); }
 
-    spectrogram::SpectrogramColorScheme colorScheme() const override { return m_colorScheme; }
-    void setColorScheme(spectrogram::SpectrogramColorScheme) override { assert(false); }
+    SpectrogramColorScheme colorScheme() const override { return m_colorScheme; }
+    void setColorScheme(SpectrogramColorScheme) override { assert(false); }
 
-    spectrogram::SpectrogramScale scale() const override { return m_scale; }
-    void setScale(spectrogram::SpectrogramScale) override { assert(false); }
+    SpectrogramScale scale() const override { return m_scale; }
+    void setScale(SpectrogramScale) override { assert(false); }
 
-    spectrogram::SpectrogramAlgorithm algorithm() const override { return m_algorithm; }
-    void setAlgorithm(spectrogram::SpectrogramAlgorithm) override { assert(false); }
+    SpectrogramAlgorithm algorithm() const override { return m_algorithm; }
+    void setAlgorithm(SpectrogramAlgorithm) override { assert(false); }
 
-    spectrogram::SpectrogramWindowType windowType() const override { return m_windowType; }
-    void setWindowType(spectrogram::SpectrogramWindowType) override { assert(false); }
+    SpectrogramWindowType windowType() const override { return m_windowType; }
+    void setWindowType(SpectrogramWindowType) override { assert(false); }
 
     int winSizeLog2() const override { return m_winSizeLog2; }
     void setWinSizeLog2(int) override { assert(false); }
@@ -71,10 +71,10 @@ private:
     const int m_colorGainDb;
     const int m_colorRangeDb;
     const int m_colorHighBoostDbPerDec;
-    const spectrogram::SpectrogramColorScheme m_colorScheme;
-    const spectrogram::SpectrogramScale m_scale;
-    const spectrogram::SpectrogramAlgorithm m_algorithm;
-    const spectrogram::SpectrogramWindowType m_windowType;
+    const SpectrogramColorScheme m_colorScheme;
+    const SpectrogramScale m_scale;
+    const SpectrogramAlgorithm m_algorithm;
+    const SpectrogramWindowType m_windowType;
     const int m_winSizeLog2;
     const int m_zeroPaddingFactor;
     const bool m_useGlobalSettings;

@@ -8,22 +8,21 @@
 #include "spectrogram/view/abstractspectrogramsettingsmodel.h"
 #include "spectrogram/iglobalspectrogramconfiguration.h"
 #include "spectrogram/ispectrogramservice.h"
-#include "context/iglobalcontext.h"
 
+#include "framework/global/async/asyncable.h"
 #include "framework/global/modularity/ioc.h"
 
-namespace au::trackedit {
-class TrackSpectrogramSettingsModel : public spectrogram::AbstractSpectrogramSettingsModel, public QQmlParserStatus,
-    public muse::async::Asyncable
+namespace au::spectrogram {
+class TrackSpectrogramSettingsModel : public AbstractSpectrogramSettingsModel, public QQmlParserStatus, public muse::async::Asyncable
 {
     Q_OBJECT
 
     Q_PROPERTY(int trackId READ trackId WRITE setTrackId NOTIFY trackIdChanged)
     Q_PROPERTY(bool useGlobalSettings READ useGlobalSettings WRITE setUseGlobalSettings NOTIFY useGlobalSettingsChanged)
 
-    muse::GlobalInject<spectrogram::IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
+    muse::GlobalInject<IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
 
-    muse::Inject<spectrogram::ISpectrogramService> spectrogramService { this };
+    muse::Inject<ISpectrogramService> spectrogramService { this };
 
 public:
     TrackSpectrogramSettingsModel(QObject* parent = nullptr);
@@ -84,7 +83,7 @@ private:
 
     int m_trackId = -1;
 
-    std::shared_ptr<spectrogram::ITrackSpectrogramConfiguration> m_trackConfig;
-    std::unique_ptr<spectrogram::ITrackSpectrogramConfiguration> m_initialTrackConfig;
+    std::shared_ptr<ITrackSpectrogramConfiguration> m_trackConfig;
+    std::unique_ptr<ITrackSpectrogramConfiguration> m_initialTrackConfig;
 };
 }
