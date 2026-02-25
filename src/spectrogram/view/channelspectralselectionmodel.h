@@ -80,7 +80,6 @@ public:
 
 signals:
     void trackSampleRateChanged();
-    void zoomChanged();
     void channelHeightChanged();
     void trackIdChanged();
     void channelChanged();

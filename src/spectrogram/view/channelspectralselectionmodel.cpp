@@ -16,30 +16,12 @@ ChannelSpectralSelectionModel::ChannelSpectralSelectionModel(QObject* parent)
 
 double ChannelSpectralSelectionModel::positionToFrequency(double y) const
 {
-    const auto config = spectrogramService()->trackSpectrogramConfiguration(m_trackId);
-    if (!config) {
-        return SelectionInfo::UndefinedFrequency;
-    }
-
-    const auto [minFreq, maxFreq] = spectrogramBounds(*config, m_trackSampleRate);
-
-    const NumberScale numberScale(config->scale(), minFreq, maxFreq);
-    const double position = 1.0 - y / m_channelHeight;
-    return numberScale.positionToValue(position);
+    return spectrogramService()->yToFrequency(m_trackId, y, m_channelHeight);
 }
 
 double ChannelSpectralSelectionModel::frequencyToPosition(double frequency) const
 {
-    const auto config = spectrogramService()->trackSpectrogramConfiguration(m_trackId);
-    if (!config) {
-        return 0.0;
-    }
-
-    const auto [minFreq, maxFreq] = spectrogramBounds(*config, m_trackSampleRate);
-
-    const NumberScale numberScale(config->scale(), minFreq, maxFreq);
-    const double valuePosition = numberScale.valueToPosition(frequency);
-    return (1.0 - valuePosition) * m_channelHeight;
+    return spectrogramService()->frequencyToY(m_trackId, frequency, m_channelHeight);
 }
 
 void ChannelSpectralSelectionModel::setTrackSampleRate(double rate)
