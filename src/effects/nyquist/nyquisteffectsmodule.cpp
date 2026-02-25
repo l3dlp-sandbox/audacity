@@ -80,7 +80,7 @@ void au::effects::NyquistEffectsContext::onPreInit(const muse::IApplication::Run
 
 void au::effects::NyquistEffectsContext::registerExports()
 {
-    m_nyquistEffectsRepository = std::make_shared<NyquistEffectsRepository>(muse::modularity::globalCtx());
+    m_nyquistEffectsRepository = std::make_shared<NyquistEffectsRepository>();
 
     ioc()->registerExport<INyquistEffectsRepository>(mname, m_nyquistEffectsRepository);
 }

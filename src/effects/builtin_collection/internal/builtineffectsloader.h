@@ -12,10 +12,9 @@
 namespace au::effects {
 class BuiltinEffectsLoader : public muse::Injectable
 {
-    // TODO all this should be global
-    muse::Inject<IBuiltinEffectsViewRegister> builtinEffectsViewRegister { this };
-    muse::Inject<IBuiltinEffectsRepository> builtinEffectsRepository { this };
+    muse::GlobalInject<IBuiltinEffectsRepository> builtinEffectsRepository;
 
+    muse::Inject<IBuiltinEffectsViewRegister> builtinEffectsViewRegister { this };
 public:
     BuiltinEffectsLoader(const muse::modularity::ContextPtr& ctx)
         : muse::Injectable(ctx) {}

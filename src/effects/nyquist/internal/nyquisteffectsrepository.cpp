@@ -9,8 +9,8 @@
 
 #include "au3-module-manager/PluginManager.h"
 
-au::effects::NyquistEffectsRepository::NyquistEffectsRepository(const muse::modularity::ContextPtr& ctx)
-    : m_helper(ctx, m_module, muse::audio::AudioResourceType::NyquistPlugin)
+au::effects::NyquistEffectsRepository::NyquistEffectsRepository()
+    : m_helper{m_module, muse::audio::AudioResourceType::NyquistPlugin}
 {
 }
 

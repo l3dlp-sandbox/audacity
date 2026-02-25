@@ -12,7 +12,7 @@ namespace au::effects {
 class NyquistEffectsRepository : public INyquistEffectsRepository
 {
 public:
-    NyquistEffectsRepository(const muse::modularity::ContextPtr& ctx);
+    NyquistEffectsRepository();
 
     EffectMetaList effectMetaList() const override;
     bool ensurePluginIsLoaded(const EffectId& effectId) const override;
