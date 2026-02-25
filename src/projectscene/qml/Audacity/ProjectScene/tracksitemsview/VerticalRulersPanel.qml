@@ -193,11 +193,19 @@ Rectangle {
                             channelHeightRatio: trackViewState.channelHeightRatio
                         }
 
-                        SpectrogramRuler {
+                        SpectrogramTrackRulers {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
                             visible: model.isSpectrogramViewVisible
+
+                            trackId: model.trackId
+                            isStereo: model.isStereo
+                            channelHeightRatio: trackViewState.channelHeightRatio
+
+                            onChannelZoomChanged: function (channel) {
+                                trackViewState.spectrogramVerticalZoomChanged(trackId, channel)
+                            }
                         }
                     }
                 }

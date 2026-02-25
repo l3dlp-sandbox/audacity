@@ -74,7 +74,7 @@
         <file>qml/Audacity/ProjectScene/tracksitemsview/LoopRegionGuideline.qml</file>
         <file>qml/Audacity/ProjectScene/trackruler/TrackRulerCustomizePopup.qml</file>
         <file>qml/Audacity/ProjectScene/trackruler/WaveformRuler.qml</file>
-        <file>qml/Audacity/ProjectScene/trackruler/SpectrogramRuler.qml</file>
+        <file>qml/Audacity/ProjectScene/trackruler/SpectrogramTrackRulers.qml</file>
         <file>qml/Audacity/ProjectScene/tracksitemsview/labeleditor/LabelEditorDialog.qml</file>
         <file>qml/Audacity/ProjectScene/tracksitemsview/labeleditor/LabelEditorTopPanel.qml</file>
         <file>qml/Audacity/ProjectScene/tracksitemsview/labeleditor/LabelEditorLabelsTableView.qml</file>

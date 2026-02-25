@@ -71,9 +71,7 @@ double SpectrogramService::yToFrequency(int trackId, double spectrogramY, double
 
     const auto [minFreq, maxFreq] = spectrogramBounds(*config, trackSampleRate(trackId));
     const NumberScale numberScale{ config->scale(), minFreq, maxFreq };
-    return std::clamp(numberScale.positionToValue((spectrogramHeight - spectrogramY) / spectrogramHeight),
-                      minFreq,
-                      maxFreq);
+    return numberScale.positionToValue((spectrogramHeight - spectrogramY) / spectrogramHeight);
 }
 
 double SpectrogramService::frequencyToY(int trackId, double frequency, double spectrogramHeight) const

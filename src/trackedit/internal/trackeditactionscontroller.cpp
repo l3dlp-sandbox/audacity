@@ -1840,7 +1840,7 @@ void TrackeditActionsController::changeTrackViewToWaveformAndSpectrogram(const m
 
 void TrackeditActionsController::changeTrackView(const muse::actions::ActionQuery& q, TrackViewType trackView)
 {
-    IF_ASSERT_FAILED(q.params().size() == 1) {
+    IF_ASSERT_FAILED(q.params().size() >= 1) {
         return;
     }
     const auto trackId = q.param("trackId").toInt();
