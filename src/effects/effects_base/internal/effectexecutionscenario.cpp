@@ -135,7 +135,8 @@ muse::Ret EffectExecutionScenario::doPerformEffect(au3::Au3Project& project, con
             isTrackSelection = !selectionController()->selectedTracks().empty();
         }
 
-        if ((!isTimeSelection || !isTrackSelection) && effect->GetType() != EffectTypeGenerate) {
+        if ((!isTimeSelection || !isTrackSelection) && (effect->GetType() != EffectTypeGenerate
+                                                        && effect->GetType() != EffectTypeTool)) {
             return make_ret(Err::EffectNoAudioSelected);
         }
 
