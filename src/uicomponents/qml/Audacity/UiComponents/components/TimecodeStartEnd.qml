@@ -27,7 +27,8 @@ RowLayout {
     property alias navigationColumnEnd: endTimecode.navigationColumnEnd
     property alias navigationRow: endTimecode.navigationRow
 
-    property string accessibleName: ""
+    property alias startAccessibleName: startTimecode.accessibleName
+    property alias endAccessibleName: endTimecode.accessibleName
 
     signal startValueChangeRequested(var newValue)
     signal endValueChangeRequested(var newValue)
@@ -52,8 +53,6 @@ RowLayout {
         navigation.row: 1
         navigation.column: 1
 
-        accessibleName: root.accessibleName
-
         onValueChangeRequested: function (newValue) {
             root.startValueChangeRequested(newValue)
         }
@@ -75,8 +74,6 @@ RowLayout {
         navigation.panel: root.navigationPanel
         navigation.row: startTimecode.navigation.row
         navigation.column: startTimecode.navigationColumnEnd + 1
-
-        accessibleName: root.accessibleName
 
         onValueChangeRequested: function (newValue) {
             root.endValueChangeRequested(newValue)
