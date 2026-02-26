@@ -6,6 +6,7 @@
 
 #include "io/fileinfo.h"
 #include "translation.h"
+#include "framework/global/defer.h"
 
 using namespace au::importexport;
 
@@ -466,6 +467,21 @@ QStringList ExportPreferencesModel::fileFilter()
 
 void ExportPreferencesModel::exportData()
 {
+    bool needToDisableMasterFx = needToDisableMasterFxBeforeExport();
+    if (needToDisableMasterFx) {
+        if (!warnAndDisableMasterFxBeforeExport()) {
+            return;
+        }
+    }
+
+    bool restoreMasterFx = needToDisableMasterFx;
+
+    const muse::Defer restoreMasterFxState([this, restoreMasterFx] {
+        if (restoreMasterFx) {
+            enableMasterFx();
+        }
+    });
+
     muse::io::path_t directoryPath = exportConfiguration()->directoryPath();
     muse::io::path_t filePath = directoryPath.appendingComponent(filename());
 
@@ -519,4 +535,57 @@ bool ExportPreferencesModel::hasMetadata()
 int ExportPreferencesModel::optionsCount()
 {
     return exporter()->optionsCount();
+}
+
+bool ExportPreferencesModel::needToDisableMasterFxBeforeExport() const
+{
+    return masterFxEnabled() && customMappingEnabled();
+}
+
+void ExportPreferencesModel::enableMasterFx() const
+{
+    realtimeEffectService()->setTrackEffectsActive(effects::IRealtimeEffectService::masterTrackId, true);
+}
+
+bool ExportPreferencesModel::masterFxEnabled() const
+{
+    const auto stack = realtimeEffectService()->effectStack(effects::IRealtimeEffectService::masterTrackId);
+    if (!stack.has_value()
+        || stack->empty()
+        || !realtimeEffectService()->trackEffectsActive(effects::IRealtimeEffectService::masterTrackId)) {
+        return false;
+    }
+
+    return std::any_of(stack->begin(), stack->end(), [this](const auto& state) {
+        return realtimeEffectService()->isActive(state);
+    });
+}
+
+bool ExportPreferencesModel::customMappingEnabled() const
+{
+    return exportChannelsType() == ExportChannelsPref::ExportChannels::CUSTOM;
+}
+
+muse::Ret ExportPreferencesModel::warnAndDisableMasterFxBeforeExport() const
+{
+    auto continueBtn = interactive()->buttonData(muse::IInteractive::Button::Continue);
+    continueBtn.accent = true;
+    auto cancelBtn = interactive()->buttonData(muse::IInteractive::Button::Cancel);
+
+    const auto result = interactive()->questionSync(
+        muse::trc("export", "Export Audio"),
+        muse::trc("export",
+                  "To export with custom channel mapping, master effects must be turned off temporarily.\n\n"
+                  "Master effects will be turned back on after export."),
+        { continueBtn, cancelBtn }, continueBtn.btn);
+
+    if (result.button() != continueBtn.btn) {
+        return muse::make_ret(muse::Ret::Code::Cancel);
+    }
+
+    if (masterFxEnabled()) {
+        realtimeEffectService()->setTrackEffectsActive(effects::IRealtimeEffectService::masterTrackId, false);
+    }
+
+    return muse::make_ok();
 }
