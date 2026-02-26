@@ -56,6 +56,10 @@ public:
     virtual void setSelectionTimecodeFormat(int) = 0;
     virtual muse::async::Notification selectionTimecodeFormatChanged() const = 0;
 
+    virtual int durationTimecodeFormat() const = 0;
+    virtual void setDurationTimecodeFormat(int) = 0;
+    virtual muse::async::Notification durationTimecodeFormatChanged() const = 0;
+
     virtual bool playbackOnRulerClickEnabled() const = 0;
     virtual void setPlaybackOnRulerClickEnabled(bool enabled) = 0;
     virtual muse::async::Notification playbackOnRulerClickEnabledChanged() const = 0;

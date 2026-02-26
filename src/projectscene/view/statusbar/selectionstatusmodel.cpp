@@ -17,6 +17,9 @@ void SelectionStatusModel::init()
     m_currentFormat = configuration()->selectionTimecodeFormat();
     emit currentFormatChanged();
 
+    m_durationFormat = configuration()->durationTimecodeFormat();
+    emit durationFormatChanged();
+
     m_startTime = selectionController()->dataSelectedStartTime();
     selectionController()->dataSelectedStartTimeChanged().onReceive(this, [this](trackedit::secs_t time) {
         m_startTime = !time.is_negative() ? time : trackedit::secs_t(0.0);
@@ -40,6 +43,10 @@ void SelectionStatusModel::init()
 
     configuration()->selectionTimecodeFormatChanged().onNotify(this, [this](){
         setCurrentFormat(configuration()->selectionTimecodeFormat());
+    });
+
+    configuration()->durationTimecodeFormatChanged().onNotify(this, [this](){
+        setDurationFormat(configuration()->durationTimecodeFormat());
     });
 }
 
@@ -85,6 +92,22 @@ void SelectionStatusModel::setCurrentFormat(int format)
     m_currentFormat = format;
     emit currentFormatChanged();
     configuration()->setSelectionTimecodeFormat(format);
+}
+
+int SelectionStatusModel::durationFormat() const
+{
+    return m_durationFormat;
+}
+
+void SelectionStatusModel::setDurationFormat(int format)
+{
+    if (m_durationFormat == format) {
+        return;
+    }
+
+    m_durationFormat = format;
+    emit durationFormatChanged();
+    configuration()->setDurationTimecodeFormat(format);
 }
 
 double SelectionStatusModel::sampleRate() const
