@@ -47,6 +47,7 @@ TrackSpectrogramBaseSection {
 
         model: ScaleSectionParameterListModel {
             settingsModel: root.settingsModel
+            trackId: root.settingsModel.trackId
             columnWidth: root.prefsColumnWidth
         }
 

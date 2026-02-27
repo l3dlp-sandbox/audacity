@@ -6,7 +6,7 @@
 
 #include "framework/global/log.h"
 
-namespace au::trackedit {
+namespace au::spectrogram {
 namespace {
 constexpr auto isPowerOfTwo(int x) -> bool
 {
@@ -34,15 +34,15 @@ static_assert(logTwo(8) == 3);
 }
 
 TrackSpectrogramSettingsModel::TrackSpectrogramSettingsModel(QObject* parent)
-    : spectrogram::AbstractSpectrogramSettingsModel(parent)
+    : AbstractSpectrogramSettingsModel(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
 {}
 
-TrackSpectrogramSettingsModel::~TrackSpectrogramSettingsModel()
+void TrackSpectrogramSettingsModel::aboutToDestroy()
 {
     if (m_initialTrackConfig) {
         spectrogramService()->copyConfiguration(*m_initialTrackConfig, *m_trackConfig);
         m_trackConfig->setUseGlobalSettings(m_initialTrackConfig->useGlobalSettings());
-        sendRepaintRequest();
+        emit updateRequested();
     }
 }
 
@@ -68,26 +68,13 @@ void TrackSpectrogramSettingsModel::componentComplete()
     emit zeroPaddingFactorChanged();
     emit useGlobalSettingsChanged();
 
-    sendRepaintRequest();
+    emit updateRequested();
 }
 
 void TrackSpectrogramSettingsModel::onSettingChanged()
 {
     setUseGlobalSettings(false);
-    sendRepaintRequest();
-}
-
-void TrackSpectrogramSettingsModel::sendRepaintRequest()
-{
-    const ITrackeditProjectPtr project = globalContext()->currentTrackeditProject();
-    IF_ASSERT_FAILED(project) {
-        return;
-    }
-    const auto track = project->track(m_trackId);
-    IF_ASSERT_FAILED(track) {
-        return;
-    }
-    project->notifyAboutTrackChanged(*track);
+    emit updateRequested();
 }
 
 void TrackSpectrogramSettingsModel::accept()
@@ -102,15 +89,6 @@ void TrackSpectrogramSettingsModel::setTrackId(int value)
     }
     m_trackId = value;
     emit trackIdChanged();
-}
-
-QString TrackSpectrogramSettingsModel::trackTitle() const
-{
-    const ITrackeditProjectPtr project = globalContext()->currentTrackeditProject();
-    if (!project) {
-        return QString();
-    }
-    return QString::fromStdString(project->trackName(m_trackId).value_or(""));
 }
 
 bool TrackSpectrogramSettingsModel::useGlobalSettings() const
@@ -140,7 +118,8 @@ void TrackSpectrogramSettingsModel::setUseGlobalSettings(bool value)
         emit windowTypeChanged();
         emit windowSizeChanged();
         emit zeroPaddingFactorChanged();
-        sendRepaintRequest();
+
+        emit updateRequested();
     }
     emit useGlobalSettingsChanged();
 }
@@ -228,7 +207,7 @@ int TrackSpectrogramSettingsModel::colorScheme() const
 
 void TrackSpectrogramSettingsModel::setColorScheme(int value)
 {
-    const auto scheme = static_cast<spectrogram::SpectrogramColorScheme>(value);
+    const auto scheme = static_cast<SpectrogramColorScheme>(value);
     if (m_trackConfig->colorScheme() == scheme) {
         return;
     }
@@ -244,7 +223,7 @@ int TrackSpectrogramSettingsModel::scale() const
 
 void TrackSpectrogramSettingsModel::setScale(int value)
 {
-    const auto scale = static_cast<spectrogram::SpectrogramScale>(value);
+    const auto scale = static_cast<SpectrogramScale>(value);
     if (m_trackConfig->scale() == scale) {
         return;
     }
@@ -260,7 +239,7 @@ int TrackSpectrogramSettingsModel::algorithm() const
 
 void TrackSpectrogramSettingsModel::setAlgorithm(int value)
 {
-    const auto algorithm = static_cast<spectrogram::SpectrogramAlgorithm>(value);
+    const auto algorithm = static_cast<SpectrogramAlgorithm>(value);
     if (m_trackConfig->algorithm() == algorithm) {
         return;
     }
@@ -276,7 +255,7 @@ int TrackSpectrogramSettingsModel::windowType() const
 
 void TrackSpectrogramSettingsModel::setWindowType(int value)
 {
-    const auto windowType = static_cast<spectrogram::SpectrogramWindowType>(value);
+    const auto windowType = static_cast<SpectrogramWindowType>(value);
     if (m_trackConfig->windowType() == windowType) {
         return;
     }

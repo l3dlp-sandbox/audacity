@@ -151,7 +151,7 @@ void ProjectSceneActionsController::togglePlaybackOnRulerClickEnabled()
 
 void ProjectSceneActionsController::toggleTrackHalfWave(const muse::actions::ActionQuery& q)
 {
-    IF_ASSERT_FAILED(q.params().size() == 1) {
+    IF_ASSERT_FAILED(q.params().size() >= 1) {
         return;
     }
     const int trackId = q.param("trackId").toInt();

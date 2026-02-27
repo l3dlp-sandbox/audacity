@@ -3,6 +3,7 @@
         <file>qml/Audacity/Spectrogram/qmldir</file>
         <file>qml/Audacity/Spectrogram/ClipSpectrogramView.qml</file>
         <file>qml/Audacity/Spectrogram/ChannelSpectralSelectionContainer.qml</file>
+        <file>qml/Audacity/Spectrogram/SpectrogramChannelRuler.qml</file>
         <file>qml/Audacity/Spectrogram/TrackSpectralSelectionContainer.qml</file>
     </qresource>
 </RCC>

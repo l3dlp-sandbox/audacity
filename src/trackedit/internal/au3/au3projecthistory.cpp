@@ -96,7 +96,7 @@ void Au3ProjectHistory::endUserInteraction(bool modifyState)
 
 void Au3ProjectHistory::modifyState(bool autoSave)
 {
-    LOGI() << "modifyState(" << (autoSave ? "true" : "false") << ")";
+    LOGD() << "modifyState(" << (autoSave ? "true" : "false") << ")";
     if (m_interactionOngoing) {
         LOGW() << "Attempt to modify state during undoable action";
         return;
@@ -116,7 +116,7 @@ void Au3ProjectHistory::modifyState(const std::type_index& restorerType)
 
 void Au3ProjectHistory::markUnsaved()
 {
-    LOGI() << "markUnsaved()";
+    LOGD() << "markUnsaved()";
     auto& project = projectRef();
     ::UndoManager::Get(project).MarkUnsaved();
 }

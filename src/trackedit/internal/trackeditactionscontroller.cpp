@@ -1840,7 +1840,7 @@ void TrackeditActionsController::changeTrackViewToWaveformAndSpectrogram(const m
 
 void TrackeditActionsController::changeTrackView(const muse::actions::ActionQuery& q, TrackViewType trackView)
 {
-    IF_ASSERT_FAILED(q.params().size() == 1) {
+    IF_ASSERT_FAILED(q.params().size() >= 1) {
         return;
     }
     const auto trackId = q.param("trackId").toInt();
@@ -1868,6 +1868,7 @@ void TrackeditActionsController::openTrackSpectrogramSettings(const muse::action
 {
     muse::UriQuery spectrogramSettingsUri("audacity://trackedit/track_spectrogram_settings");
     spectrogramSettingsUri.addParam("trackId", muse::Val(q.param("trackId").toInt()));
+    spectrogramSettingsUri.addParam("trackTitle", muse::Val(q.param("trackTitle").toString()));
     interactive()->open(spectrogramSettingsUri);
 }
 

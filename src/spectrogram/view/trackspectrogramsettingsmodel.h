@@ -8,35 +8,32 @@
 #include "spectrogram/view/abstractspectrogramsettingsmodel.h"
 #include "spectrogram/iglobalspectrogramconfiguration.h"
 #include "spectrogram/ispectrogramservice.h"
-#include "context/iglobalcontext.h"
 
+#include "framework/global/async/asyncable.h"
 #include "framework/global/modularity/ioc.h"
 
-namespace au::trackedit {
-class TrackSpectrogramSettingsModel : public spectrogram::AbstractSpectrogramSettingsModel, public QQmlParserStatus,
+namespace au::spectrogram {
+class TrackSpectrogramSettingsModel : public AbstractSpectrogramSettingsModel,  public QQmlParserStatus, public muse::Injectable,
     public muse::async::Asyncable
 {
     Q_OBJECT
 
     Q_PROPERTY(int trackId READ trackId WRITE setTrackId NOTIFY trackIdChanged)
-    Q_PROPERTY(QString trackTitle READ trackTitle NOTIFY trackIdChanged)
     Q_PROPERTY(bool useGlobalSettings READ useGlobalSettings WRITE setUseGlobalSettings NOTIFY useGlobalSettingsChanged)
 
-    muse::GlobalInject<spectrogram::IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
+    muse::GlobalInject<IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
 
-    muse::Inject<au::context::IGlobalContext> globalContext { this };
-    muse::Inject<spectrogram::ISpectrogramService> spectrogramService { this };
+    muse::Inject<ISpectrogramService> spectrogramService { this };
 
 public:
     TrackSpectrogramSettingsModel(QObject* parent = nullptr);
-    ~TrackSpectrogramSettingsModel() override;
+    ~TrackSpectrogramSettingsModel() override = default;
 
     Q_INVOKABLE void accept();
+    Q_INVOKABLE void aboutToDestroy();
 
     int trackId() const { return m_trackId; }
     void setTrackId(int value);
-
-    QString trackTitle() const;
 
     bool useGlobalSettings() const;
     void setUseGlobalSettings(bool value);
@@ -77,17 +74,17 @@ public:
 signals:
     void trackIdChanged();
     void useGlobalSettingsChanged();
+    void updateRequested();
 
 private:
     void classBegin() override {}
     void componentComplete() override;
 
     void onSettingChanged();
-    void sendRepaintRequest();
 
     int m_trackId = -1;
 
-    std::shared_ptr<spectrogram::ITrackSpectrogramConfiguration> m_trackConfig;
-    std::unique_ptr<spectrogram::ITrackSpectrogramConfiguration> m_initialTrackConfig;
+    std::shared_ptr<ITrackSpectrogramConfiguration> m_trackConfig;
+    std::unique_ptr<ITrackSpectrogramConfiguration> m_initialTrackConfig;
 };
 }

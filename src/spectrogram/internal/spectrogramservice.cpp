@@ -24,6 +24,16 @@ ITrackSpectrogramConfigurationPtr SpectrogramService::trackSpectrogramConfigurat
     return Au3TrackSpectrogramConfiguration::create(trackId, *globalContext());
 }
 
+muse::async::Channel<int> SpectrogramService::trackSpectrogramConfigurationChanged() const
+{
+    return m_trackSpectrogramConfigurationChanged;
+}
+
+void SpectrogramService::notifyAboutTrackSpectrogramConfigurationChanged(int trackId)
+{
+    m_trackSpectrogramConfigurationChanged.send(trackId);
+}
+
 void SpectrogramService::copyConfiguration(const ISpectrogramConfiguration& source,
                                            ISpectrogramConfiguration& destination) const
 {
@@ -40,6 +50,28 @@ void SpectrogramService::copyConfiguration(const ISpectrogramConfiguration& sour
     destination.setZeroPaddingFactor(source.zeroPaddingFactor());
 }
 
+double SpectrogramService::trackSampleRate(int trackId) const
+{
+    const auto prj = globalContext()->currentProject();
+    // If config is not null, then so should prj.
+    IF_ASSERT_FAILED(prj) {
+        return 0.;
+    }
+
+    au3::Au3WaveTrack* const waveTrack = au3::DomAccessor::findWaveTrack(*reinterpret_cast<::AudacityProject*>(prj->au3ProjectPtr()),
+                                                                         ::TrackId { trackId });
+    IF_ASSERT_FAILED(waveTrack) {
+        return 0.;
+    }
+
+    return waveTrack->GetRate();
+}
+
+double SpectrogramService::frequencyHardMaximum(int trackId) const
+{
+    return trackSampleRate(trackId) / 2;
+}
+
 double SpectrogramService::yToFrequency(int trackId, double spectrogramY, double spectrogramHeight) const
 {
     const auto config = trackSpectrogramConfiguration(trackId);
@@ -47,19 +79,21 @@ double SpectrogramService::yToFrequency(int trackId, double spectrogramY, double
         return SelectionInfo::UndefinedFrequency;
     }
 
-    const auto prj = globalContext()->currentProject();
-    // If config is not null, then so should prj.
-    IF_ASSERT_FAILED(prj) {
-        return SelectionInfo::UndefinedFrequency;
+    const auto [minFreq, maxFreq] = spectrogramBounds(*config, trackSampleRate(trackId));
+    const NumberScale numberScale{ config->scale(), minFreq, maxFreq };
+    return numberScale.positionToValue((spectrogramHeight - spectrogramY) / spectrogramHeight);
+}
+
+double SpectrogramService::frequencyToY(int trackId, double frequency, double spectrogramHeight) const
+{
+    const auto config = trackSpectrogramConfiguration(trackId);
+    if (!config) {
+        return 0.0;
     }
 
-    au3::Au3WaveTrack* const waveTrack = au3::DomAccessor::findWaveTrack(*reinterpret_cast<::AudacityProject*>(prj->au3ProjectPtr()),
-                                                                         ::TrackId { trackId });
-
-    const auto [minFreq, maxFreq] = spectrogramBounds(*config, waveTrack->GetRate());
-    const NumberScale numberScale{ config->scale(), minFreq, maxFreq };
-    return std::clamp(numberScale.positionToValue((spectrogramHeight - spectrogramY) / spectrogramHeight),
-                      minFreq,
-                      maxFreq);
+    const auto [minFreq, maxFreq] = spectrogramBounds(*config, trackSampleRate(trackId));
+    const NumberScale numberScale(config->scale(), minFreq, maxFreq);
+    const double valuePosition = numberScale.valueToPosition(frequency);
+    return (1.0 - valuePosition) * spectrogramHeight;
 }
 }

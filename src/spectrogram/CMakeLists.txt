@@ -35,6 +35,7 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/internal/spectrogramcolors.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/globalspectrogramconfiguration.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/globalspectrogramconfiguration.h
+    ${CMAKE_CURRENT_LIST_DIR}/internal/snapshotspectrogramconfiguration.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/spectrogramutils.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/spectrogramutils.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/spectrogramservice.cpp
@@ -75,14 +76,17 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/scalesectionparameterlistmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/globalspectrogramsettingsmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/globalspectrogramsettingsmodel.h
-    
     ${CMAKE_CURRENT_LIST_DIR}/view/channelspectralselectionmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/channelspectralselectionmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/clipchannelspectrogramview.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/clipchannelspectrogramview.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramchannelrulermodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramchannelrulermodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramhit.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramhit.h
     ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramviewutils.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/trackspectrogramsettingsmodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/trackspectrogramsettingsmodel.h
 )
 
 set(MODULE_QML_IMPORT ${CMAKE_CURRENT_LIST_DIR}/qml)

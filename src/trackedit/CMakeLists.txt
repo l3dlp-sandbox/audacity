@@ -35,7 +35,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/dom/wave.cpp
     ${CMAKE_CURRENT_LIST_DIR}/dom/wave.h
 
-    ${CMAKE_CURRENT_LIST_DIR}/internal/snapshotspectrogramconfiguration.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/trackspectrogramsettingsupdater.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/trackspectrogramsettingsupdater.h
 
@@ -87,8 +86,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/pastebehaviorpanelmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/tracknavigationmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/tracknavigationmodel.h
-    ${CMAKE_CURRENT_LIST_DIR}/view/trackspectrogramsettingsmodel.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/view/trackspectrogramsettingsmodel.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/trackspectrogramsettingsdialogmodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/trackspectrogramsettingsdialogmodel.h
     )
 
 # AU3
