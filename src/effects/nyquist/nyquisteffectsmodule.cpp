@@ -8,7 +8,6 @@
 
 #include "effects/effects_base/iparameterextractorregistry.h"
 #include "effects/effects_base/ieffectviewlaunchregister.h"
-#include "effects/effects_base/view/effectsviewutils.h"
 
 #include "internal/nyquisteffectsrepository.h"
 #include "internal/nyquistparameterextractorservice.h"
@@ -17,7 +16,6 @@
 #include "internal/nyquistpluginsmetareader.h"
 
 #include "nyquistprompt/nyquistpromptloader.h"
-#include "nyquistprompt/nyquistprompteffect.h"
 #include "nyquistprompt/nyquistpromptviewmodel.h"
 
 namespace {
@@ -73,9 +71,7 @@ au::effects::NyquistEffectsContext::NyquistEffectsContext(const muse::modularity
 
 void au::effects::NyquistEffectsContext::onPreInit(const muse::IApplication::RunMode&)
 {
-    //! NOTE preInit() only creates static Registration objects (doesn't use `this`).
-    //! Must run at module level before Au3WrapModule::onInit() sets sInitialized = true.
-    NyquistPromptLoader::preInit();
+    m_nyquistPromptLoader->preInit();
 }
 
 void au::effects::NyquistEffectsContext::registerExports()

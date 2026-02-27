@@ -9,6 +9,8 @@
 namespace au::effects {
 void NyquistPromptLoader::preInit()
 {
+    //! NOTE preInit() only creates static Registration objects (doesn't use `this`).
+    //! Must run at module level before Au3WrapModule::onInit() sets sInitialized = true.
     static BuiltinEffectsModule::Registration< NyquistPromptEffect > regNyquistPrompt;
 }
 
