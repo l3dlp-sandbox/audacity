@@ -16,9 +16,8 @@ class NyquistPromptLoader;
 class NyquistEffectsModule : public muse::modularity::IModuleSetup
 {
 public:
-    NyquistEffectsModule();
-
     std::string moduleName() const override;
+    void registerExports() override;
     void registerResources() override;
     void resolveImports() override;
     void onInit(const muse::IApplication::RunMode& runMode) override;
@@ -27,7 +26,7 @@ public:
     muse::modularity::IContextSetup* newContext(const muse::modularity::ContextPtr& ctx) const override;
 
 private:
-    const std::shared_ptr<NyquistPluginsMetaReader> m_nyquistMetaReader;
+    std::shared_ptr<NyquistPluginsMetaReader> m_nyquistMetaReader;
 };
 
 class NyquistEffectsContext : public muse::modularity::IContextSetup

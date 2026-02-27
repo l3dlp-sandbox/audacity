@@ -27,12 +27,14 @@ static void nyquist_init_qrc()
     Q_INIT_RESOURCE(nyquist);
 }
 
-au::effects::NyquistEffectsModule::NyquistEffectsModule()
-    : m_nyquistMetaReader(std::make_shared<NyquistPluginsMetaReader>()) {}
-
 std::string au::effects::NyquistEffectsModule::moduleName() const
 {
     return mname;
+}
+
+void au::effects::NyquistEffectsModule::registerExports()
+{
+    m_nyquistMetaReader = std::make_shared<NyquistPluginsMetaReader>();
 }
 
 void au::effects::NyquistEffectsModule::registerResources()
