@@ -10,9 +10,7 @@
 
 #include "effects/nyquist/internal/nyquistparameterextractorservice.h"
 
-#include <QFileDialog>
 #include <QDir>
-#include <QFileInfo>
 
 using namespace au::effects;
 using namespace muse;
@@ -46,37 +44,41 @@ QString NyquistPromptViewModel::title() const
 
 void NyquistPromptViewModel::loadScript()
 {
-    const QString filter = muse::qtrc("effects", "Nyquist scripts") + " (*.ny);;"
-                           + muse::qtrc("effects", "Lisp scripts") + " (*.lsp);;"
-                           + muse::qtrc("effects", "All files") + " (*)";
+    const std::vector<std::string> filter {
+        muse::trc("effects", "Nyquist scripts") + " (*.ny)",
+        muse::trc("effects", "Lisp scripts") + " (*.lsp)",
+        muse::trc("effects", "All files") + " (*)"
+    };
 
-    const QString filePath = QFileDialog::getOpenFileName(
-        nullptr,
-        muse::qtrc("effects", "Load Nyquist script"),
-        m_lastFilePath.isEmpty() ? QDir::homePath() : QFileInfo(m_lastFilePath).absolutePath(),
+    const io::path_t dir = m_lastFilePath.isEmpty()
+                           ? io::path_t(QDir::homePath().toStdString())
+                           : io::dirpath(io::path_t(m_lastFilePath.toStdString()));
+
+    const io::path_t filePath = interactive()->selectOpeningFileSync(
+        muse::trc("effects", "Load Nyquist script"),
+        dir,
         filter
         );
 
-    if (filePath.isEmpty()) {
+    if (filePath.empty()) {
         return;
     }
 
     // Load the file (overriding current text)
-    const io::path_t path = io::path_t(filePath.toStdString());
-    Ret ret = fileSystem()->exists(path);
+    Ret ret = fileSystem()->exists(filePath);
     if (!ret) {
         LOGE() << "File does not exist: " << filePath;
         return;
     }
 
     ByteArray data;
-    ret = fileSystem()->readFile(path, data);
+    ret = fileSystem()->readFile(filePath, data);
     if (!ret) {
         LOGE() << "Failed to read file: " << filePath;
         return;
     }
 
-    m_lastFilePath = filePath;
+    m_lastFilePath = QString::fromStdString(filePath.toStdString());
 
     // Find the actual end of the text (before any null bytes)
     size_t actualSize = data.size();
@@ -95,33 +97,37 @@ void NyquistPromptViewModel::loadScript()
 
 void NyquistPromptViewModel::saveScript()
 {
-    const QString filter = muse::qtrc("effects", "Nyquist scripts") + " (*.ny);;"
-                           + muse::qtrc("effects", "Lisp scripts") + " (*.lsp);;"
-                           + muse::qtrc("effects", "All files") + " (*)";
+    const std::vector<std::string> filter {
+        muse::trc("effects", "Nyquist scripts") + " (*.ny)",
+        muse::trc("effects", "Lisp scripts") + " (*.lsp)",
+        muse::trc("effects", "All files") + " (*)"
+    };
 
-    const QString filePath = QFileDialog::getSaveFileName(
-        nullptr,
-        muse::qtrc("effects", "Save Nyquist script"),
-        m_lastFilePath.isEmpty() ? QDir::homePath() : m_lastFilePath,
+    const io::path_t defaultPath = m_lastFilePath.isEmpty()
+                                   ? io::path_t(QDir::homePath().toStdString())
+                                   : io::path_t(m_lastFilePath.toStdString());
+
+    const io::path_t filePath = interactive()->selectSavingFileSync(
+        muse::trc("effects", "Save Nyquist script"),
+        defaultPath,
         filter
         );
 
-    if (filePath.isEmpty()) {
+    if (filePath.empty()) {
         return;
     }
 
     // Save the file
-    const io::path_t path = io::path_t(filePath.toStdString());
     const QByteArray qdata = m_commandText.toUtf8();
     const ByteArray data = ByteArray::fromQByteArrayNoCopy(qdata);
 
-    const Ret ret = fileSystem()->writeFile(path, data);
+    const Ret ret = fileSystem()->writeFile(filePath, data);
     if (!ret) {
         LOGE() << "Failed to write file: " << filePath;
         return;
     }
 
-    m_lastFilePath = filePath;
+    m_lastFilePath = QString::fromStdString(filePath.toStdString());
 }
 
 void NyquistPromptViewModel::debugEffect()
