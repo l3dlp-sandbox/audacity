@@ -9,6 +9,7 @@
 #include "trackedit/itrackeditproject.h"
 
 #include "framework/global/log.h"
+#include "framework/global/translation.h"
 
 using namespace au::effects;
 using namespace muse;
@@ -50,7 +51,7 @@ QString GeneratedEffectViewerModel::computeEffectName(EffectInstanceId instanceI
     if (meta.isValid()) {
         return meta.title.toQString();
     }
-    return QString("Unknown Effect");
+    return muse::qtrc("effects", "Unknown Effect");
 }
 
 IParameterExtractorService* GeneratedEffectViewerModel::getParameterExtractor() const
@@ -66,7 +67,7 @@ IParameterExtractorService* GeneratedEffectViewerModel::getParameterExtractor() 
 
 QString GeneratedEffectViewerModel::noParametersMessage() const
 {
-    return QObject::tr("No parameters available for this effect");
+    return muse::qtrc("effects", "No parameters available for this effect");
 }
 
 bool GeneratedEffectViewerModel::hasParameters() const

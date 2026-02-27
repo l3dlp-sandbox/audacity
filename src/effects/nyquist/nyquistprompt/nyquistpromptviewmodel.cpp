@@ -41,18 +41,18 @@ void NyquistPromptViewModel::setCommandText(const QString& text)
 
 QString NyquistPromptViewModel::title() const
 {
-    return QObject::tr("Nyquist prompt");
+    return muse::qtrc("effects", "Nyquist prompt");
 }
 
 void NyquistPromptViewModel::loadScript()
 {
-    const QString filter = QObject::tr("Nyquist scripts") + " (*.ny);;"
-                           + QObject::tr("Lisp scripts") + " (*.lsp);;"
-                           + QObject::tr("All files") + " (*)";
+    const QString filter = muse::qtrc("effects", "Nyquist scripts") + " (*.ny);;"
+                           + muse::qtrc("effects", "Lisp scripts") + " (*.lsp);;"
+                           + muse::qtrc("effects", "All files") + " (*)";
 
     const QString filePath = QFileDialog::getOpenFileName(
         nullptr,
-        QObject::tr("Load Nyquist script"),
+        muse::qtrc("effects", "Load Nyquist script"),
         m_lastFilePath.isEmpty() ? QDir::homePath() : QFileInfo(m_lastFilePath).absolutePath(),
         filter
         );
@@ -95,13 +95,13 @@ void NyquistPromptViewModel::loadScript()
 
 void NyquistPromptViewModel::saveScript()
 {
-    const QString filter = QObject::tr("Nyquist scripts") + " (*.ny);;"
-                           + QObject::tr("Lisp scripts") + " (*.lsp);;"
-                           + QObject::tr("All files") + " (*)";
+    const QString filter = muse::qtrc("effects", "Nyquist scripts") + " (*.ny);;"
+                           + muse::qtrc("effects", "Lisp scripts") + " (*.lsp);;"
+                           + muse::qtrc("effects", "All files") + " (*)";
 
     const QString filePath = QFileDialog::getSaveFileName(
         nullptr,
-        QObject::tr("Save Nyquist script"),
+        muse::qtrc("effects", "Save Nyquist script"),
         m_lastFilePath.isEmpty() ? QDir::homePath() : m_lastFilePath,
         filter
         );
