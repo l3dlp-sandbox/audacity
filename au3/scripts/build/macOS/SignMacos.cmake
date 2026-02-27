@@ -45,7 +45,7 @@ endfunction()
 
 if( DEFINED APP_LOCATION )
     sign_modules( "${APP_LOCATION}/Contents/modules" )
-    sign_modules( "${APP_LOCATION}/Contents/plug-ins" )
+    sign_modules( "${APP_LOCATION}/Contents/nyquist-plug-ins" )
     codesign( "${APP_LOCATION}" On Off )
 endif()
 

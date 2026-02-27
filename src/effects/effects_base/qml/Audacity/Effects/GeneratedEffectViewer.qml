@@ -2,6 +2,7 @@
  * Audacity: A Digital Audio Editor
  */
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 
 import Muse.Ui
@@ -16,18 +17,16 @@ Rectangle {
 
     implicitWidth: prv.dialogWidth
     implicitHeight: {
-        // why 5 times spaceXL?
-        // -> 5 * spaceXL accounts for the combined vertical margins and spacing:
+        // why 2 times spaceXL? and 2 times spaceM?
+        // -> 2 * spaceXL and 2 * spaceM account for the combined vertical margins and spacing:
         // Calculate total height needed:
-        // - Top margin: prv.spaceXL (1)
-        // - Title height: titleLabel.height
-        // - Spacing after title: prv.spaceXL (2)
-        // - Flickable top margin: prv.spaceXL (3)
+        // - Flickable top margin: prv.spaceXL (1)
+        // - Flickable inner margin: prv.spaceM (1')
         // - Content: parametersColumn.height
-        // - Flickable bottom margin: prv.spaceXL (4)
-        // - Bottom margin: prv.spaceXL (5)
+        // - Flickable inner margin: prv.spaceM (2')
+        // - Flickable bottom margin: prv.spaceXL (2)
         // - Border: 2 * prv.borderWidth
-        var totalHeight = prv.spaceXL * 5 + titleLabel.height + parametersColumn.height + 2 * prv.borderWidth
+        var totalHeight = prv.spaceXL * 2 + prv.spaceM * 2 + parametersColumn.height + 2 * prv.borderWidth
         // we automatically size the height to fit the content for plugins with few parameters
         // we limit the height to avoid making the dialog too tall
         return Math.min(totalHeight, prv.maxDialogHeight)
@@ -48,7 +47,7 @@ Rectangle {
         readonly property int borderRadius: 4
 
         readonly property int dialogWidth: 640
-        readonly property int maxDialogHeight: 640
+        readonly property int maxDialogHeight: 340 // real ~444px with system bar on Mac
         readonly property int maxContentWidth: 512
     }
 
@@ -61,16 +60,7 @@ Rectangle {
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
-        anchors.margins: prv.spaceXL
         spacing: prv.spaceXL
-
-        StyledTextLabel {
-            id: titleLabel
-            Layout.fillWidth: true
-            text: viewModel.title
-            font: ui.theme.headerBoldFont
-            horizontalAlignment: Text.AlignHCenter
-        }
 
         Rectangle {
             Layout.fillWidth: true
@@ -81,8 +71,12 @@ Rectangle {
             radius: prv.borderRadius
 
             StyledFlickable {
+                id: flickable
+
                 anchors.fill: parent
-                anchors.margins: prv.spaceXL
+                anchors.margins: prv.spaceM
+                anchors.topMargin: prv.spaceXXL
+                anchors.bottomMargin: prv.spaceXXL
                 contentHeight: parametersColumn.height
 
                 ColumnLayout {
@@ -108,6 +102,12 @@ Rectangle {
                             Layout.fillWidth: true
                             parameterData: model
 
+                            // Pass time-related properties for time controls
+                            sampleRate: viewModel.sampleRate
+                            tempo: viewModel.tempo
+                            upperTimeSignature: viewModel.upperTimeSignature
+                            lowerTimeSignature: viewModel.lowerTimeSignature
+
                             onGestureStarted: function (parameterId) {
                                 viewModel.parametersModel.beginGesture(parameterId)
                             }
@@ -119,9 +119,25 @@ Rectangle {
                             onValueChanged: function (parameterId, value) {
                                 viewModel.parametersModel.setParameterValue(parameterId, value)
                             }
+
+                            onStringValueChanged: function (parameterId, stringValue) {
+                                viewModel.parametersModel.setParameterStringValue(parameterId, stringValue)
+                            }
                         }
                     }
                 }
+
+                ScrollBar.vertical: scrollBar
+                ScrollBar.horizontal: null
+            }
+
+            StyledScrollBar {
+                id: scrollBar
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.margins: 0
+                policy: ScrollBar.AlwaysOn
             }
         }
     }
@@ -136,6 +152,7 @@ Rectangle {
     }
 
     property bool isApplyAllowed: true
+    property bool isPreviewAllowed: viewModel.isPreviewAllowed
     property bool usesPresets: true
     property bool isPreviewing: viewModel.isPreviewing
 }

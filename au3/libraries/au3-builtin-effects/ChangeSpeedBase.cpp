@@ -5,7 +5,6 @@
 #include "au3-preferences/Prefs.h"
 #include "au3-math/Resample.h"
 #include "au3-command-parameters/ShuttleAutomation.h"
-#include "au3-track-selection/SyncLock.h"
 #include "au3-track/TimeWarper.h"
 #include "au3-wave-track/WaveClip.h"
 #include "au3-wave-track/WaveTrack.h"
@@ -142,11 +141,13 @@ bool ChangeSpeedBase::Process(EffectInstance&, EffectSettings&)
     outputs.Get().Any().VisitWhile(
         bGoodResult,
         [&](LabelTrack& lt) {
-        if (SyncLock::IsSelectedOrSyncLockSelected(lt)) {
-            if (!ProcessLabelTrack(&lt)) {
-                bGoodResult = false;
-            }
-        }
+        assert(false && "please adjust to SyncLock removal");
+        // TODO: please adjust to SyncLock removal
+        // if (SyncLock::IsSelectedOrSyncLockSelected(lt)) {
+        //     if (!ProcessLabelTrack(&lt)) {
+        //         bGoodResult = false;
+        //     }
+        // }
     },
         [&](auto&& fallthrough) {
         return [&](WaveTrack& outWaveTrack) {

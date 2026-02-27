@@ -8,6 +8,7 @@
 #include "ieffectsprovider.h"
 #include "ieffectsconfiguration.h"
 #include "effectstypes.h"
+#include "effectsviewtypes.h"
 #include "effects/effects_base/irealtimeeffectservice.h"
 #include "context/iglobalcontext.h"
 #include "actions/actionable.h"
@@ -18,23 +19,6 @@
 #include <QObject>
 
 namespace au::effects {
-class ViewerComponentTypes
-{
-    Q_GADGET
-public:
-    enum class Type {
-        AudioUnit,
-        Lv2,
-        Vst,
-        Builtin,
-        Generated,
-        Unknown
-    };
-    Q_ENUM(Type)
-};
-
-using ViewerComponentType = ViewerComponentTypes::Type;
-
 class RealtimeEffectViewerDialogModel : public QObject, public muse::Injectable, public muse::async::Asyncable,
     public muse::actions::Actionable
 {

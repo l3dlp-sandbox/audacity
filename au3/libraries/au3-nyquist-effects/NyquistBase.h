@@ -21,6 +21,10 @@ class wxTextCtrl;
 
 class EffectOutputTracks;
 
+namespace au::effects {
+class NyquistParameterExtractorService;
+}
+
 #define NYQUISTEFFECTS_VERSION wxT("1.0.0.0")
 #define NYQUIST_WORKER_ID wxT("Nyquist Worker")
 #define UNINITIALIZED_CONTROL ((double)99999999.99)
@@ -86,6 +90,12 @@ public:
     {
     };
 
+    struct NYQUIST_EFFECTS_API GetHasSpectralDisplayHook : GlobalHook<
+            GetHasSpectralDisplayHook,
+            bool(const WaveTrack*)>
+    {
+    };
+
     struct NYQUIST_EFFECTS_API ShowDebugOutputHook : GlobalHook<
             ShowDebugOutputHook, void(
                 const TranslatableString& title,
@@ -121,6 +131,7 @@ public:
     // EffectDefinitionInterface implementation
 
     EffectType GetType() const override;
+    EffectGroup GetGroup() const override;
     EffectType GetClassification() const override;
     EffectFamilySymbol GetFamily() const override;
     bool IsInteractive() const override;
@@ -234,7 +245,6 @@ protected:
     bool mTrace; // True when *tracenable* or *sal-traceback* are enabled
     bool mIsSal;
     bool mExternal;
-    bool mIsSpectral;
     bool mIsTool;
     /** True if the code to execute is obtained interactively from the user via
      * the "Nyquist Effect Prompt", or "Nyquist Prompt", false for all other
@@ -263,6 +273,7 @@ protected:
     FilePath mHelpPage;
     EffectType mType;
     EffectType mPromptType; // If a prompt, need to remember original type.
+    EffectGroup mGroup = EffectGroup::Unspecified;
 
     bool mEnablePreview;
     bool mDebugButton; // Set to false to disable Debug button.
@@ -282,7 +293,7 @@ protected:
     sampleCount mMaxLen;
     int mTrackIndex;
     bool mFirstInGroup;
-    double mOutputTime;
+    double mOutputDuration;
     unsigned mCount;
     unsigned mNumSelectedChannels;
 
@@ -295,4 +306,5 @@ protected:
     int mMergeClips;
 
     friend class NyquistEffectsModule;
+    friend class au::effects::NyquistParameterExtractorService;
 };

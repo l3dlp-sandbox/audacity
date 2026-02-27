@@ -10,6 +10,8 @@ set( SOURCES
     IResponse.h
     IResponseFactory.h
 
+    NetworkManagerApi.h
+
     HeadersList.h
     HeadersList.cpp
 

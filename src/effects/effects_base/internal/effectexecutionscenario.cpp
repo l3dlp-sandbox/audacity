@@ -3,9 +3,9 @@
 */
 #include "effectexecutionscenario.h"
 
-#include "global/defer.h"
-#include "global/realfn.h"
-#include "global/translation.h"
+#include "framework/global/defer.h"
+#include "framework/global/realfn.h"
+#include "framework/global/translation.h"
 
 #include "au3-project/Project.h"
 #include "au3-effects/Effect.h"
@@ -83,6 +83,7 @@ muse::Ret EffectExecutionScenario::doPerformEffect(au3::Au3Project& project, con
     secs_t t0;
     secs_t t1;
     bool isTimeSelection = false;
+    const spectrogram::FrequencySelection frequencySelection = frequencySelectionController()->frequencySelection();
 
     const trackedit::ClipKeyList selectedClips = selectionController()->selectedClips();
     const auto numSelectedClips = selectedClips.size();
@@ -134,7 +135,8 @@ muse::Ret EffectExecutionScenario::doPerformEffect(au3::Au3Project& project, con
             isTrackSelection = !selectionController()->selectedTracks().empty();
         }
 
-        if ((!isTimeSelection || !isTrackSelection) && effect->GetType() != EffectTypeGenerate) {
+        if ((!isTimeSelection || !isTrackSelection) && (effect->GetType() != EffectTypeGenerate
+                                                        && effect->GetType() != EffectTypeTool)) {
             return make_ret(Err::EffectNoAudioSelected);
         }
 
@@ -161,6 +163,7 @@ muse::Ret EffectExecutionScenario::doPerformEffect(au3::Au3Project& project, con
         double t1 = 0.0;
         double f0 = 0.0;
         double f1 = 0.0;
+        bool spectralSelectionEnabled = false;
     } tp;
 
     tp.projectRate = ProjectRate::Get(project).GetRate();
@@ -194,9 +197,9 @@ muse::Ret EffectExecutionScenario::doPerformEffect(au3::Au3Project& project, con
             tp.t1 = tp.t0 + quantizedDuration;
         }
 
-        //! TODO when we support spectral display and selection
-        //   tp.f0 = f0;
-        //   tp.f1 = f1;
+        tp.f0 = frequencySelection.startFrequency;
+        tp.f1 = frequencySelection.endFrequency;
+        tp.spectralSelectionEnabled = spectrogramConfiguration()->spectralSelectionEnabled();
 
         //! NOTE Step 2.4 - update settings
         wxString newFormat = (isTimeSelection
@@ -227,6 +230,7 @@ muse::Ret EffectExecutionScenario::doPerformEffect(au3::Au3Project& project, con
         effect->CountWaveTracks();
 
         //! NOTE Step 3.2 - check frequency params
+        effect->mSpectralSelectionEnabled = tp.spectralSelectionEnabled;
         effect->mF0 = tp.f0;
         effect->mF1 = tp.f1;
         if (effect->mF0 != UNDEFINED_FREQUENCY) {

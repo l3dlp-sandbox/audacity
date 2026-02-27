@@ -192,6 +192,7 @@ const PluginID& PluginManager::RegisterPlugin(
 
     plug.SetEffectType(effect->GetClassification());
     plug.SetEffectFamily(effect->GetFamily().Internal());
+    plug.SetEffectGroup(effect->GetGroup());
     plug.SetEffectInteractive(effect->IsInteractive());
     plug.SetEffectDefault(effect->IsDefault());
     plug.SetRealtimeSupport(effect->RealtimeSupport());
@@ -234,7 +235,7 @@ void PluginManager::FindFilesInPathList(const wxString& pattern,
     // just remove the MacOSX part.
     ff.RemoveLastDir();
 #endif
-    ff.AppendDir(wxT("plug-ins"));
+    ff.AppendDir(wxT("nyquist-plug-ins"));
     paths.push_back(ff.GetPath());
 
     // Weed out duplicates

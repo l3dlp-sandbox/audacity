@@ -5,8 +5,11 @@
 #include "effectparameterslistmodel.h"
 
 #include "au3-effects/EffectPlugin.h"
+#include "playback/iaudiooutput.h"
+#include "trackedit/itrackeditproject.h"
 
 #include "framework/global/log.h"
+#include "framework/global/translation.h"
 
 using namespace au::effects;
 using namespace muse;
@@ -15,7 +18,6 @@ GeneratedEffectViewerModel::GeneratedEffectViewerModel(QObject* parent, EffectIn
     : AbstractEffectViewModel(parent, instanceId)
     , m_parametersModel(new EffectParametersListModel(this, instanceId))
     , m_effectName(computeEffectName(instanceId, effectsProvider().get(), instancesRegister().get()))
-    , m_title(computeTitle(m_effectName))
 {
     // Connect to parameters model to forward hasParametersChanged signal
     connect(m_parametersModel, &EffectParametersListModel::hasParametersChanged,
@@ -49,15 +51,7 @@ QString GeneratedEffectViewerModel::computeEffectName(EffectInstanceId instanceI
     if (meta.isValid()) {
         return meta.title.toQString();
     }
-    return QString("Unknown Effect");
-}
-
-QString GeneratedEffectViewerModel::computeTitle(const QString& effectName)
-{
-    if (effectName.isEmpty()) {
-        return QObject::tr("Auto-Generated UI");
-    }
-    return QObject::tr("%1 Fallback UI").arg(effectName);
+    return muse::qtrc("effects", "Unknown Effect");
 }
 
 IParameterExtractorService* GeneratedEffectViewerModel::getParameterExtractor() const
@@ -73,12 +67,44 @@ IParameterExtractorService* GeneratedEffectViewerModel::getParameterExtractor() 
 
 QString GeneratedEffectViewerModel::noParametersMessage() const
 {
-    return QObject::tr("No parameters available for this effect");
+    return muse::qtrc("effects", "No parameters available for this effect");
 }
 
 bool GeneratedEffectViewerModel::hasParameters() const
 {
     return m_parametersModel->hasParameters();
+}
+
+double GeneratedEffectViewerModel::sampleRate() const
+{
+    return playback()->audioOutput()->sampleRate();
+}
+
+double GeneratedEffectViewerModel::tempo() const
+{
+    auto project = globalContext()->currentTrackeditProject();
+    if (!project) {
+        return 0.0;
+    }
+    return project->timeSignature().tempo;
+}
+
+int GeneratedEffectViewerModel::upperTimeSignature() const
+{
+    auto project = globalContext()->currentTrackeditProject();
+    if (!project) {
+        return 0;
+    }
+    return project->timeSignature().upper;
+}
+
+int GeneratedEffectViewerModel::lowerTimeSignature() const
+{
+    auto project = globalContext()->currentTrackeditProject();
+    if (!project) {
+        return 0;
+    }
+    return project->timeSignature().lower;
 }
 
 void GeneratedEffectViewerModel::doInit()
@@ -124,4 +150,16 @@ void GeneratedEffectViewerModel::doStartPreview()
 void GeneratedEffectViewerModel::doStopPreview()
 {
     effectsProvider()->stopPreview();
+}
+
+bool GeneratedEffectViewerModel::isPreviewAllowed() const
+{
+    const EffectId effectId = instancesRegister()->effectIdByInstanceId(instanceId());
+    const EffectMeta meta = effectsProvider()->meta(effectId);
+
+    // Analyze and Tool effects don't support preview
+    if (meta.type == EffectType::Analyzer || meta.type == EffectType::Tool) {
+        return false;
+    }
+    return true;
 }

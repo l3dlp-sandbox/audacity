@@ -1350,7 +1350,7 @@ void WaveTrack::ClearAndPasteAtSameTempo(
     t1 = SnapToSample(t1);
 
     const auto endTime = src.GetEndTime();
-    double dur = std::min(t1 - t0, endTime);
+    const double dur = std::min(t1 - t0, endTime);
 
     // If duration is 0, then it's just a plain paste
     if (dur == 0.0) {
@@ -1444,13 +1444,13 @@ void WaveTrack::ClearAndPasteAtSameTempo(
 
     const auto tolerance = 2.0 / track.GetRate();
 
-    // This is not a split-cut operation.
     constexpr auto addCutLines = false;
-    constexpr auto split = false;
+    // ClearAndPaste means "replace t0 to t1 by nothing and paste (eating around if necessary) the source track".
+    constexpr auto split = true;
     constexpr auto moveClips = false;
 
-    // Now, clear the selection
-    track.HandleClear(t0, t1, addCutLines, split, moveClips, clearByTrimming);
+    // Now, make room as needed
+    track.HandleClear(t0, std::max(t1, t0 + endTime), addCutLines, split, moveClips, clearByTrimming);
 
     // And paste in the new data
     track.PasteWaveTrackAtSameTempo(t0, src, merge, moveClips);
@@ -1862,14 +1862,6 @@ void WaveTrack::PasteWaveTrackAtSameTempo(double t0, const WaveTrack& other, boo
         return;
     }
 
-    //wxPrintf("Check if we need to make room for the pasted data\n");
-
-    const SimpleMessageBoxException notEnoughSpaceException {
-        ExceptionType::BadUserAction,
-        XO("There is not enough room available to paste the selection"),
-        XO("Warning"), "Error:_Insufficient_space_in_track"
-    };
-
     // Make room for the pasted data
     if (moveClips) {
         if (!singleClipMode) {
@@ -1885,15 +1877,8 @@ void WaveTrack::PasteWaveTrackAtSameTempo(double t0, const WaveTrack& other, boo
                 clip->ShiftBy(insertDuration);
             }
         }
-    } else {
-        if (!merge) {
-            track.SplitAt(t0);
-        }
-        const auto clipAtT0 = track.GetClipAtTime(t0);
-        const auto t = clipAtT0 ? clipAtT0->GetPlayEndTime() : t0;
-        if (!track.IsEmpty(t, t + insertDuration)) {
-            throw notEnoughSpaceException;
-        }
+    } else if (!merge) {
+        track.SplitAt(t0);
     }
 
     // See if the clipboard data is one clip only and if it should be merged. If
@@ -1924,20 +1909,6 @@ void WaveTrack::PasteWaveTrackAtSameTempo(double t0, const WaveTrack& other, boo
 
         if (insideClip) {
             // Exhibit traditional behaviour
-            //wxPrintf("paste: traditional behaviour\n");
-            if (!moveClips) {
-                // We did not move other clips out of the way already, so
-                // check if we can paste without having to move other clips
-                for (const auto& clip : track.Intervals()) {
-                    if (clip->GetPlayStartTime() > insideClip->GetPlayStartTime()
-                        && insideClip->GetPlayEndTime() + insertDuration
-                        > clip->GetPlayStartTime()) {
-                        // Strong-guarantee in case of this path
-                        // not that it matters.
-                        throw notEnoughSpaceException;
-                    }
-                }
-            }
             if (auto pClip = other.GetClip(0)) {
                 // This branch only gets executed in `singleClipMode` - we've
                 // already made sure that stretch ratios are equal, satisfying
@@ -1955,15 +1926,6 @@ void WaveTrack::PasteWaveTrackAtSameTempo(double t0, const WaveTrack& other, boo
     }
 
     // Insert NEW clips
-    //wxPrintf("paste: multi clip mode!\n");
-
-    if (!moveClips
-        && !track.IsEmpty(t0, t0 + insertDuration - 1.0 / rate)) {
-        // Strong-guarantee in case of this path
-        // not that it matters.
-        throw notEnoughSpaceException;
-    }
-
     for (const auto& clip : other.Intervals()) {
         // AWD Oct. 2009: Don't actually paste in placeholder clips
         if (!clip->GetIsPlaceholder()) {

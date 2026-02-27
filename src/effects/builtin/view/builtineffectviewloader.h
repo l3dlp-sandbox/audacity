@@ -10,8 +10,7 @@
 #include "global/async/asyncable.h"
 #include "modularity/ioc.h"
 
-#include "ieffectsviewregister.h"
-
+#include "effects/builtin/ibuiltineffectsviewregister.h"
 #include "effects/effects_base/ieffectsuiengine.h"
 #include "effects/effects_base/ieffectinstancesregister.h"
 
@@ -23,7 +22,7 @@ class BuiltinEffectViewLoader : public QObject, public muse::async::Asyncable, m
 
     Q_PROPERTY(QQuickItem * contentItem READ contentItem NOTIFY contentItemChanged FINAL)
 
-    muse::Inject<IEffectsViewRegister> viewRegister { this };
+    muse::Inject<IBuiltinEffectsViewRegister> viewRegister { this };
     muse::Inject<IEffectsUiEngine> engine { this };
     muse::Inject<IEffectInstancesRegister> instancesRegister { this };
 

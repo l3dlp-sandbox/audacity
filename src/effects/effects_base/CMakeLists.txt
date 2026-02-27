@@ -71,6 +71,9 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/internal/parameterextractorregistry.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/parameterextractorregistry.h
 
+    # AU3
+    ${CMAKE_CURRENT_LIST_DIR}/internal/au3/au3effectsutils.h
+
     # view
     ${CMAKE_CURRENT_LIST_DIR}/view/abstracteffectviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/abstracteffectviewmodel.h
@@ -78,6 +81,7 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/effectmanagemenu.h
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsuiengine.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsuiengine.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewtypes.h
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewutils.h
     ${CMAKE_CURRENT_LIST_DIR}/view/destructiveeffectviewerdialogmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/destructiveeffectviewerdialogmodel.h

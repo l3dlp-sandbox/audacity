@@ -1,6 +1,6 @@
 /*
-* Audacity: A Digital Audio Editor
-*/
+ * Audacity: A Digital Audio Editor
+ */
 import QtQuick
 import QtQuick.Layouts
 
@@ -10,24 +10,39 @@ import Muse.UiComponents
 import Audacity.Effects
 import Audacity.BuiltinEffects
 import Audacity.Lv2
-import Audacity.Vst
 import Audacity.AudioUnit
+import Audacity.Vst
 
 EffectStyledDialogView {
     id: root
 
     property int effectFamily: EffectFamily.Unknown
 
+    title: viewerModel.title
+    navigationSection.name: title
+
+    contentWidth: Math.max(viewerLoader.width + prv.viewMargins * 2, prv.minimumWidth)
+    contentHeight: {
+        let height = 0
+        height += prv.showTopPanel ? topPanel.height : prv.viewMargins
+        height += viewerLoader.height
+        height += prv.showBottomPanel ? bottomPanel.height : prv.viewMargins
+        return height
+    }
+
     QtObject {
         id: prv
         property alias viewer: viewerLoader.item
-        property bool isApplyAllowed: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.isApplyAllowed)
-        property bool showPresets: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.usesPresets)
 
         property int minimumWidth: viewerModel.effectFamily === EffectFamily.LV2 ? 500 : 250
-        property int panelMargins: viewerModel.effectFamily == EffectFamily.Builtin ? 16 : 4
-        property int viewMargins: viewerModel.effectFamily == EffectFamily.Builtin ? 16 : 0
-        property int separatorHeight: viewerModel.effectFamily == EffectFamily.Builtin ? separator.height + prv.panelMargins : 0
+        property int panelMargins: (viewerModel.effectFamily === EffectFamily.Builtin || viewerModel.viewerComponentType === ViewerComponentType.Generated) ? 16 : 4
+        property int viewMargins: (viewerModel.effectFamily === EffectFamily.Builtin || viewerModel.viewerComponentType === ViewerComponentType.Generated) ? 16 : 0
+        property int separatorHeight: (viewerModel.effectFamily === EffectFamily.Builtin || viewerModel.viewerComponentType === ViewerComponentType.Generated) ? separator.height + prv.panelMargins : 0
+        property bool showTopPanel: viewerModel.effectFamily !== EffectFamily.Builtin || (viewer && viewer.usesPresets)
+        property bool showBottomPanel: true
+
+        property bool isApplyAllowed: viewerModel.effectFamily != EffectFamily.Builtin || (viewer && viewer.isApplyAllowed)
+        property bool isPreviewAllowed: !viewer || viewer.isPreviewAllowed !== false
 
         function closeWindow(accept) {
             if (prv.viewer) {
@@ -52,15 +67,6 @@ EffectStyledDialogView {
         }
     }
 
-    title: viewerModel.title
-
-    contentWidth: Math.max(viewerLoader.width + prv.viewMargins * 2, prv.minimumWidth)
-    contentHeight: {
-        let height = viewerLoader.height + bottomPanel.height
-        height += prv.showPresets ? topPanel.height : prv.viewMargins
-        return height
-    }
-
     Component.onCompleted: {
         viewerModel.load()
         loadViewer()
@@ -68,18 +74,6 @@ EffectStyledDialogView {
 
     onWindowChanged: {
         loadViewer()
-    }
-
-    Connections {
-        target: viewerModel
-        function onViewerComponentTypeChanged() {
-            // For Audio Units, reload the view instead of switching components
-            if (viewerModel.viewerComponentType === ViewerComponentType.AudioUnit && viewerLoader.item) {
-                viewerLoader.item.reload()
-            } else {
-                loadViewer()
-            }
-        }
     }
 
     // Listen to UI mode changes from the presets bar menu
@@ -90,22 +84,34 @@ EffectStyledDialogView {
         }
     }
 
+    Connections {
+        target: viewerModel
+        function onViewerComponentTypeChanged() {
+            // For Audio Units, reload the view instead of switching components
+            if (viewerModel.viewerComponentType === ViewerComponentType.AudioUnit && prv.viewer) {
+                prv.viewer.reload()
+            } else {
+                loadViewer()
+            }
+        }
+    }
+
     function loadViewer() {
         switch (viewerModel.viewerComponentType) {
         case ViewerComponentType.AudioUnit:
-            viewerLoader.sourceComponent = audioUnitViewerComp
+            viewerLoader.sourceComponent = audioUnitViewerComponent
             break
         case ViewerComponentType.Lv2:
-            viewerLoader.sourceComponent = lv2ViewerComp
+            viewerLoader.sourceComponent = lv2ViewerComponent
             break
         case ViewerComponentType.Vst:
-            viewerLoader.sourceComponent = vstViewerComp
+            viewerLoader.sourceComponent = vstViewerComponent
             break
         case ViewerComponentType.Builtin:
-            viewerLoader.sourceComponent = builtinViewerComp
+            viewerLoader.sourceComponent = builtinViewerComponent
             break
         case ViewerComponentType.Generated:
-            viewerLoader.sourceComponent = generatedViewerComp
+            viewerLoader.sourceComponent = generatedViewerComponent
             break
         default:
             viewerLoader.sourceComponent = null
@@ -117,12 +123,61 @@ EffectStyledDialogView {
         instanceId: root.instanceId
     }
 
+    Component {
+        id: audioUnitViewerComponent
+        AudioUnitViewer {
+            height: implicitHeight
+
+            instanceId: root.instanceId
+            topPadding: topPanel.height
+            bottomPadding: bbox.implicitHeight + prv.panelMargins * 2
+            sidePadding: prv.viewMargins
+            minimumWidth: prv.minimumWidth
+        }
+    }
+
+    Component {
+        id: lv2ViewerComponent
+        Lv2Viewer {
+            instanceId: root.instanceId
+            title: root.title
+        }
+    }
+
+    Component {
+        id: vstViewerComponent
+        VstViewer {
+            height: implicitHeight
+
+            instanceId: root.instanceId
+            topPadding: topPanel.height
+            bottomPadding: bbox.implicitHeight + prv.panelMargins * 2
+            sidePadding: prv.viewMargins
+            minimumWidth: prv.minimumWidth
+        }
+    }
+
+    Component {
+        id: builtinViewerComponent
+        BuiltinEffectViewer {
+            instanceId: root.instanceId
+            dialogView: root
+            usedDestructively: true
+        }
+    }
+
+    Component {
+        id: generatedViewerComponent
+        GeneratedEffectViewer {
+            instanceId: root.instanceId
+        }
+    }
+
     Column {
-        id: column
         anchors.fill: parent
 
         WindowContainer {
-            visible: prv.showPresets
+            visible: prv.showTopPanel
 
             window: Window {
                 id: topPanel
@@ -132,13 +187,11 @@ EffectStyledDialogView {
 
                 color: ui.theme.backgroundPrimaryColor
 
-                Column {
-                    id: presetsBarContainer
-
+                Row {
+                    id: headerBar
+                    spacing: 4
                     anchors.fill: parent
                     anchors.margins: prv.panelMargins
-
-                    spacing: prv.panelMargins
 
                     EffectPresetsBar {
                         id: presetsBar
@@ -158,11 +211,11 @@ EffectStyledDialogView {
                 SeparatorLine {
                     id: separator
 
-                    anchors.top: presetsBarContainer.bottom
+                    anchors.top: headerBar.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
 
-                    visible: viewerModel.effectFamily == EffectFamily.Builtin
+                    visible: (viewerModel.effectFamily == EffectFamily.Builtin || viewerModel.viewerComponentType == ViewerComponentType.Generated)
                 }
             }
         }
@@ -170,7 +223,7 @@ EffectStyledDialogView {
         Item {
             id: spacer
 
-            visible: !prv.showPresets
+            visible: !prv.showTopPanel
 
             width: parent.width
             height: prv.viewMargins
@@ -221,6 +274,7 @@ EffectStyledDialogView {
                             height: presetsBar.height
                             minWidth: 80
                             isLeftSide: true
+                            visible: prv.isPreviewAllowed
 
                             text: (prv.viewer && prv.viewer.isPreviewing) ?
                             //: Shown on a button that stops effect preview
@@ -289,55 +343,5 @@ EffectStyledDialogView {
 
         visible: prv.viewer && prv.viewer.isPreviewing
         effectFamily: root.effectFamily
-    }
-
-    Component {
-        id: builtinViewerComp
-        BuiltinEffectViewer {
-            instanceId: root.instanceId
-            dialogView: root
-            usedDestructively: true
-        }
-    }
-
-    Component {
-        id: lv2ViewerComp
-        Lv2Viewer {
-            instanceId: root.instanceId
-            title: root.title
-        }
-    }
-
-    Component {
-        id: audioUnitViewerComp
-        AudioUnitViewer {
-            height: implicitHeight
-
-            instanceId: root.instanceId
-            topPadding: topPanel.height
-            bottomPadding: bbox.implicitHeight + prv.panelMargins * 2
-            sidePadding: prv.viewMargins
-            minimumWidth: prv.minimumWidth
-        }
-    }
-
-    Component {
-        id: vstViewerComp
-        VstViewer {
-            height: implicitHeight
-
-            instanceId: root.instanceId
-            topPadding: topPanel.height
-            bottomPadding: bbox.implicitHeight + prv.panelMargins * 2
-            sidePadding: prv.viewMargins
-            minimumWidth: prv.minimumWidth
-        }
-    }
-
-    Component {
-        id: generatedViewerComp
-        GeneratedEffectViewer {
-            instanceId: root.instanceId
-        }
     }
 }

@@ -2,10 +2,12 @@
 # Audacity: A Digital Audio Editor
 #
 
-install (DIRECTORY
-    workspaces
-    DESTINATION ${AU4_SHARE_NAME}${AU4_INSTALL_NAME}
-    PATTERN ".*" EXCLUDE
-    )
+add_subdirectory(locale)
+add_subdirectory(autobotscripts)
+add_subdirectory(icons)
+add_subdirectory(workspaces)
 
-subdirs(locale autobotscripts icons)
+IF (AU_MODULE_EFFECTS_NYQUIST)
+    add_subdirectory(nyquist-runtime)
+    add_subdirectory(nyquist-plug-ins)
+ENDIF()

@@ -13,7 +13,7 @@
 #include "au3-project-file-io/ProjectFileIO.h"
 #include "au3-tags/Tags.h"
 
-#include "RegisterImportPlugins.h"
+#include "RegisterImportPlugins.h" // from au3/modules/import-export/ see IMPORT_EXPORT_MODULE in au3wrapDefs.cmake
 
 #include "au3wrap/au3types.h"
 #include "au3wrap/internal/wxtypes_convert.h"

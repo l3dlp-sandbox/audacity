@@ -43,7 +43,7 @@ bool Generator::Process(EffectInstance&, EffectSettings& settings)
 
             //if we can't move clips, and we're generating into an empty space,
             //make sure there's room.
-            if (    track.IsEmpty(mT0, mT1 + 1.0 / track.GetRate())
+            if (track.IsEmpty(mT0, mT1 + 1.0 / track.GetRate())
                 && !track.IsEmpty(mT0,
                                   mT0 + duration - (mT1 - mT0) - 1.0 / track.GetRate())) {
                 using namespace BasicUI;
@@ -65,16 +65,11 @@ bool Generator::Process(EffectInstance&, EffectSettings& settings)
                     copy->Flush();
                     PasteTimeWarper warper { mT1, mT0 + duration };
                     auto pProject = FindProject();
-                    const auto& selectedRegion
-                        =ViewInfo::Get(*pProject).selectedRegion;
-                    // According to https://manual.audacityteam.org/man/silence.html,
-                    // generating silence with an audio selection should behave like
-                    // the "Silence Audio" command, which doesn't affect track clip
-                    // boundaries.
+                    const auto& selectedRegion = ViewInfo::Get(*pProject).selectedRegion;
                     constexpr auto preserve = true;
                     constexpr auto merge = true;
                     track.ClearAndPaste(
-                        selectedRegion.t0(), selectedRegion.t1(), *copy, preserve,
+                        selectedRegion.t0(), selectedRegion.t1(), *copy, mPreserveUnderlyingClipBoundaries,
                         merge, &warper);
                 } else {
                     return;

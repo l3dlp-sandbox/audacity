@@ -17,5 +17,6 @@ public:
 
     virtual muse::async::Notification effectMetaListUpdated() const = 0;
     virtual EffectMetaList effectMetaList() const = 0;
+    virtual void registerMeta(const EffectMeta& meta) = 0;
 };
 }

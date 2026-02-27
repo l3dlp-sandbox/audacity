@@ -14,15 +14,16 @@
 #include "au3-files/FileNames.h"
 #include "au3-label-track/LabelTrack.h"
 #include "au3-strings/Languages.h"
+#if defined(USE_MIDI)
 #include "au3-note-track/NoteTrack.h"
+#endif
 #include "au3-files/PlatformCompatibility.h"
 #include "au3-module-manager/PluginManager.h"
 #include "au3-preferences/Prefs.h"
 #include "au3-project/Project.h"
 #include "au3-project-rate/ProjectRate.h"
 #include "au3-command-parameters/ShuttleAutomation.h"
-#include "au3-wave-track-settings/SpectrogramSettings.h"
-#include "au3-track-selection/SyncLock.h"
+// #include "au3-wave-track-settings/SpectrogramSettings.h" // TODO: properly handle SpectrogramSettings
 #include "au3-files/TempDirectory.h"
 #include "au3-time-track/TimeTrack.h"
 #include "au3-track/TimeWarper.h"
@@ -121,7 +122,7 @@ NyquistBase::~NyquistBase()
 PluginPath NyquistBase::GetPath() const
 {
     if (mIsPrompt) {
-        return NYQUIST_PROMPT_ID;
+        return Effect::GetPath();
     }
 
     return mFileName.GetFullPath();
@@ -129,10 +130,6 @@ PluginPath NyquistBase::GetPath() const
 
 ComponentInterfaceSymbol NyquistBase::GetSymbol() const
 {
-    if (mIsPrompt) {
-        return { NYQUIST_PROMPT_ID, NYQUIST_PROMPT_NAME }
-    }
-
     return mName;
 }
 
@@ -186,6 +183,11 @@ FilePath NyquistBase::HelpPage() const
 EffectType NyquistBase::GetType() const
 {
     return mType;
+}
+
+EffectGroup NyquistBase::GetGroup() const
+{
+    return mGroup;
 }
 
 EffectType NyquistBase::GetClassification() const
@@ -467,7 +469,7 @@ bool NyquistBase::Init()
         mName = mPromptName;
         // Reset effect type each time we call the Nyquist Prompt.
         mType = mPromptType;
-        mIsSpectral = false;
+        mGroup = EffectGroup::Unspecified;
         mDebugButton = true; // Debug button always enabled for Nyquist Prompt.
         mEnablePreview
             =true; // Preview button always enabled for Nyquist Prompt.
@@ -479,7 +481,7 @@ bool NyquistBase::Init()
     // least one frequency bound and Spectral Selection is enabled for the
     // selected track(s) - (but don't apply to Nyquist Prompt).
 
-    if (!mIsPrompt && mIsSpectral) {
+    if (!mIsPrompt && mGroup == EffectGroup::SpectralTools) {
         // Completely skip the spectral editing limitations if there is no
         // project because that is editing of macro parameters
         if (const auto project = FindProject()) {
@@ -488,34 +490,24 @@ bool NyquistBase::Init()
             for (auto t : TrackList::Get(*project).Selected<const WaveTrack>()) {
                 // Find() not Get() to avoid creation-on-demand of views in case we
                 // are only previewing
-                const auto displays = GetDisplaysHook::Call(t);
-                hasSpectral |= displays.end()
-                               != std::find(
-                    displays.begin(), displays.end(),
-                    WaveChannelSubViewType {
-                    WaveChannelViewConstants::Spectrum, {} });
+                hasSpectral |= GetHasSpectralDisplayHook::Call(t);
 
-                if (
-                    hasSpectral
-                    && (SpectrogramSettings::Get(*t).SpectralSelectionEnabled())) {
+                if (hasSpectral && mSpectralSelectionEnabled) {
                     bAllowSpectralEditing = true;
                     break;
                 }
             }
 
             if (!bAllowSpectralEditing || ((mF0 < 0.0) && (mF1 < 0.0))) {
-                using namespace BasicUI;
                 if (!hasSpectral) {
-                    ShowMessageBox(
-                        XO("Enable track spectrogram view before\n"
-                           "applying 'Spectral' effects."),
-                        MessageBoxOptions {}.IconStyle(Icon::Error));
+                    mLastError
+                        = XO("Enable track spectrogram view before\n"
+                             "applying 'Spectral' effects.").Translation().ToStdString();
                 } else {
-                    ShowMessageBox(
-                        XO("To use 'Spectral effects', enable 'Spectral Selection'\n"
-                           "in the track Spectrogram settings and select the\n"
-                           "frequency range for the effect to act von."),
-                        MessageBoxOptions {}.IconStyle(Icon::Error));
+                    mLastError
+                        = XO("To use 'Spectral effects', enable 'Spectral Selection'\n"
+                             "in the track Spectrogram settings and select the\n"
+                             "frequency range for the effect to act on.").Translation().ToStdString();
                 }
                 return false;
             }
@@ -647,7 +639,7 @@ bool NyquistBase::Process(EffectInstance&, EffectSettings& settings)
     //  mProgress->Hide();
     //}
 
-    mOutputTime = 0;
+    mOutputDuration = 0;
     mCount = 0;
     const auto scale
         =(GetType() == EffectTypeProcess ? 0.5 : 1.0) / GetNumWaveGroups();
@@ -667,8 +659,7 @@ bool NyquistBase::Process(EffectInstance&, EffectSettings& settings)
     std::optional<EffectOutputTracks> oOutputs;
     if (!bOnePassTool) {
         oOutputs.emplace(
-            *mTracks, GetType(), EffectOutputTracks::TimeInterval { mT0, mT1 },
-            true, false);
+            *mTracks, GetType(), std::optional<EffectOutputTracks::TimeInterval> { { mT0, mT1 } });
     }
 
     mNumSelectedChannels
@@ -845,10 +836,7 @@ bool NyquistBase::Process(EffectInstance&, EffectSettings& settings)
 
     // Nyquist Prompt does not require a selection, but effects do.
     if (!bOnePassTool && (mNumSelectedChannels == 0)) {
-        auto message = XO("Audio selection required.");
-        using namespace BasicUI;
-        BasicUI::ShowMessageBox(
-            message, MessageBoxOptions {}.IconStyle(Icon::Error));
+        mLastError = XO("Audio selection required.").Translation().ToStdString();
     }
 
     std::optional<TrackIterRange<WaveTrack> > pRange;
@@ -899,7 +887,7 @@ bool NyquistBase::Process(EffectInstance&, EffectSettings& settings)
                 }
 
                 // Check whether we're in the same group as the last selected track
-                Track* gt = *SyncLock::Group(*mCurChannelGroup).first;
+                Track* gt = mCurChannelGroup;
                 mFirstInGroup = !gtLast || (gtLast != gt);
                 gtLast = gt;
 
@@ -998,8 +986,8 @@ bool NyquistBase::Process(EffectInstance&, EffectSettings& settings)
         mCount += mCurNumChannels;
     }
 
-    if (mOutputTime > 0.0) {
-        mT1 = mT0 + mOutputTime;
+    if (mOutputDuration > 0.0) {
+        mT1 = mT0 + mOutputDuration;
     }
 
 finish:
@@ -1107,10 +1095,12 @@ bool NyquistBase::ProcessOne(
         mCurChannelGroup->TypeSwitch(
             [&](const WaveTrack& wt) {
             type = wxT("wave");
-            spectralEditp = SpectrogramSettings::Get(*mCurChannelGroup)
-                            .SpectralSelectionEnabled()
-                            ? wxT("T")
-                            : wxT("NIL");
+            // TODO: properly handle SpectrogramSettings
+            spectralEditp = wxT("NIL");
+            // spectralEditp = SpectrogramSettings::Get(*mCurChannelGroup)
+            //                 .SpectralSelectionEnabled()
+            //                 ? wxT("T")
+            //                 : wxT("NIL");
             view = wxT("NIL");
             // Find() not Get() to avoid creation-on-demand of views in case we
             // are only previewing
@@ -1442,12 +1432,22 @@ bool NyquistBase::ProcessOne(
     }
 
     if (rval == nyx_string) {
+        // True if not process type.
+        // If not returning audio from process effect,
+        // return first result then stop (disables preview)
+        // but allow all output from Nyquist Prompt.
+        const auto isOk = !GetType() != EffectTypeProcess || mIsPrompt;
+
         // Assume the string has already been translated within the Lisp runtime
         // if necessary, by one of the gettext functions defined below, before it
         // is communicated back to C++
         auto msg = Verbatim(NyquistToWxString(nyx_get_string()));
         if (!msg.empty()) { // Empty string may be used as a No-Op return value.
-            BasicUI::ShowMessageBox(msg);
+            if (!isOk) {
+                mLastError = msg.Translation().ToStdString();
+            } else {
+                BasicUI::ShowMessageBox(msg);
+            }
         } else if (GetType() == EffectTypeTool) {
             // ;tools may change the project with aud-do commands so
             // it is essential that the state is added to history.
@@ -1458,23 +1458,29 @@ bool NyquistBase::ProcessOne(
             return true;
         }
 
-        // True if not process type.
-        // If not returning audio from process effect,
-        // return first result then stop (disables preview)
-        // but allow all output from Nyquist Prompt.
-        return GetType() != EffectTypeProcess || mIsPrompt;
+        return isOk;
     }
 
     if (rval == nyx_double) {
         auto str = XO("Nyquist returned the value: %f").Format(nyx_get_double());
-        BasicUI::ShowMessageBox(str);
-        return GetType() != EffectTypeProcess || mIsPrompt;
+        const auto isOk = GetType() != EffectTypeProcess || mIsPrompt;
+        if (isOk) {
+            BasicUI::ShowMessageBox(str);
+        } else {
+            mLastError = str.Translation().ToStdString();
+        }
+        return isOk;
     }
 
     if (rval == nyx_int) {
         auto str = XO("Nyquist returned the value: %d").Format(nyx_get_int());
-        BasicUI::ShowMessageBox(str);
-        return GetType() != EffectTypeProcess || mIsPrompt;
+        const auto isOk = GetType() != EffectTypeProcess || mIsPrompt;
+        if (isOk) {
+            BasicUI::ShowMessageBox(str);
+        } else {
+            mLastError = str.Translation().ToStdString();
+        }
+        return isOk;
     }
 
     if (rval == nyx_labels) {
@@ -1514,19 +1520,18 @@ bool NyquistBase::ProcessOne(
 
     int outChannels = nyx_get_audio_num_channels();
     if (outChannels > (int)mCurNumChannels) {
-        BasicUI::ShowMessageBox(
-            XO("Nyquist returned too many audio channels.\n"));
+        mLastError = (
+            XO("Nyquist returned too many audio channels.\n")).Translation().ToStdString();
         return false;
     }
 
     if (outChannels == -1) {
-        BasicUI::ShowMessageBox(
-            XO("Nyquist returned one audio channel as an array.\n"));
+        mLastError = XO("Nyquist returned one audio channel as an array.\n").Translation().ToStdString();
         return false;
     }
 
     if (outChannels == 0) {
-        BasicUI::ShowMessageBox(XO("Nyquist returned an empty array.\n"));
+        mLastError = XO("Nyquist returned an empty array.\n").Translation().ToStdString();
         return false;
     }
 
@@ -1545,9 +1550,9 @@ bool NyquistBase::ProcessOne(
         return false;
     }
 
-    mOutputTime = out->GetEndTime();
-    if (mOutputTime <= 0) {
-        BasicUI::ShowMessageBox(XO("Nyquist returned nil audio.\n"));
+    mOutputDuration = out->GetEndTime();
+    if (mOutputDuration <= 0) {
+        mLastError = XO("Nyquist returned nil audio.\n").Translation().ToStdString();
         return false;
     }
 
@@ -1565,27 +1570,18 @@ bool NyquistBase::ProcessOne(
     }
 
     {
-        const bool bMergeClips = (mMergeClips < 0)
-                                 // Use sample counts to determine default
-                                 // behaviour - times will rarely be equal.
-                                 ?
-                                 (out->TimeToLongSamples(mT0)
-                                  + out->TimeToLongSamples(mOutputTime)
-                                  == out->TimeToLongSamples(mT1))
-                                 : mMergeClips != 0;
         PasteTimeWarper warper { mT1, mT0 + tempTrack->GetEndTime() };
+        auto pProject = FindProject();
+        const auto& selectedRegion = ViewInfo::Get(*pProject).selectedRegion;
+        const bool mergeClips = (mMergeClips < 0)
+                                ? GetType() != EffectTypeGenerate
+                                : mMergeClips > 0;
         mCurChannelGroup->ClearAndPaste(
-            mT0, mT1, *tempTrack, mRestoreSplits, bMergeClips, &warper);
+            selectedRegion.t0(), selectedRegion.t1(), *tempTrack, mRestoreSplits, mergeClips, &warper);
     }
 
     // If we were first in the group adjust non-selected group tracks
     if (mFirstInGroup) {
-        for (auto t : SyncLock::Group(*mCurChannelGroup)) {
-            if (!t->GetSelected() && SyncLock::IsSyncLockSelected(*t)) {
-                t->SyncLockAdjust(mT1, mT0 + out->GetEndTime());
-            }
-        }
-
         // Only the first channel can be first in its group
         mFirstInGroup = false;
     }
@@ -1675,7 +1671,7 @@ FileNames::FileType NyquistBase::ParseFileType(const wxString& text)
         tzer.Tokenize(text, true, 1, 1);
         auto& tokens = tzer.tokens;
         if (tokens.size() == 2) {
-            result = { UnQuoteMsgid(tokens[0]), ParseFileExtensions(tokens[1]) }
+            result = { UnQuoteMsgid(tokens[0]), ParseFileExtensions(tokens[1]) };
         }
     }
     return result;
@@ -1757,7 +1753,7 @@ TranslatableString NyquistBase::UnQuoteMsgid(
     const wxString& s, bool allowParens, wxString* pExtraString)
 {
     if (pExtraString) {
-        *pExtraString = wxString {}
+        *pExtraString = wxString {};
     }
 
     int len = s.length();
@@ -1785,7 +1781,7 @@ TranslatableString NyquistBase::UnQuoteMsgid(
                 return UnQuoteMsgid(tokens[1], false);
             }
         } else {
-            return {}
+            return {};
         }
     } else {
         // If string was not quoted, assume no translation exists
@@ -1965,8 +1961,33 @@ bool NyquistBase::Parse(
             mType = EffectTypeAnalyze;
         }
 
-        if (len >= 3 && tokens[2] == wxT("spectral")) {
-            mIsSpectral = true;
+        if (len >= 3) {
+            const auto& tok = tokens[2];
+            if (tok == wxT("nogroup")) {
+                mGroup = EffectGroup::None;
+            } else if (tok == wxT("volumeandcompression")) {
+                mGroup = EffectGroup::VolumeAndCompression;
+            } else if (tok == wxT("fading")) {
+                mGroup = EffectGroup::Fading;
+            } else if (tok == wxT("pitchandtempo")) {
+                mGroup = EffectGroup::PitchAndTempo;
+            } else if (tok == wxT("eqandfilters")) {
+                mGroup = EffectGroup::EqAndFilters;
+            } else if (tok == wxT("noiseremovalandrepair")) {
+                mGroup = EffectGroup::NoiseRemovalAndRepair;
+            } else if (tok == wxT("delayandreverb")) {
+                mGroup = EffectGroup::DelayAndReverb;
+            } else if (tok == wxT("distortionandmodulation")) {
+                mGroup = EffectGroup::DistortionAndModulation;
+            } else if (tok == wxT("special")) {
+                mGroup = EffectGroup::Special;
+            } else if (tok == wxT("spectral") || tok == wxT("spectraltools")) {
+                mGroup = EffectGroup::SpectralTools;
+            } else if (tok == wxT("legacy")) {
+                mGroup = EffectGroup::Legacy;
+            } else {
+                mGroup = EffectGroup::Unspecified;
+            }
         }
         return true;
     }
@@ -2007,7 +2028,7 @@ bool NyquistBase::Parse(
     if (len >= 2 && tokens[0] == wxT("version")) {
         long v;
         tokens[1].ToLong(&v);
-        if (v < 1 || v > 4) {
+        if (v < 1 || v > 5) {
             // This is an unsupported plug-in version
             mOK = false;
             mInitError
@@ -2073,7 +2094,11 @@ bool NyquistBase::Parse(
         long v;
         // -1 = auto (default), 0 = don't merge clips, 1 = do merge clips
         tokens[1].ToLong(&v);
-        mMergeClips = v;
+        if (v == 0) {
+            mMergeClips = false;
+        } else if (v == 1) {
+            mMergeClips = true;
+        }
         return true;
     }
 
@@ -2279,9 +2304,8 @@ bool NyquistBase::ParseProgram(wxInputStream& stream)
     mIsSal = false;
     mControls.clear();
     mCategories.clear();
-    mIsSpectral = false;
-    mManPage = wxEmptyString; // If not wxEmptyString, must be a page in the
-                              // Audacity manual.
+    mGroup = EffectGroup::Unspecified;
+    mManPage = wxEmptyString; // If not wxEmptyString, must be a page in the Audacity manual.
     mHelpFile
         =wxEmptyString; // If not wxEmptyString, must be a valid HTML help file.
     mHelpFileExists = false;
@@ -2340,14 +2364,10 @@ bool NyquistBase::ParseProgram(wxInputStream& stream)
         using namespace BasicUI;
         /* i1n-hint: SAL and LISP are names for variant syntaxes for the
          Nyquist programming language.  Leave them, and 'return', untranslated. */
-        BasicUI::ShowMessageBox(
-            XO(
-                "Your code looks like SAL syntax, but there is no \'return\' statement.\n\
-For SAL, use a return statement such as:\n\treturn *track* * 0.1\n\
-or for LISP, begin with an open parenthesis such as:\n\t(mult *track* 0.1)\n ."),
-            MessageBoxOptions {}.IconStyle(Icon::Error));
-        /* i18n-hint: refers to programming "languages" */
-        mInitError = XO("Could not determine language");
+        mLastError = XO(
+            "Your code looks like SAL syntax, but there is no \'return\' statement.\n\
+            For SAL, use a return statement such as:\n\treturn *track* * 0.1\n\
+            or for LISP, begin with an open parenthesis such as:\n\t(mult *track* 0.1)\n .").Translation().ToStdString();
         return false;
         // Else just throw it at Nyquist to see what happens
     }
@@ -2517,9 +2537,9 @@ FilePaths NyquistBase::GetNyquistSearchPath()
 
     for (size_t i = 0; i < audacityPathList.size(); i++) {
         wxString prefix = audacityPathList[i] + wxFILE_SEP_PATH;
-        FileNames::AddUniquePathToPathList(prefix + wxT("nyquist"), pathList);
+        FileNames::AddUniquePathToPathList(prefix + wxT("nyquist-runtime"), pathList);
         FileNames::AddUniquePathToPathList(prefix + wxT("plugins"), pathList);
-        FileNames::AddUniquePathToPathList(prefix + wxT("plug-ins"), pathList);
+        FileNames::AddUniquePathToPathList(prefix + wxT("nyquist-plug-ins"), pathList);
     }
     pathList.push_back(FileNames::PlugInDir());
 

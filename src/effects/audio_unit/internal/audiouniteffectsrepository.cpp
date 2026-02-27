@@ -4,7 +4,7 @@
 #include "audiouniteffectsrepository.h"
 
 au::effects::AudioUnitEffectsRepository::AudioUnitEffectsRepository()
-    : m_helper(m_module, muse::audio::AudioResourceType::AudioUnit)
+    : m_helper{m_module, muse::audio::AudioResourceType::AudioUnit}
 {
 }
 

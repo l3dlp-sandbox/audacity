@@ -21,7 +21,7 @@ xargs xgettext \
 --package-version='3.6.0' \
 --msgid-bugs-address="audacity-translation@lists.sourceforge.net" \
 --add-location=file -L C -o audacity.pot 
-echo ";; Adding nyquist files to audacity.pot"
+echo ";; Adding nyquist files to audacity.pot" # path to nyquist-plug-ins has changed it's now in share
 for path in ../plug-ins ; do find $path -name \*.ny -not -name rms.ny; done | LANG=c sort | \
 sed -E 's/\.\.\///g' |\
 xargs xgettext \

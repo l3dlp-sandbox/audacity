@@ -412,6 +412,7 @@ public:
     using Track::Paste; // Get the non-virtual overload too
 
     /*!
+     @brief Replaces t0 to t1 by silence and then pastes src at t0, eating into clips in the way.
      May assume precondition: t0 <= t1
      If the source has one channel and this has more, then replicate source
      @pre `src.NChannels() == 1 || src.NChannels() == NChannels()`

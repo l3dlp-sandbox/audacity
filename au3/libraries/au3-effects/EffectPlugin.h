@@ -83,6 +83,8 @@ public:
         NotifyingSelectedRegion& selectedRegion, unsigned flags, const EffectSettingsAccessPtr& pAccess = nullptr
         //!< Sometimes given; only for UI
         ) = 0;
+
+    EffectGroup GetGroup() const override { return EffectGroup::None; }
 };
 
 /***************************************************************************//**

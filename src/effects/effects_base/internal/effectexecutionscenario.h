@@ -15,6 +15,8 @@
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/internal/itracknavigationcontroller.h"
 #include "au3wrap/au3types.h"
+#include "spectrogram/iglobalspectrogramconfiguration.h"
+#include "spectrogram/ifrequencyselectioncontroller.h"
 
 #include <optional>
 
@@ -36,6 +38,8 @@ class EffectExecutionScenario : public IEffectExecutionScenario, public muse::In
     muse::Inject<muse::IInteractive> interactive{ this };
     muse::Inject<trackedit::IProjectHistory> projectHistory{ this };
     muse::Inject<trackedit::ITrackNavigationController> trackNavigationController { this };
+    muse::Inject<spectrogram::IFrequencySelectionController> frequencySelectionController { this };
+    muse::GlobalInject<spectrogram::IGlobalSpectrogramConfiguration> spectrogramConfiguration;
 
 public:
     EffectExecutionScenario(const muse::modularity::ContextPtr& ctx)

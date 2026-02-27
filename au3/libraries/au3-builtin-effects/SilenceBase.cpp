@@ -19,7 +19,16 @@ const ComponentInterfaceSymbol SilenceBase::Symbol
 /* i18n-hint: noun */
 { XC("Silence", "generator") };
 
+namespace {
+// According to https://manual.audacityteam.org/man/silence.html,
+// generating silence with an audio selection should behave like
+// the "Silence Audio" command, which doesn't affect track clip
+// boundaries.
+constexpr auto preserveUnderlyingClipBoundaries = true;
+}
+
 SilenceBase::SilenceBase()
+    : Generator(preserveUnderlyingClipBoundaries)
 {
     SetLinearEffectFlag(true);
 }

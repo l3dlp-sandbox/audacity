@@ -118,6 +118,7 @@ add_to_link_if_exists(context)
 add_to_link_if_exists(effects_audio_unit)
 add_to_link_if_exists(effects_base)
 add_to_link_if_exists(effects_builtin)
+add_to_link_if_exists(effects_builtin_collection)
 add_to_link_if_exists(effects_lv2)
 add_to_link_if_exists(effects_nyquist)
 add_to_link_if_exists(effects_vst)
@@ -131,18 +132,6 @@ add_to_link_if_exists(projectscene)
 add_to_link_if_exists(record)
 add_to_link_if_exists(spectrogram)
 add_to_link_if_exists(toast)
-
-if (AU_MODULE_EFFECTS_VST)
-    add_definitions(-DAU_MODULE_EFFECTS_VST)
-endif()
-
-if (AU_MODULE_EFFECTS_LV2)
-    add_definitions(-DAU_MODULE_EFFECTS_LV2)
-endif()
-
-if (AU_MODULE_EFFECTS_AUDIO_UNIT)
-    add_definitions(-DAU_MODULE_EFFECTS_AUDIO_UNIT)
-endif()
 
 set (AUDACITY_APPEND_SRC)
 
@@ -228,6 +217,14 @@ endif(CC_IS_MSVC)
 # Link
 ##########################################
 target_link_libraries(audacity PRIVATE ${LINK_LIB}  ${COVERAGE_LINK_FLAGS})
+
+###########################################
+# Dependencies
+###########################################
+
+if (AU_MODULE_EFFECTS_NYQUIST)
+    add_dependencies(audacity nyquist-runtime nyquist-plug-ins)
+endif()
 
 ###########################################
 # INSTALL

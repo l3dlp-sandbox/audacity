@@ -125,10 +125,15 @@ void PluginRegistrationApp::finish()
 
     // Delete contexts
     for (auto& c : m_contexts) {
+        for (modularity::IContextSetup* s : c.setups) {
+            s->onDeinit();
+        }
         qDeleteAll(c.setups);
+        modularity::removeIoC(c.ctx);
     }
     m_contexts.clear();
 
+    // Delete modules
     qDeleteAll(m_modules);
     m_modules.clear();
 }

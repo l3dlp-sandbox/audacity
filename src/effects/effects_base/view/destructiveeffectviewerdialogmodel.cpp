@@ -2,7 +2,6 @@
  * Audacity: A Digital Audio Editor
  */
 #include "destructiveeffectviewerdialogmodel.h"
-#include "log.h"
 
 namespace au::effects {
 DestructiveEffectViewerDialogModel::DestructiveEffectViewerDialogModel(QObject* parent)
@@ -80,6 +79,10 @@ ViewerComponentType DestructiveEffectViewerDialogModel::viewerComponentType() co
     // Built-in effects always use their custom viewers
     if (family == EffectFamily::Builtin) {
         return ViewerComponentType::Builtin;
+    }
+
+    if (family == EffectFamily::Nyquist) {
+        return ViewerComponentType::Generated;
     }
 
     // For external plugins (VST3, LV2), check if we should use generated UI

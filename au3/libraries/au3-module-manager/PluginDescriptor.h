@@ -74,7 +74,8 @@ public:
     // So config compatibility will break if it is changed across Audacity versions
     wxString GetEffectFamily() const;
 
-    EffectType GetEffectType() const;
+    ::EffectType GetEffectType() const;
+    ::EffectGroup GetEffectGroup() const;
     bool IsEffectDefault() const;
     bool IsEffectInteractive() const;
     bool IsEffectLegacy() const;
@@ -108,7 +109,8 @@ public:
 
     // "family" should be an untranslated string wrapped in wxT()
     void SetEffectFamily(const wxString& family);
-    void SetEffectType(EffectType type);
+    void SetEffectType(::EffectType type);
+    void SetEffectGroup(::EffectGroup group);
     void SetEffectDefault(bool dflt);
     void SetEffectInteractive(bool interactive);
     void SetEffectLegacy(bool legacy);
@@ -143,7 +145,8 @@ private:
     // Effects
 
     wxString mEffectFamily;
-    EffectType mEffectType { EffectTypeNone };
+    ::EffectType mEffectType { EffectTypeNone };
+    ::EffectGroup mEffectGroup { EffectGroup::Unspecified };
     bool mEffectInteractive { false };
     bool mEffectDefault { false };
     bool mEffectLegacy { false };

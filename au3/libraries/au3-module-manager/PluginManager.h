@@ -120,7 +120,7 @@ public:
         Iterator(PluginManager& manager, int pluginType //!< bitwise or of values in PluginType
                  );
         //! Iterates only enabled and matching effects, with family enabled too
-        Iterator(PluginManager& manager, EffectType type);
+        Iterator(PluginManager& manager, ::EffectType type);
         bool operator !=(int) const
         {
             return mIterator != mPm.mRegisteredPlugins.end();
@@ -132,7 +132,7 @@ public:
         void Advance(bool incrementing);
         const PluginManager& mPm;
         PluginMap::iterator mIterator;
-        EffectType mEffectType{ EffectTypeNone };
+        ::EffectType mEffectType{ EffectTypeNone };
         int mPluginType{ PluginTypeNone };
     };
     struct Range {
@@ -143,7 +143,7 @@ public:
 
     Range AllPlugins() { return { Iterator{ *this } }; }
     Range PluginsOfType(int type) { return { Iterator{ *this, type } }; }
-    Range EffectsOfType(EffectType type) { return { Iterator{ *this, type } }; }
+    Range EffectsOfType(::EffectType type) { return { Iterator{ *this, type } }; }
     //! @}
 
     bool IsPluginEnabled(const PluginID& ID);
@@ -234,9 +234,9 @@ private:
 // Defining these special names in the low-level PluginManager.h
 // is unfortunate
 // Internal name should be stable across versions
-#define NYQUIST_PROMPT_ID wxT("Nyquist Prompt")
+#define NYQUIST_PROMPT_ID wxT("Nyquist prompt")
 // User-visible name might change in later versions
-#define NYQUIST_PROMPT_NAME XO("Nyquist Prompt")
+#define NYQUIST_PROMPT_NAME XO("Nyquist prompt")
 
 // Latest version of the plugin registry config
 constexpr auto REGVERCUR = "1.5";

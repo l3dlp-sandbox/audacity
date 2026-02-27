@@ -4,6 +4,7 @@
 
 add_subdirectory(effects_base)
 add_subdirectory(builtin)
+add_subdirectory(builtin_collection)
 
 if (AU_MODULE_EFFECTS_LV2)
     add_subdirectory(lv2)
@@ -17,4 +18,6 @@ if (AU_MODULE_EFFECTS_AUDIO_UNIT)
     add_subdirectory(audio_unit)
 endif()
 
-add_subdirectory(nyquist)
+if (AU_MODULE_EFFECTS_NYQUIST)
+    add_subdirectory(nyquist)
+endif()

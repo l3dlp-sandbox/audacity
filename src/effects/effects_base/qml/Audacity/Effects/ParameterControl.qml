@@ -8,6 +8,7 @@ import Muse.Ui
 import Muse.UiComponents
 
 import Audacity.Effects
+import Audacity.UiComponents
 
 Item {
     id: root
@@ -15,11 +16,18 @@ Item {
     property var parameterData: null
     property string parameterId: parameterData ? parameterData.id : ""
 
+    // Properties for time controls
+    property double sampleRate: 0
+    property double tempo: 0
+    property int upperTimeSignature: 0
+    property int lowerTimeSignature: 0
+
     signal valueChanged(string parameterId, double value)
+    signal stringValueChanged(string parameterId, string stringValue)
     signal gestureStarted(string parameterId)
     signal gestureEnded(string parameterId)
 
-    implicitHeight: controlLoader.height
+    implicitHeight: rowLayout.implicitHeight
 
     QtObject {
         id: prv
@@ -35,12 +43,14 @@ Item {
     }
 
     RowLayout {
+        id: rowLayout
         anchors.fill: parent
         anchors.rightMargin: prv.spaceL
         spacing: prv.spaceL
 
         // Parameter label
         StyledTextLabel {
+            id: paramLabel
             Layout.preferredWidth: prv.labelWidth
             Layout.alignment: Qt.AlignVCenter
             text: parameterData ? parameterData.name : ""
@@ -70,6 +80,12 @@ Item {
                     return numericControl
                 case "readonly":
                     return readonlyControl
+                case "time":
+                    return timeControl
+                case "file":
+                    return fileControl
+                case "text":
+                    return textControl
                 default:
                     return unknownControl
                 }
@@ -190,12 +206,14 @@ Item {
     Component {
         id: numericControl
 
-        RowLayout {
-            spacing: prv.spaceM
+        // Wrapper Item needed to properly communicate size to parent Loader via implicitWidth/Height
+        Item {
+            implicitWidth: numericInput.width
+            implicitHeight: numericInput.height
 
             IncrementalPropertyControl {
                 id: numericInput
-                Layout.preferredWidth: prv.numericControlWidth
+                width: prv.numericControlWidth
 
                 // Always use normalized values (0.0 to 1.0) like AU3 does
                 currentValue: parameterData ? parameterData.currentValue : 0
@@ -238,13 +256,111 @@ Item {
                     }
                 }
             }
+        }
+    }
 
-            // Display formatted value from plugin (like AU3 does)
-            StyledTextLabel {
-                Layout.preferredWidth: prv.valueDisplayWidth
-                Layout.alignment: Qt.AlignVCenter
-                text: parameterData ? parameterData.formattedValue : ""
-                horizontalAlignment: Text.AlignLeft
+    // Time control (timecode input)
+    Component {
+        id: timeControl
+
+        // Wrapper Item needed to properly communicate size to parent Loader via implicitWidth/Height
+        Item {
+            implicitWidth: timecode.width
+            implicitHeight: timecode.height
+
+            Timecode {
+                id: timecode
+
+                value: parameterData ? parameterData.currentValue : 0
+                mode: TimecodeModeSelector.Duration
+                currentFormatStr: "" // TODO
+                sampleRate: root.sampleRate
+                tempo: root.tempo
+                upperTimeSignature: root.upperTimeSignature
+                lowerTimeSignature: root.lowerTimeSignature
+
+                onValueChanged: {
+                    root.valueChanged(root.parameterId, timecode.value)
+                }
+
+                onFocusChanged: {
+                    if (focus) {
+                        root.gestureStarted(root.parameterId)
+                    } else {
+                        root.gestureEnded(root.parameterId)
+                    }
+                }
+            }
+        }
+    }
+
+    // File control (file picker)
+    Component {
+        id: fileControl
+
+        FilePicker {
+            id: filePicker
+            width: parent.width
+
+            path: parameterData ? parameterData.currentValueString : ""
+
+            pickerType: {
+                if (!parameterData) {
+                    return FilePicker.PickerType.File
+                }
+
+                // If "save" flag is set, use Any type (save dialog)
+                if (parameterData.isFileSave) {
+                    return FilePicker.PickerType.Any
+                }
+
+                // Otherwise use File type (open dialog)
+                // Note: Multiple file selection is not yet fully supported in the Framework
+                // but the flag is available for future implementation
+                return FilePicker.PickerType.File
+            }
+
+            enabled: parameterData ? !parameterData.isReadOnly : false
+
+            // Set file filters from parameterData
+            filter: {
+                if (!parameterData || !parameterData.fileFilters || parameterData.fileFilters.length === 0) {
+                    return ""
+                }
+                // Join all filters with ";;" separator for Qt file dialog
+                return parameterData.fileFilters.join(";;")
+            }
+
+            onPathEdited: function (newPath) {
+                // File selection is a single atomic operation - begin and end gesture immediately
+                root.gestureStarted(root.parameterId)
+                root.stringValueChanged(root.parameterId, newPath)
+                root.gestureEnded(root.parameterId)
+            }
+        }
+    }
+
+    // Text control (free-form string input)
+    Component {
+        id: textControl
+
+        // Wrapper Item needed to properly communicate size to parent Loader via implicitWidth/Height
+        Item {
+            implicitWidth: textField.width
+            implicitHeight: textField.height
+
+            TextInputField {
+                id: textField
+                width: prv.controlWidth
+
+                currentText: parameterData ? parameterData.currentValueString : ""
+                enabled: parameterData ? !parameterData.isReadOnly : false
+
+                onTextEdited: function (newTextValue) {
+                    root.gestureStarted(root.parameterId)
+                    root.stringValueChanged(root.parameterId, newTextValue)
+                    root.gestureEnded(root.parameterId)
+                }
             }
         }
     }
@@ -256,6 +372,10 @@ Item {
         StyledTextLabel {
             text: parameterData ? parameterData.formattedValue : ""
             opacity: 0.7
+            wrapMode: Text.WordWrap
+            Layout.alignment: Qt.AlignVCenter
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignLeft
         }
     }
 

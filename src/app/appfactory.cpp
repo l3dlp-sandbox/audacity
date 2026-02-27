@@ -42,11 +42,15 @@
 #include "toast/toastmodule.h"
 #include "effects/effects_base/effectsmodule.h"
 #include "effects/builtin/builtineffectsmodule.h"
-#include "effects/nyquist/nyquisteffectsmodule.h"
+#include "effects/builtin_collection/builtineffectscollectionmodule.h"
 #include "importexport/import/importermodule.h"
 #include "importexport/export/exportermodule.h"
 #include "importexport/labels/labelsmodule.h"
 #include "au3cloud/au3cloudmodule.h"
+
+#if AU_MODULE_EFFECTS_NYQUIST
+#include "effects/nyquist/nyquisteffectsmodule.h"
+#endif
 
 #ifdef AU_MODULE_EFFECTS_LV2
 #include "effects/lv2/lv2effectsmodule.h"
@@ -59,6 +63,7 @@
 #else
 #include "stubs/vst/vsteffectsstubmodule.h"
 #endif
+
 #ifdef AU_MODULE_EFFECTS_AUDIO_UNIT
 #include "effects/audio_unit/audiouniteffectsmodule.h"
 #else
@@ -135,6 +140,7 @@ std::shared_ptr<muse::IApplication> AppFactory::newGuiApp(const CommandLineParse
     app->addModule(new au::effects::AudioUnitEffectsModule());
     app->addModule(new au::effects::Lv2EffectsModule());
     app->addModule(new au::effects::VstEffectsModule());
+    app->addModule(new au::effects::NyquistEffectsModule());
     app->addModule(new au::context::ContextModule());
     app->addModule(new au::audio::AudioModule());
     app->addModule(new au::au3audio::Au3AudioModule());
@@ -152,7 +158,7 @@ std::shared_ptr<muse::IApplication> AppFactory::newGuiApp(const CommandLineParse
     app->addModule(new au::au3cloud::Au3CloudModule());
     app->addModule(new au::effects::EffectsModule());
     app->addModule(new au::effects::BuiltinEffectsModule());
-    app->addModule(new au::effects::NyquistEffectsModule());
+    app->addModule(new au::effects::BuiltinEffectsCollectionModule());
 
     return app;
 }
@@ -174,6 +180,7 @@ std::shared_ptr<muse::IApplication> AppFactory::newPluginRegistrationApp(const C
     app->addModule(new au::effects::AudioUnitEffectsModule());
     app->addModule(new au::effects::Lv2EffectsModule());
     app->addModule(new au::effects::VstEffectsModule());
+    app->addModule(new au::effects::NyquistEffectsModule());
 
     return app;
 }

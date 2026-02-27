@@ -142,6 +142,11 @@ EffectType PluginDescriptor::GetEffectType() const
     return mEffectType;
 }
 
+EffectGroup PluginDescriptor::GetEffectGroup() const
+{
+    return mEffectGroup;
+}
+
 bool PluginDescriptor::IsEffectInteractive() const
 {
     return mEffectInteractive;
@@ -175,6 +180,11 @@ void PluginDescriptor::SetEffectFamily(const wxString& family)
 void PluginDescriptor::SetEffectType(EffectType type)
 {
     mEffectType = type;
+}
+
+void PluginDescriptor::SetEffectGroup(EffectGroup group)
+{
+    mEffectGroup = group;
 }
 
 void PluginDescriptor::SetEffectInteractive(bool interactive)

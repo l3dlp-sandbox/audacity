@@ -28,13 +28,13 @@ extern STRINGS_API const wxString& GetCustomSubstitution(const wxString& str1);
 
 // Marks strings for extraction only... use .Translate() to translate.
 // '&', preceding menu accelerators, should NOT occur in the argument.
-#define XO(s)  (TranslatableString{ wxT(s), {} })
+#define XO(s)  (::TranslatableString{ wxT(s), {} })
 
 // Alternative taking a second context argument.  A context is a string literal,
 // which is not translated, but serves to disambiguate uses of the first string
 // that might need differing translations, such as "Light" meaning not-heavy in
 // one place but not-dark elsewhere.
-#define XC(s, c)  (TranslatableString{ wxT(s), {} }.Context(c))
+#define XC(s, c)  (::TranslatableString{ wxT(s), {} }.Context(c))
 
 // Marks strings for extraction only, where '&', preceding menu accelerators, MAY
 // occur.
@@ -64,11 +64,11 @@ extern STRINGS_API const wxString& GetCustomSubstitution(const wxString& str1);
 // parentheses.  The third argument of the macro call is the zero-based index
 // of the format argument that selects singular or plural
 #define XP(sing, plur, n) \
-    TranslatableString{ wxT(sing), {} }.Plural<(n)>(wxT(plur))
+    ::TranslatableString{ wxT(sing), {} }.Plural<(n)>(wxT(plur))
 
 // Like XP but with an additional context argument, as for XC
 #define XPC(sing, plur, n, c) \
-    TranslatableString{ wxT(sing), {} }.Context(c).Plural<(n)>(wxT(plur))
+    ::TranslatableString{ wxT(sing), {} }.Context(c).Plural<(n)>(wxT(plur))
 
 class STRINGS_API Internat
 {
@@ -104,8 +104,8 @@ public:
 
     /** \brief Convert a number to a string while formatting it in bytes, KB,
      * MB, GB */
-    static TranslatableString FormatSize(wxLongLong size);
-    static TranslatableString FormatSize(double size);
+    static ::TranslatableString FormatSize(wxLongLong size);
+    static ::TranslatableString FormatSize(double size);
 
     /** \brief Check a proposed file name string for illegal characters and
      * remove them
