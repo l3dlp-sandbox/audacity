@@ -41,11 +41,10 @@ inline bool copyFile(const std::string& from, const std::string& to)
 }
 
 #if defined(_WIN32)
-inline bool removePermissionBits(const std::string& file, int bitsToRemove)
+inline bool removePermissionBits([[maybe_unused]] const std::string& file,
+                                 [[maybe_unused]] int bitsToRemove)
 {
     // No-op on Windows; permissions require ACL manipulation
-    (void)file;
-    (void)bitsToRemove;
     return true;
 }
 
