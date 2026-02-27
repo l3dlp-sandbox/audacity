@@ -178,16 +178,7 @@ au::playback::PlaybackMeterModel* TrackViewStateModel::meterModel() const
 
 void TrackViewStateModel::spectrogramVerticalZoomChanged(trackedit::TrackId trackId, int channel)
 {
+    Q_UNUSED(trackId);
     Q_UNUSED(channel);
-    const auto prj = globalContext()->currentTrackeditProject();
-    IF_ASSERT_FAILED(prj) {
-        return;
-    }
-    const auto track = prj->track(trackId);
-    IF_ASSERT_FAILED(track) {
-        return;
-    }
-    prj->notifyAboutTrackChanged(*track);
-    projectHistory()->modifyState();
     projectHistory()->markUnsaved();
 }

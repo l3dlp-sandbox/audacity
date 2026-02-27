@@ -24,6 +24,16 @@ ITrackSpectrogramConfigurationPtr SpectrogramService::trackSpectrogramConfigurat
     return Au3TrackSpectrogramConfiguration::create(trackId, *globalContext());
 }
 
+muse::async::Channel<int> SpectrogramService::trackSpectrogramConfigurationChanged() const
+{
+    return m_trackSpectrogramConfigurationChanged;
+}
+
+void SpectrogramService::notifyAboutTrackSpectrogramConfigurationChanged(int trackId)
+{
+    m_trackSpectrogramConfigurationChanged.send(trackId);
+}
+
 void SpectrogramService::copyConfiguration(const ISpectrogramConfiguration& source,
                                            ISpectrogramConfiguration& destination) const
 {

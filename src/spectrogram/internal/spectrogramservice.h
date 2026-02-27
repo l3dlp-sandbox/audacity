@@ -25,6 +25,8 @@ public:
     void init();
 
     ITrackSpectrogramConfigurationPtr trackSpectrogramConfiguration(int trackId) const override;
+    muse::async::Channel<int> trackSpectrogramConfigurationChanged() const override;
+    void notifyAboutTrackSpectrogramConfigurationChanged(int trackId) override;
 
     void copyConfiguration(const ISpectrogramConfiguration& source, ISpectrogramConfiguration& destination) const override;
     double frequencyHardMaximum(int trackId) const override;
@@ -33,5 +35,7 @@ public:
 
 private:
     double trackSampleRate(int trackId) const;
+
+    muse::async::Channel<int> m_trackSpectrogramConfigurationChanged;
 };
 }

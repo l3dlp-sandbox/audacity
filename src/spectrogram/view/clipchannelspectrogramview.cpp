@@ -22,6 +22,11 @@ void ClipChannelSpectrogramView::componentComplete()
             update();
         }
     });
+    spectrogramService()->trackSpectrogramConfigurationChanged().onReceive(this, [this](int trackId) {
+        if (trackId == m_trackId) {
+            update();
+        }
+    });
 }
 
 void ClipChannelSpectrogramView::setClipId(int id)

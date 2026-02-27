@@ -4,6 +4,7 @@
 #pragma once
 
 #include "internal/ispectrogrampainter.h"
+#include "ispectrogramservice.h"
 
 #include "context/iglobalcontext.h"
 
@@ -30,6 +31,7 @@ class ClipChannelSpectrogramView : public QQuickPaintedItem, public muse::async:
     Q_PROPERTY(
         double selectionEndFrequency READ selectionEndFrequency WRITE setSelectionEndFrequency NOTIFY selectionFrequencyChanged FINAL)
 
+    muse::Inject<ISpectrogramService> spectrogramService{ this };
     muse::Inject<ISpectrogramPainter> spectrogramPainter { this };
     muse::Inject<au::context::IGlobalContext> globalContext { this };
 

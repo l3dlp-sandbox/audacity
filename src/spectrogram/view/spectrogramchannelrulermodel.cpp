@@ -106,5 +106,6 @@ void SpectrogramChannelRulerModel::zoomBy(double factor, double mousePos)
     config->setUseGlobalSettings(false);
 
     emit zoomChanged();
+    spectrogramService()->notifyAboutTrackSpectrogramConfigurationChanged(m_trackId);
 }
 }
