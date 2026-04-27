@@ -16,14 +16,21 @@ BuiltinEffectBase {
     implicitHeight: boardRectangle.height
 
     builtinEffectModel: FilterCurveEqViewModelFactory.createModel(root, root.instanceId)
-    numNavigationPanels: 0
+    numNavigationPanels: 1
     property alias filterCurveEq: root.builtinEffectModel
+    property NavigationPanel buttonsNavigationPanel: NavigationPanel {
+        name: "FilterCurveEqButtons"
+        enabled: root.enabled && root.visible
+        direction: NavigationPanel.Horizontal
+        section: root.dialogView ? root.dialogView.navigationSection : null
+        order: 1
+    }
 
     Rectangle {
         id: boardRectangle
 
         width: 720
-        height: 420
+        height: 460
         anchors.centerIn: parent
 
         radius: 8
@@ -33,7 +40,10 @@ BuiltinEffectBase {
         PolylinePlot {
             id: curve
 
-            anchors.fill: parent
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.bottom: buttonsRow.top
             anchors.margins: 16
 
             lineColor: ui.theme.accentColor
@@ -75,6 +85,43 @@ BuiltinEffectBase {
 
             onDragCancelled: {
                 filterCurveEq.curveModel.cancelDrag()
+            }
+        }
+
+        Row {
+            id: buttonsRow
+
+            spacing: 8
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 16
+
+            FlatButton {
+                id: flattenButton
+
+                width: 64
+                height: 28
+
+                navigation.panel: root.buttonsNavigationPanel
+                navigation.order: 0
+
+                text: qsTrc("effects/filtercurveeq", "Flatten")
+
+                onClicked: filterCurveEq.curveModel.flatten()
+            }
+
+            FlatButton {
+                id: invertButton
+
+                width: 64
+                height: 28
+
+                navigation.panel: root.buttonsNavigationPanel
+                navigation.order: flattenButton.navigation.order + 1
+
+                text: qsTrc("effects/filtercurveeq", "Invert")
+
+                onClicked: filterCurveEq.curveModel.invert()
             }
         }
     }

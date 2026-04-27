@@ -86,6 +86,29 @@ void FilterCurveModel::cancelDrag()
     emit pointsChanged();
 }
 
+void FilterCurveModel::flatten()
+{
+    auto& parameters = m_eq.mCurvesList.mParameters;
+    parameters.mLogEnvelope.Flatten(0.0);
+    parameters.mLogEnvelope.SetTrackLen(1.0);
+    parameters.mLinEnvelope.Flatten(0.0);
+    parameters.mLinEnvelope.SetTrackLen(1.0);
+
+    m_points.clear();
+    m_eq.mCurvesList.EnvelopeUpdated();
+    emit pointsChanged();
+}
+
+void FilterCurveModel::invert()
+{
+    for (auto& p : m_points) {
+        p.setY(-p.y());
+    }
+    syncToEnvelope();
+    m_eq.mCurvesList.EnvelopeUpdated();
+    emit pointsChanged();
+}
+
 void FilterCurveModel::rebuildFromEnvelope()
 {
     m_points.clear();

@@ -31,6 +31,9 @@ public:
     Q_INVOKABLE void removePoint(int index, bool completed);
     Q_INVOKABLE void cancelDrag();
 
+    Q_INVOKABLE void flatten();
+    Q_INVOKABLE void invert();
+
 signals:
     void pointsChanged();
 
