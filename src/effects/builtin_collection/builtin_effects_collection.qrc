@@ -28,6 +28,7 @@
         <file>graphiceq/GraphicEqGridLines.qml</file>
         <file>graphiceq/GraphicEqView.qml</file>
         <file>filtercurveeq/FilterCurveEqGridLines.qml</file>
+        <file>filtercurveeq/FilterCurveEqTooltip.qml</file>
         <file>filtercurveeq/FilterCurveEqView.qml</file>
         <file>tonegen/ChirpView.qml</file>
         <file>tonegen/ToneView.qml</file>

@@ -94,8 +94,21 @@ BuiltinEffectBase {
                     curve.init()
                 }
 
+                function activePointFreq() {
+                    const norm = curve.width > 0 ? (curve.activePointX / curve.width) : 0
+                    if (filterCurveEq.linFreqScale) {
+                        return norm * filterCurveEq.hiFreq
+                    }
+                    const loLog = Math.log(filterCurveEq.loFreq) / Math.LN10
+                    const hiLog = Math.log(filterCurveEq.hiFreq) / Math.LN10
+                    return Math.pow(10, norm * (hiLog - loLog) + loLog)
+                }
+
                 onPointMoved: function(index, x, y, completed) {
                     filterCurveEq.curveModel.setPoint(index, x, y, completed)
+                    tooltip.gain = y
+                    tooltip.freq = curve.activePointFreq()
+                    tooltip.show(true)
                 }
 
                 onPointAdded: function(x, y, completed) {
@@ -108,6 +121,38 @@ BuiltinEffectBase {
 
                 onDragCancelled: {
                     filterCurveEq.curveModel.cancelDrag()
+                    tooltip.hide(true)
+                }
+
+                onInteractionFinished: function() {
+                    if (!curve.hasActivePoint) {
+                        tooltip.hide(true)
+                    }
+                }
+
+                onActivePointChanged: {
+                    if (curve.hasActivePoint) {
+                        fake.x = curve.activePointX
+                        fake.y = curve.activePointY - (curve.pointRadius + 2)
+                        tooltip.gain = curve.activePointValue
+                        tooltip.freq = curve.activePointFreq()
+                        tooltip.show(true)
+                    } else {
+                        tooltip.hide(true)
+                    }
+                }
+
+                Item {
+                    // fakeItem the tooltip popup is anchored to.
+                    id: fake
+
+                    width: 1
+                    height: 1
+                    enabled: false  // don't steal mouse events
+
+                    FilterCurveEqTooltip {
+                        id: tooltip
+                    }
                 }
             }
         }
