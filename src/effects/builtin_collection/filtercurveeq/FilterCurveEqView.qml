@@ -30,15 +30,15 @@ BuiltinEffectBase {
         id: boardRectangle
 
         width: 720
-        height: 460
+        height: 480
         anchors.centerIn: parent
 
         radius: 8
         color: ui.theme.backgroundSecondaryColor
         border.color: ui.theme.strokeColor
 
-        PolylinePlot {
-            id: curve
+        Item {
+            id: plotContainer
 
             anchors.left: parent.left
             anchors.right: parent.right
@@ -46,45 +46,68 @@ BuiltinEffectBase {
             anchors.bottom: buttonsRow.top
             anchors.margins: 16
 
-            lineColor: ui.theme.accentColor
-            lineWidth: 2
+            FilterCurveEqGridLines {
+                id: gridLines
 
-            pointRadius: 4.0
-            pointOutlineColor: ui.theme.accentColor
-            pointCentreColor: ui.theme.accentColor
-            pointOutlineWidth: 2.0
+                anchors.fill: parent
 
-            ghostPointRadius: 3.0
-            ghostPointOutlineColor: ui.theme.accentColor
-
-            points: filterCurveEq.curveModel.points
-            defaultValue: filterCurveEq.curveModel.defaultValue
-
-            xRangeFrom: 0.0
-            xRangeTo: 1.0
-
-            yRangeFrom: filterCurveEq.dbMin
-            yRangeTo: filterCurveEq.dbMax
-            yAxisInverse: true
-
-            Component.onCompleted: {
-                curve.init()
+                dbMin: filterCurveEq.dbMin
+                dbMax: filterCurveEq.dbMax
+                loFreq: filterCurveEq.loFreq
+                hiFreq: filterCurveEq.hiFreq
+                linesVisible: filterCurveEq.gridlinesVisible
             }
 
-            onPointMoved: function(index, x, y, completed) {
-                filterCurveEq.curveModel.setPoint(index, x, y, completed)
-            }
+            PolylinePlot {
+                id: curve
 
-            onPointAdded: function(x, y, completed) {
-                filterCurveEq.curveModel.addPoint(x, y, completed)
-            }
+                x: gridLines.plotX
+                y: gridLines.plotY
+                width: gridLines.plotW
+                height: gridLines.plotH
 
-            onPointRemoved: function(index, completed) {
-                filterCurveEq.curveModel.removePoint(index, completed)
-            }
+                lineColor: ui.theme.accentColor
+                lineWidth: 2
 
-            onDragCancelled: {
-                filterCurveEq.curveModel.cancelDrag()
+                pointRadius: 4.0
+                pointOutlineColor: ui.theme.accentColor
+                pointCentreColor: ui.theme.accentColor
+                pointOutlineWidth: 2.0
+
+                ghostPointRadius: 3.0
+                ghostPointOutlineColor: ui.theme.accentColor
+
+                drawBackground: false
+
+                points: filterCurveEq.curveModel.points
+                defaultValue: filterCurveEq.curveModel.defaultValue
+
+                xRangeFrom: 0.0
+                xRangeTo: 1.0
+
+                yRangeFrom: filterCurveEq.dbMin
+                yRangeTo: filterCurveEq.dbMax
+                yAxisInverse: true
+
+                Component.onCompleted: {
+                    curve.init()
+                }
+
+                onPointMoved: function(index, x, y, completed) {
+                    filterCurveEq.curveModel.setPoint(index, x, y, completed)
+                }
+
+                onPointAdded: function(x, y, completed) {
+                    filterCurveEq.curveModel.addPoint(x, y, completed)
+                }
+
+                onPointRemoved: function(index, completed) {
+                    filterCurveEq.curveModel.removePoint(index, completed)
+                }
+
+                onDragCancelled: {
+                    filterCurveEq.curveModel.cancelDrag()
+                }
             }
         }
 
@@ -122,6 +145,21 @@ BuiltinEffectBase {
                 text: qsTrc("effects/filtercurveeq", "Invert")
 
                 onClicked: filterCurveEq.curveModel.invert()
+            }
+
+            CheckBox {
+                id: showGridlinesCheckBox
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                navigation.panel: root.buttonsNavigationPanel
+                navigation.order: invertButton.navigation.order + 1
+
+                text: qsTrc("effects/filtercurveeq", "Show grid lines")
+
+                checked: filterCurveEq.gridlinesVisible
+
+                onClicked: filterCurveEq.gridlinesVisible = !filterCurveEq.gridlinesVisible
             }
         }
     }
