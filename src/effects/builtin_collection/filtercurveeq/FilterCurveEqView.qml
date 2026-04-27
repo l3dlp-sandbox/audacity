@@ -59,99 +59,115 @@ BuiltinEffectBase {
                 linesVisible: filterCurveEq.gridlinesVisible
             }
 
-            PolylinePlot {
-                id: curve
+            Item {
+                // Clips the plot so that only the currently-visible dB band is shown.
+                // The PolylinePlot itself is sized for the full hard range, then
+                // scaled & offset so the [dbMin, dbMax] window aligns with this clip.
+                id: plotClip
 
                 x: gridLines.plotX
                 y: gridLines.plotY
                 width: gridLines.plotW
                 height: gridLines.plotH
+                clip: true
 
-                lineColor: ui.theme.accentColor
-                lineWidth: 2
+                readonly property real dbVisibleSpan: filterCurveEq.dbMax - filterCurveEq.dbMin
+                readonly property real dbHardSpan: filterCurveEq.dbHardMax - filterCurveEq.dbHardMin
 
-                pointRadius: 4.0
-                pointOutlineColor: ui.theme.accentColor
-                pointCentreColor: ui.theme.accentColor
-                pointOutlineWidth: 2.0
+                PolylinePlot {
+                    id: curve
 
-                ghostPointRadius: 3.0
-                ghostPointOutlineColor: ui.theme.accentColor
+                    width: plotClip.width
+                    height: plotClip.dbVisibleSpan > 0 ? plotClip.height * plotClip.dbHardSpan / plotClip.dbVisibleSpan : plotClip.height
+                    x: 0
+                    y: plotClip.dbVisibleSpan > 0 ? -plotClip.height * (filterCurveEq.dbHardMax - filterCurveEq.dbMax) / plotClip.dbVisibleSpan : 0
 
-                drawBackground: false
+                    lineColor: ui.theme.accentColor
+                    lineWidth: 2
 
-                points: filterCurveEq.curveModel.points
-                defaultValue: filterCurveEq.curveModel.defaultValue
+                    pointRadius: 4.0
+                    pointOutlineColor: ui.theme.accentColor
+                    pointCentreColor: ui.theme.accentColor
+                    pointOutlineWidth: 2.0
 
-                xRangeFrom: 0.0
-                xRangeTo: 1.0
+                    ghostPointRadius: 3.0
+                    ghostPointOutlineColor: ui.theme.accentColor
 
-                yRangeFrom: filterCurveEq.dbMin
-                yRangeTo: filterCurveEq.dbMax
-                yAxisInverse: true
+                    drawBackground: false
 
-                Component.onCompleted: {
-                    curve.init()
-                }
+                    points: filterCurveEq.curveModel.points
+                    defaultValue: filterCurveEq.curveModel.defaultValue
 
-                function activePointFreq() {
-                    const norm = curve.width > 0 ? (curve.activePointX / curve.width) : 0
-                    if (filterCurveEq.linFreqScale) {
-                        return norm * filterCurveEq.hiFreq
+                    xRangeFrom: 0.0
+                    xRangeTo: 1.0
+
+                    yRangeFrom: filterCurveEq.dbHardMin
+                    yRangeTo: filterCurveEq.dbHardMax
+                    yAxisInverse: true
+
+                    Component.onCompleted: {
+                        curve.init()
                     }
-                    const loLog = Math.log(filterCurveEq.loFreq) / Math.LN10
-                    const hiLog = Math.log(filterCurveEq.hiFreq) / Math.LN10
-                    return Math.pow(10, norm * (hiLog - loLog) + loLog)
-                }
 
-                onPointMoved: function(index, x, y, completed) {
-                    filterCurveEq.curveModel.setPoint(index, x, y, completed)
-                    tooltip.gain = y
-                    tooltip.freq = curve.activePointFreq()
-                    tooltip.show(true)
-                }
-
-                onPointAdded: function(x, y, completed) {
-                    filterCurveEq.curveModel.addPoint(x, y, completed)
-                }
-
-                onPointRemoved: function(index, completed) {
-                    filterCurveEq.curveModel.removePoint(index, completed)
-                }
-
-                onDragCancelled: {
-                    filterCurveEq.curveModel.cancelDrag()
-                    tooltip.hide(true)
-                }
-
-                onInteractionFinished: function() {
-                    if (!curve.hasActivePoint) {
-                        tooltip.hide(true)
+                    function activePointFreq() {
+                        const norm = curve.width > 0 ? (curve.activePointX / curve.width) : 0
+                        if (filterCurveEq.linFreqScale) {
+                            return norm * filterCurveEq.hiFreq
+                        }
+                        const loLog = Math.log(filterCurveEq.loFreq) / Math.LN10
+                        const hiLog = Math.log(filterCurveEq.hiFreq) / Math.LN10
+                        return Math.pow(10, norm * (hiLog - loLog) + loLog)
                     }
-                }
 
-                onActivePointChanged: {
-                    if (curve.hasActivePoint) {
-                        fake.x = curve.activePointX
-                        fake.y = curve.activePointY - (curve.pointRadius + 2)
-                        tooltip.gain = curve.activePointValue
+                    onPointMoved: function (index, x, y, completed) {
+                        filterCurveEq.curveModel.setPoint(index, x, y, completed)
+                        tooltip.gain = y
                         tooltip.freq = curve.activePointFreq()
                         tooltip.show(true)
-                    } else {
+                    }
+
+                    onPointAdded: function (x, y, completed) {
+                        filterCurveEq.curveModel.addPoint(x, y, completed)
+                    }
+
+                    onPointRemoved: function (index, completed) {
+                        filterCurveEq.curveModel.removePoint(index, completed)
+                    }
+
+                    onDragCancelled: {
+                        filterCurveEq.curveModel.cancelDrag()
                         tooltip.hide(true)
                     }
-                }
 
-                Item {
-                    // fakeItem the tooltip popup is anchored to.
-                    id: fake
+                    onInteractionFinished: function () {
+                        if (!curve.hasActivePoint) {
+                            tooltip.hide(true)
+                        }
+                    }
 
-                    width: 1
-                    height: 1
-                    enabled: false  // don't steal mouse events
+                    onActivePointChanged: {
+                        if (curve.hasActivePoint) {
+                            fake.x = curve.activePointX
+                            fake.y = curve.activePointY - (curve.pointRadius + 2)
+                            tooltip.gain = curve.activePointValue
+                            tooltip.freq = curve.activePointFreq()
+                            tooltip.show(true)
+                        } else {
+                            tooltip.hide(true)
+                        }
+                    }
 
-                    FilterCurveEqTooltip {
-                        id: tooltip
+                    Item {
+                        // fakeItem the tooltip popup is anchored to.
+                        id: fake
+
+                        width: 1
+                        height: 1
+                        enabled: false  // don't steal mouse events
+
+                        FilterCurveEqTooltip {
+                            id: tooltip
+                        }
                     }
                 }
             }

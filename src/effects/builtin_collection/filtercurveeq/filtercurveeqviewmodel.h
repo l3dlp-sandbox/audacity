@@ -14,6 +14,8 @@ class FilterCurveEqViewModel : public BuiltinEffectModel
 {
     Q_OBJECT
     Q_PROPERTY(FilterCurveModel * curveModel READ curveModel NOTIFY curveModelChanged FINAL)
+    Q_PROPERTY(double dbHardMin READ dbHardMin CONSTANT FINAL)
+    Q_PROPERTY(double dbHardMax READ dbHardMax CONSTANT FINAL)
     Q_PROPERTY(double dbMin READ dbMin NOTIFY dbRangeChanged FINAL)
     Q_PROPERTY(double dbMax READ dbMax NOTIFY dbRangeChanged FINAL)
     Q_PROPERTY(double loFreq READ loFreq NOTIFY freqRangeChanged FINAL)
@@ -27,6 +29,8 @@ public:
     FilterCurveEqViewModel(QObject* parent, int instanceId);
 
     FilterCurveModel* curveModel() const;
+    double dbHardMin() const;
+    double dbHardMax() const;
     double dbMin() const;
     double dbMax() const;
     double loFreq() const;

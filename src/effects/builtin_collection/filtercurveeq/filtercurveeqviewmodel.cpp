@@ -41,6 +41,16 @@ FilterCurveModel* FilterCurveEqViewModel::curveModel() const
     return m_curveModel;
 }
 
+double FilterCurveEqViewModel::dbHardMin() const
+{
+    return -kMaxDbHalfRange;
+}
+
+double FilterCurveEqViewModel::dbHardMax() const
+{
+    return kMaxDbHalfRange;
+}
+
 double FilterCurveEqViewModel::dbMin() const
 {
     return effect<FilterCurveEq>().mCurvesList.mParameters.mdBMin;
