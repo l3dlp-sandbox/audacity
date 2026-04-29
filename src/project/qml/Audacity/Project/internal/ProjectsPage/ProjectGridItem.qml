@@ -174,61 +174,36 @@ FocusScope {
             Loader {
                 active: root.isCloud
 
-                anchors.left: parent.left
-                anchors.leftMargin: 8
+                anchors.top: parent.top
+                anchors.topMargin: 8
+                anchors.right: parent.right
+                anchors.rightMargin: 8
+
+                sourceComponent: MenuButton {
+                    id: cloudMenuButton
+
+                    width: 20
+                    height: width
+                }
+            }
+
+            Loader {
+                active: root.isCloud
+
                 anchors.right: parent.right
                 anchors.rightMargin: 8
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 8
 
-                sourceComponent: RowLayout {
-                    visible: root.isCloud
+                sourceComponent: CloudProjectIndicatorButton {
+                    mouseArea.enabled: false
 
-                    spacing: 8
+                    isProgress: false //cloudProjectStatusWatcher.isProgress
+                    isDownloadedAndUpToDate: true //cloudProjectStatusWatcher.isDownloadedAndUpToDate
 
-                    // CloudProjectStatusWatcher {
-                    //     id: cloudProjectStatusWatcher
-                    // }
-
-                    // Component.onCompleted: {
-                    //     cloudProjectStatusWatcher.load(root.cloudProjectId)
-                    // }
-
-                    // ProgressBar {
-                    //     Layout.fillWidth: true
-                    //     Layout.preferredHeight: 16
-
-                    //     visible: cloudProjectStatusWatcher.isProgress
-
-                    //     from: 0
-                    //     to: cloudProjectStatusWatcher.progressTotal
-                    //     value: cloudProjectStatusWatcher.progressCurrent
-
-                    //     navigation.panel: root.navigation.panel
-                    //     navigation.row: root.navigation.row
-                    //     navigation.column: root.navigation.column + 1
-                    // }
-
-                    CloudProjectIndicatorButton {
-                        Layout.alignment: Qt.AlignTrailing | Qt.AlignVCenter
-
-                        mouseArea.enabled: false
-
-                        isProgress: false //cloudProjectStatusWatcher.isProgress
-                        isDownloadedAndUpToDate: true //cloudProjectStatusWatcher.isDownloadedAndUpToDate
-
-                        navigation.panel: root.navigation.panel
-                        navigation.row: root.navigation.row
-                        navigation.column: root.navigation.column + 2
-
-                        // onClicked: {
-                        //     if (isProgress) {
-                        //         cloudProjectStatusWatcher.cancel()
-                        //     } else {
-                        //         root.clicked()
-                        //     }
-                        // }
-                    }
+                    navigation.panel: root.navigation.panel
+                    navigation.row: root.navigation.row
+                    navigation.column: root.navigation.column + 2
                 }
             }
         }
