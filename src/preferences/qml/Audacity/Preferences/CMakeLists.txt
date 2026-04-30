@@ -69,6 +69,7 @@ qt_add_qml_module(preferences_qml
         internal/NumberFormatSection.qml
         internal/PasteBehaviorSection.qml
         internal/PlaybackPerformanceSection.qml
+        internal/PluginLocationsSection.qml
         internal/PreferencesButtonsPanel.qml
         internal/PreferencesMenu.qml
         internal/ProgramStartSection.qml

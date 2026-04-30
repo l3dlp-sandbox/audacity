@@ -4,6 +4,7 @@
 #pragma once
 
 #include "framework/audioplugins/iaudiopluginsscanner.h"
+#include "framework/global/io/path.h"
 
 #include "au3-strings/Identifier.h" // PluginPaths
 
@@ -23,9 +24,14 @@ public:
 
 protected:
     virtual ::PluginPaths pluginPaths() const;
+    virtual muse::io::paths_t customPaths() const { return {}; }
+
+    PluginProvider& pluginProvider() const { return m_pluginProvider; }
 
 private:
     virtual void doInit() {}
+    void syncCustomPathsToProvider() const;
+
     PluginProvider& m_pluginProvider;
 };
 }

@@ -13,6 +13,29 @@ static const muse::Settings::Key EFFECT_MENU_ORGANIZATION(moduleName, "effects/e
 static const muse::Settings::Key PREVIEW_MAX_DURATION(moduleName, "effects/previewMaxDuration");
 static const std::string EFFECT_UI_MODE_PREFIX = "effects/effectUIMode/";
 static const std::string LAST_USED_PRESET_PREFIX = "effects/lastUsedPreset/";
+static const muse::Settings::Key LV2_CUSTOM_PATHS(moduleName, "effects/lv2CustomPaths");
+static const muse::Settings::Key VST3_CUSTOM_PATHS(moduleName, "effects/vst3CustomPaths");
+
+static muse::io::paths_t readPathList(const muse::Settings::Key& key)
+{
+    const muse::ValList list = muse::settings()->value(key).toList();
+    muse::io::paths_t result;
+    result.reserve(list.size());
+    for (const auto& item : list) {
+        result.push_back(item.toPath());
+    }
+    return result;
+}
+
+static muse::Val toVal(const muse::io::paths_t& paths)
+{
+    muse::ValList list;
+    list.reserve(paths.size());
+    for (const auto& p : paths) {
+        list.push_back(muse::Val(p));
+    }
+    return muse::Val(list);
+}
 
 static muse::Settings::Key makeEffectUIModeKey(const EffectId& effectId)
 {
@@ -37,6 +60,16 @@ void EffectsConfiguration::init()
     });
 
     muse::settings()->setDefaultValue(PREVIEW_MAX_DURATION, muse::Val(60.0));
+
+    muse::settings()->setDefaultValue(LV2_CUSTOM_PATHS, muse::Val(muse::ValList {}));
+    muse::settings()->valueChanged(LV2_CUSTOM_PATHS).onReceive(nullptr, [this](const muse::Val&) {
+        m_lv2CustomPathsChanged.notify();
+    });
+
+    muse::settings()->setDefaultValue(VST3_CUSTOM_PATHS, muse::Val(muse::ValList {}));
+    muse::settings()->valueChanged(VST3_CUSTOM_PATHS).onReceive(nullptr, [this](const muse::Val&) {
+        m_vst3CustomPathsChanged.notify();
+    });
 }
 
 bool EffectsConfiguration::applyEffectToAllAudio() const
@@ -141,4 +174,40 @@ void EffectsConfiguration::setLastUsedPreset(const EffectId& effectId, const std
     }
 
     muse::settings()->setSharedValue(key, muse::Val(presetId));
+}
+
+muse::io::paths_t EffectsConfiguration::lv2CustomPaths() const
+{
+    return readPathList(LV2_CUSTOM_PATHS);
+}
+
+void EffectsConfiguration::setLv2CustomPaths(const muse::io::paths_t& paths)
+{
+    if (lv2CustomPaths() == paths) {
+        return;
+    }
+    muse::settings()->setSharedValue(LV2_CUSTOM_PATHS, toVal(paths));
+}
+
+muse::async::Notification EffectsConfiguration::lv2CustomPathsChanged() const
+{
+    return m_lv2CustomPathsChanged;
+}
+
+muse::io::paths_t EffectsConfiguration::vst3CustomPaths() const
+{
+    return readPathList(VST3_CUSTOM_PATHS);
+}
+
+void EffectsConfiguration::setVst3CustomPaths(const muse::io::paths_t& paths)
+{
+    if (vst3CustomPaths() == paths) {
+        return;
+    }
+    muse::settings()->setSharedValue(VST3_CUSTOM_PATHS, toVal(paths));
+}
+
+muse::async::Notification EffectsConfiguration::vst3CustomPathsChanged() const
+{
+    return m_vst3CustomPathsChanged;
 }

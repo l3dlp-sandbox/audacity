@@ -3,7 +3,29 @@
  */
 #include "pluginpreferencesmodel.h"
 
+#include "io/dir.h"
+
 namespace au::appshell {
+static QStringList toQStringList(const muse::io::paths_t& paths)
+{
+    QStringList result;
+    result.reserve(static_cast<int>(paths.size()));
+    for (const auto& p : paths) {
+        result.push_back(p.toQString());
+    }
+    return result;
+}
+
+static muse::io::paths_t toPathsT(const QStringList& paths)
+{
+    muse::io::paths_t result;
+    result.reserve(static_cast<size_t>(paths.size()));
+    for (const auto& p : paths) {
+        result.push_back(muse::io::path_t(p));
+    }
+    return result;
+}
+
 PluginPreferencesModel::PluginPreferencesModel(QObject* parent)
     : QObject(parent)
 {
@@ -13,6 +35,14 @@ void PluginPreferencesModel::init()
 {
     effectsConfiguration()->effectMenuOrganizationChanged().onNotify(this, [this] {
         emit effectMenuOrganizationChanged();
+    });
+
+    effectsConfiguration()->lv2CustomPathsChanged().onNotify(this, [this] {
+        emit lv2CustomPathsChanged();
+    });
+
+    effectsConfiguration()->vst3CustomPathsChanged().onNotify(this, [this] {
+        emit vst3CustomPathsChanged();
     });
 }
 
@@ -28,5 +58,98 @@ void PluginPreferencesModel::setEffectMenuOrganization(effects::EffectMenuOrgani
     }
 
     effectsConfiguration()->setEffectMenuOrganization(organization);
+}
+
+QStringList PluginPreferencesModel::lv2CustomPaths() const
+{
+    return toQStringList(effectsConfiguration()->lv2CustomPaths());
+}
+
+QStringList PluginPreferencesModel::vst3CustomPaths() const
+{
+    return toQStringList(effectsConfiguration()->vst3CustomPaths());
+}
+
+void PluginPreferencesModel::addLv2Path()
+{
+    QStringList paths = lv2CustomPaths();
+    paths.append(QString());
+    effectsConfiguration()->setLv2CustomPaths(toPathsT(paths));
+    emit lv2CustomPathsChanged();
+}
+
+void PluginPreferencesModel::setLv2Path(int index, const QString& path)
+{
+    QStringList paths = lv2CustomPaths();
+    if (index < 0 || index >= paths.size()) {
+        return;
+    }
+    paths[index] = path;
+    effectsConfiguration()->setLv2CustomPaths(toPathsT(paths));
+}
+
+void PluginPreferencesModel::removeLv2Path(int index)
+{
+    QStringList paths = lv2CustomPaths();
+    if (index < 0 || index >= paths.size()) {
+        return;
+    }
+    paths.removeAt(index);
+    effectsConfiguration()->setLv2CustomPaths(toPathsT(paths));
+    emit lv2CustomPathsChanged();
+}
+
+void PluginPreferencesModel::addVst3Path()
+{
+    QStringList paths = vst3CustomPaths();
+    paths.append(QString());
+    effectsConfiguration()->setVst3CustomPaths(toPathsT(paths));
+    emit vst3CustomPathsChanged();
+}
+
+void PluginPreferencesModel::setVst3Path(int index, const QString& path)
+{
+    QStringList paths = vst3CustomPaths();
+    if (index < 0 || index >= paths.size()) {
+        return;
+    }
+    paths[index] = path;
+    effectsConfiguration()->setVst3CustomPaths(toPathsT(paths));
+}
+
+void PluginPreferencesModel::removeVst3Path(int index)
+{
+    QStringList paths = vst3CustomPaths();
+    if (index < 0 || index >= paths.size()) {
+        return;
+    }
+    paths.removeAt(index);
+    effectsConfiguration()->setVst3CustomPaths(toPathsT(paths));
+    emit vst3CustomPathsChanged();
+}
+
+bool PluginPreferencesModel::pathExists(const QString& path) const
+{
+    if (path.isEmpty()) {
+        return true; // empty path represents an unfilled, freshly-added row
+    }
+    return muse::io::Dir(muse::io::path_t(path)).exists();
+}
+
+bool PluginPreferencesModel::lv2Supported() const
+{
+    // Mirrors AU_MODULE_EFFECTS_LV2 build gating in CMakeLists.txt:
+    // LV2 is currently only built on Linux.
+#ifdef Q_OS_LINUX
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool PluginPreferencesModel::vst3Supported() const
+{
+    // VST3 is built on all supported platforms by default.
+    return true;
 }
 }

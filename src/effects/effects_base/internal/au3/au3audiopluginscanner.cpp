@@ -29,6 +29,13 @@ void Au3AudioPluginScanner::deinit()
 
 muse::io::paths_t Au3AudioPluginScanner::scanPlugins() const
 {
+    // Push user-configured custom paths into PluginManager so that providers
+    // (e.g. VST3) which read them via ReadCustomPaths(*this) pick them up.
+    // This must NOT run during plugin-registration subprocesses
+    // (`--register-audio-plugin`), which never invoke scanPlugins() and don't
+    // load effects_base / IEffectsConfiguration / PluginManager::Initialize().
+    syncCustomPathsToProvider();
+
     muse::io::paths_t result;
 
     const PluginPaths paths = pluginPaths();
@@ -45,5 +52,18 @@ PluginPaths Au3AudioPluginScanner::pluginPaths() const
 {
     // PluginManager still needed here by some effect modules for the implementation of custom paths.
     return m_pluginProvider.FindModulePaths(PluginManager::Get());
+}
+
+void Au3AudioPluginScanner::syncCustomPathsToProvider() const
+{
+    const muse::io::paths_t userPaths = customPaths();
+    ::PluginPaths customPathsForProvider;
+    customPathsForProvider.reserve(userPaths.size());
+    for (const auto& p : userPaths) {
+        if (!p.empty()) {
+            customPathsForProvider.emplace_back(wxString::FromUTF8(p.toStdString()));
+        }
+    }
+    PluginManager::Get().StoreCustomPaths(m_pluginProvider, customPathsForProvider);
 }
 }

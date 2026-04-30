@@ -5,6 +5,7 @@
 
 #include "effectstypes.h"
 #include "framework/global/async/notification.h"
+#include "framework/global/io/path.h"
 #include "framework/global/modularity/imoduleinterface.h"
 
 namespace au::effects {
@@ -32,5 +33,13 @@ public:
 
     virtual std::string lastUsedPreset(const EffectId& effectId) const = 0;
     virtual void setLastUsedPreset(const EffectId& effectId, const std::string& presetId) = 0;
+
+    virtual muse::io::paths_t lv2CustomPaths() const = 0;
+    virtual void setLv2CustomPaths(const muse::io::paths_t& paths) = 0;
+    virtual muse::async::Notification lv2CustomPathsChanged() const = 0;
+
+    virtual muse::io::paths_t vst3CustomPaths() const = 0;
+    virtual void setVst3CustomPaths(const muse::io::paths_t& paths) = 0;
+    virtual muse::async::Notification vst3CustomPathsChanged() const = 0;
 };
 }
