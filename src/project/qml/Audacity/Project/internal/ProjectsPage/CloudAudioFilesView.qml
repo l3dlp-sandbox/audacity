@@ -310,42 +310,37 @@ ProjectsView {
                             radius: 2 + border.width
                         }
                     }
-                }
-                /*ProjectsListView.ColumnItem {
+                },
+                ProjectsListView.ColumnItem {
                     id: btnColumn
                     header: ""
+
+                    Component.onCompleted: {
+                        if (item.contextMenuModel != null) {
+                            item.contextMenuModel.load()
+                        }
+                    }
 
                     width: function (parentWidth) {
                         let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
                         return 0.05 * parentWidthExclusingSpacing
                     }
 
-                    delegate: Rectangle {
-                        MenuButton {
-                            id: menuButton
+                    delegate: MenuButton {
+                        id: menuButton
 
-                            width: 16
-                            height: 16
+                        width: 16
+                        height: 16
 
-                            CloudAudioFileContextMenuModel {
-                                id: contextMenuModel
+                        visible: Boolean(item.contextMenuModel)
 
-                                audioId: item.itemId ?? ""
-                                slug: item.slug ?? ""
-                            }
+                        menuModel: item.contextMenuModel
 
-                            Component.onCompleted: contextMenuModel.load()
-
-                            menuModel: contextMenuModel
-
-                            onHandleMenuItem: function (itemId) {
-                                contextMenuModel.handleMenuItem(itemId)
-                            }
+                        onHandleMenuItem: function (itemId) {
+                            item.contextMenuModel.handleMenuItem(itemId)
                         }
                     }
-                } */
-
-
+                }
             ]
         }
     }

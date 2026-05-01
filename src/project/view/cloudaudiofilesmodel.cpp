@@ -3,6 +3,7 @@
 */
 #include "cloudaudiofilesmodel.h"
 
+#include "async/asyncable.h"
 #include "framework/global/dataformatter.h"
 #include "framework/global/types/datetime.h"
 
@@ -35,7 +36,7 @@ void CloudAudioFilesModel::load()
                 break;
             }
         }
-    });
+    }, async::Asyncable::Mode::SetReplace);
 }
 
 void CloudAudioFilesModel::reload()
