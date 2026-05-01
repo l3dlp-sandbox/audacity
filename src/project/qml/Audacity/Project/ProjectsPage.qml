@@ -109,7 +109,7 @@ FocusScope {
         }
     }
 
-    RowLayout {
+    ColumnLayout {
         id: controlsRow
 
         anchors.top: topLayout.bottom
@@ -177,66 +177,77 @@ FocusScope {
             }
         }
 
-        NavigationPanel {
-            id: viewButtonsNavPanel
-            name: "ViewButtons"
-            enabled: tabBar.enabled && tabBar.visible
-            section: navSec
-            order: 3
-            direction: NavigationPanel.Horizontal
-            accessible.name: qsTrc("project", "View buttons")
-        }
+        RowLayout {
+            id: viewControlsRow
 
-        FlatButton {
-            id: refreshButton
+            Layout.fillWidth: true
+            spacing: 12
 
-            visible: tabBar.currentIndex === 1 || tabBar.currentIndex === 2
+            Item {
+                Layout.fillWidth: true
+            }
 
-            navigation.panel: viewButtonsNavPanel
-            navigation.order: 1
+            NavigationPanel {
+                id: viewButtonsNavPanel
+                name: "ViewButtons"
+                enabled: tabBar.enabled && tabBar.visible
+                section: navSec
+                order: 3
+                direction: NavigationPanel.Horizontal
+                accessible.name: qsTrc("project", "View buttons")
+            }
 
-            icon: IconCode.UPDATE
-            text: qsTrc("project", "Refresh")
-            orientation: Qt.Horizontal
-        }
+            FlatButton {
+                id: refreshButton
 
-        RadioButtonGroup {
-            id: viewTypeRadioButtons
+                visible: tabBar.currentIndex === 1 || tabBar.currentIndex === 2
 
-            property int navigationOrderStart: refreshButton.navigation.order + 1
+                navigation.panel: viewButtonsNavPanel
+                navigation.order: 1
 
-            implicitHeight: ui.theme.defaultButtonSize
+                icon: IconCode.UPDATE
+                text: qsTrc("project", "Refresh")
+                orientation: Qt.Horizontal
+            }
 
-            model: [
-                {
-                    "icon": IconCode.GRID,
-                    "title": qsTrc("project", "Grid view"),
-                    "value": ProjectsPageModel.Grid
-                },
-                {
-                    "icon": IconCode.LIST,
-                    "title": qsTrc("project", "List view"),
-                    "value": ProjectsPageModel.List
-                }
-            ]
+            RadioButtonGroup {
+                id: viewTypeRadioButtons
 
-            delegate: FlatRadioButton {
-                implicitWidth: ui.theme.defaultButtonSize
+                property int navigationOrderStart: refreshButton.navigation.order + 1
+
                 implicitHeight: ui.theme.defaultButtonSize
 
-                checked: projectsPageModel.viewType === modelData.value
+                model: [
+                    {
+                        "icon": IconCode.GRID,
+                        "title": qsTrc("project", "Grid view"),
+                        "value": ProjectsPageModel.Grid
+                    },
+                    {
+                        "icon": IconCode.LIST,
+                        "title": qsTrc("project", "List view"),
+                        "value": ProjectsPageModel.List
+                    }
+                ]
 
-                iconCode: modelData.icon
-                transparent: true
-                checkedColor: ui.theme.buttonColor
+                delegate: FlatRadioButton {
+                    implicitWidth: ui.theme.defaultButtonSize
+                    implicitHeight: ui.theme.defaultButtonSize
 
-                navigation.name: "ViewType_" + modelData.title
-                navigation.panel: viewButtonsNavPanel
-                navigation.order: viewTypeRadioButtons.navigationOrderStart + model.index
-                navigation.accessible.name: modelData.title
+                    checked: projectsPageModel.viewType === modelData.value
 
-                onToggled: {
-                    projectsPageModel.viewType = modelData.value
+                    iconCode: modelData.icon
+                    transparent: true
+                    checkedColor: ui.theme.buttonColor
+
+                    navigation.name: "ViewType_" + modelData.title
+                    navigation.panel: viewButtonsNavPanel
+                    navigation.order: viewTypeRadioButtons.navigationOrderStart + model.index
+                    navigation.accessible.name: modelData.title
+
+                    onToggled: {
+                        projectsPageModel.viewType = modelData.value
+                    }
                 }
             }
         }
