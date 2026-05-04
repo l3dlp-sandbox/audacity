@@ -177,6 +177,13 @@ ProjectsView {
         ProjectsListView {
             id: list
 
+            readonly property int nameColumnWidth: 200
+            readonly property int thumbnailColumnWidth: 200
+            readonly property int modifiedColumnWidth: 100
+            readonly property int durationColumnWidth: 100
+            readonly property int sizeColumnWidth: 75
+            readonly property int btnColumnWidth: 44
+
             anchors.fill: parent
 
             model: cloudAudioFilesModel
@@ -184,8 +191,6 @@ ProjectsView {
 
             backgroundColor: root.backgroundColor
             sideMargin: root.sideMargin
-
-            thumbnailFull: true
 
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrder
@@ -197,14 +202,45 @@ ProjectsView {
 
             columns: [
                 ProjectsListView.ColumnItem {
+                    id: nameColumn
+
+                    header: qsTrc("project", "Name")
+
+                    width: nameColumnWidth
+
+                    delegate: StyledTextLabel {
+                        height: 48
+                        width: parent.width
+
+                        text: item.name ?? ""
+                        font: ui.theme.largeBodyFont
+                        horizontalAlignment: Text.AlignLeft
+                    }
+                },
+                ProjectsListView.ColumnItem {
+                    id: thumbnailColumn
+
+                    header: ""
+
+                    width: thumbnailColumnWidth
+                    fillWidth: true
+
+                    delegate: ProjectThumbnail {
+                        height: 48
+
+                        path: item.thumbnailUrl ?? ""
+
+                        backgroundColor: "transparent"
+                        lineColor: Qt.alpha(ui.theme.fontPrimaryColor, 0.8)
+                        borderColor: "transparent"
+                    }
+                },
+                ProjectsListView.ColumnItem {
                     id: modifiedColumn
 
                     header: qsTrc("project", "Modified")
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return Math.max(0.10 * parentWidthExclusingSpacing, 100)
-                    }
+                    width: modifiedColumnWidth
 
                     delegate: StyledTextLabel {
                         id: modifiedLabel
@@ -237,12 +273,10 @@ ProjectsView {
                 },
                 ProjectsListView.ColumnItem {
                     id: durationColumn
+
                     header: qsTrc("global", "Duration", "file duration")
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return Math.max(0.10 * parentWidthExclusingSpacing, 70)
-                    }
+                    width: durationColumnWidth
 
                     delegate: StyledTextLabel {
                         id: durationLabel
@@ -275,12 +309,10 @@ ProjectsView {
                 },
                 ProjectsListView.ColumnItem {
                     id: sizeColumn
+
                     header: qsTrc("global", "Size", "file size")
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return Math.max(0.05 * parentWidthExclusingSpacing, 50)
-                    }
+                    width: sizeColumnWidth
 
                     delegate: StyledTextLabel {
                         id: sizeLabel
@@ -313,11 +345,10 @@ ProjectsView {
                 },
                 ProjectsListView.ColumnItem {
                     id: btnColumn
+
                     header: ""
 
-                    width: function (parentWidth) {
-                        return 44
-                    }
+                    width: btnColumnWidth
 
                     delegate: Item {
                         width: parent.width

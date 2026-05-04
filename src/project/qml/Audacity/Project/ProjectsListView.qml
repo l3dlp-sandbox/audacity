@@ -1,24 +1,6 @@
 /*
- * SPDX-License-Identifier: GPL-3.0-only
- * Audacity-CLA-applies
- *
- * Audacity
- * Music Composition & Notation
- *
- * Copyright (C) 2024 Audacity BVBA and others
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 3 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+* Audacity: A Digital Audio Editor
+*/
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -34,16 +16,12 @@ Item {
 
     property AbstractItemModel model
     property list<ColumnItem> columns
-    property alias showNewProjectItem: newProjectItem.visible
+    property bool showNewProjectItem: false
+    //property alias showNewProjectItem: newProjectItem.visible
     property string searchText
 
     property color backgroundColor: ui.theme.backgroundSecondaryColor
     property real sideMargin: 46
-    property string placeholder: ""
-
-    property bool isCloudList: false
-
-    property bool thumbnailFull: false
 
     property alias view: view
 
@@ -55,11 +33,8 @@ Item {
 
     component ColumnItem: QtObject {
         property string header
-
-        property var width: function (parentWidth) {
-            return parentWidth / 5
-        }
-
+        property real width: 0
+        property bool fillWidth: false
         property Component delegate
     }
 
@@ -85,6 +60,19 @@ Item {
         accessible.name: qsTrc("project", "Projects list")
     }
 
+    Component {
+        id: headerLabelComp
+
+        StyledTextLabel {
+            text: headerText
+
+            font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, {
+                capitalization: Font.AllUppercase
+            }))
+            horizontalAlignment: Text.AlignLeft
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.leftMargin: sideMargin
@@ -92,43 +80,43 @@ Item {
 
         spacing: 12
 
-        ProjectListItem {
-            id: newProjectItem
+        // ProjectListItem {
+        //     id: newProjectItem
 
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
-            implicitHeight: view.rowHeight
+        //     Layout.fillWidth: true
+        //     Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
+        //     implicitHeight: view.rowHeight
 
-            visible: false
-            itemInset: view.itemInset
-            showBottomBorder: false
+        //     visible: false
+        //     itemInset: view.itemInset
+        //     showBottomBorder: false
 
-            thumbnailFull: root.thumbnailFull
+        //     thumbnailFull: root.thumbnailFull
 
-            navigation.panel: navPanel
-            navigation.row: 0
-            navigation.column: 0
+        //     navigation.panel: navPanel
+        //     navigation.row: 0
+        //     navigation.column: 0
 
-            item: {
-                "name": qsTrc("project", "New project")
-            }
+        //     item: {
+        //         "name": qsTrc("project", "New project")
+        //     }
 
-            thumbnailComponent: Rectangle {
-                anchors.fill: parent
-                color: ui.theme.extra["white_color"]
+        //     thumbnailComponent: Rectangle {
+        //         anchors.fill: parent
+        //         color: ui.theme.extra["white_color"]
 
-                StyledIconLabel {
-                    anchors.centerIn: parent
+        //         StyledIconLabel {
+        //             anchors.centerIn: parent
 
-                    iconCode: IconCode.PLUS
+        //             iconCode: IconCode.PLUS
 
-                    font.pixelSize: 16
-                    color: ui.theme.extra["black_color"]
-                }
-            }
+        //             font.pixelSize: 16
+        //             color: ui.theme.extra["black_color"]
+        //         }
+        //     }
 
-            onClicked: root.createNewProjectRequested()
-        }
+        //     onClicked: root.createNewProjectRequested()
+        // }
 
         Item {
             id: listViewContainer
@@ -155,39 +143,47 @@ Item {
 
                     spacing: view.columnSpacing
 
-                    StyledTextLabel {
-                        Layout.fillWidth: true
+                    Loader {
+                        readonly property var columnData: root.columns.length > 0 ? root.columns[0] : null
 
-                        text: qsTrc("project", "Name")
+                        active: columnData !== null
 
-                        // It is not possible to set the `font` and `font.capitalization` properties at the same time.
-                        // The following alternatives do not work:
-                        // - font: { let f = ui.theme.bodyBoldFont; f.capitalization = Font.AllUppercase; return f }
-                        //
-                        // - font: ui.theme.bodyBoldFont
-                        //   Component.onCompleted: { font.capitalization = Font.AllUppercase }
-                        //   (breaks updating the font when changed in Preferences > Appearance
-                        //
-                        // - Qt.font(Object.assign(ui.theme.bodyBoldFont, { capitalization: Font.AllUppercase }))
-                        //   (complains that ui.theme.bodyBoldFont is const and cannot be modified)
-                        font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, {
-                            capitalization: Font.AllUppercase
-                        }))
-                        horizontalAlignment: Text.AlignLeft
+                        Layout.preferredWidth: columnData ? columnData.width : 0
+                        Layout.preferredHeight: parent.height
+
+                        sourceComponent: columnData ? headerLabelComp : null
+
+                        readonly property string headerText: columnData ? columnData.header : ""
                     }
 
-                    Repeater {
-                        model: root.columns
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: parent.height
+                        clip: true
 
-                        delegate: StyledTextLabel {
-                            Layout.preferredWidth: modelData.width(parent.width)
+                        RowLayout {
+                            anchors.right: parent.right
+                            width: Math.max(parent.width, implicitWidth)
+                            height: parent.height
+                            spacing: view.columnSpacing
 
-                            text: modelData.header
+                            Repeater {
+                                id: headerColumnsRepeater
+                                model: Math.max(root.columns.length - 1, 0)
 
-                            font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, {
-                                capitalization: Font.AllUppercase
-                            }))
-                            horizontalAlignment: Text.AlignLeft
+                                delegate: Loader {
+                                    readonly property var columnData: root.columns[model.index + 1]
+
+                                    Layout.preferredWidth: columnData.width
+                                    Layout.minimumWidth: columnData.width
+                                    Layout.preferredHeight: parent.height
+                                    Layout.fillWidth: columnData.fillWidth
+
+                                    sourceComponent: headerLabelComp
+
+                                    readonly property string headerText: columnData.header
+                                }
+                            }
                         }
                     }
                 }
@@ -204,7 +200,7 @@ Item {
 
                     readonly property real itemInset: 12
                     readonly property real rowHeight: 64
-                    readonly property real columnSpacing: 44
+                    readonly property real columnSpacing: 24
 
                     readonly property int cellHeight: rowHeight + spacing
 
@@ -229,11 +225,6 @@ Item {
                         itemInset: view.itemInset
                         implicitHeight: view.rowHeight
                         columnSpacing: view.columnSpacing
-
-                        isCloudItem: root.isCloudList
-                        thumbnailFull: root.thumbnailFull
-
-                        placeholder: root.placeholder
 
                         navigation.panel: navPanel
                         navigation.row: index + 1

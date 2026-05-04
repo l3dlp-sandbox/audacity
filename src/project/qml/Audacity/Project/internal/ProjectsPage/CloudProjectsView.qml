@@ -186,12 +186,18 @@ ProjectsView {
         ProjectsListView {
             id: list
 
+            readonly property int nameColumnWidth: 200
+            readonly property int thumbnailColumnWidth: 200
+            readonly property int iconColumnWidth: 28
+            readonly property int modifiedColumnWidth: 100
+            readonly property int durationColumnWidth: 100
+            readonly property int sizeColumnWidth: 75
+            readonly property int btnColumnWidth: 44
+
             anchors.fill: parent
 
             model: cloudProjectsModel
             searchText: root.searchText
-
-            isCloudList: true
 
             backgroundColor: root.backgroundColor
             sideMargin: root.sideMargin
@@ -207,16 +213,78 @@ ProjectsView {
 
             columns: [
                 ProjectsListView.ColumnItem {
+                    id: nameColumn
+
+                    header: qsTrc("project", "Name")
+
+                    width: nameColumnWidth
+
+                    delegate: StyledTextLabel {
+                        height: 48
+                        width: parent.width
+
+                        text: item.name ?? ""
+                        font: ui.theme.largeBodyFont
+                        horizontalAlignment: Text.AlignLeft
+                    }
+                },
+                ProjectsListView.ColumnItem {
+                    id: thumbnailColumn
+
+                    header: ""
+
+                    width: thumbnailColumnWidth
+                    fillWidth: true
+
+                    delegate: Row {
+                        spacing: 0
+
+                        ProjectThumbnail {
+                            id: thumbnail
+
+                            height: 48
+                            width: 90
+
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            path: item.thumbnailUrl ?? ""
+
+                            backgroundColor: ui.theme.backgroundSecondaryColor
+                            lineColor: Qt.alpha(ui.theme.fontPrimaryColor, 0.8)
+                            borderColor: ui.theme.strokeColor
+                        }
+
+                        Item {
+                            width: parent.width - thumbnail.width
+                            height: parent.height
+                        }
+                    }
+                },
+                ProjectsListView.ColumnItem {
+                    id: cloudIndicatorColumn
+
+                    header: ""
+
+                    width: iconColumnWidth
+
+                    delegate: Item {
+                        width: parent.width
+                        height: parent.height
+
+                        CloudProjectIndicatorButton {
+                            anchors.centerIn: parent
+
+                            isProgress: false
+                            isDownloadedAndUpToDate: true
+                        }
+                    }
+                },
+                ProjectsListView.ColumnItem {
                     id: modifiedColumn
 
-                    //: Stands for "Last time that this project was modified".
-                    //: Used as the header of this column in the scores list.
                     header: qsTrc("project", "Modified")
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return 0.25 * parentWidthExclusingSpacing
-                    }
+                    width: modifiedColumnWidth
 
                     delegate: StyledTextLabel {
                         id: modifiedLabel
@@ -248,13 +316,47 @@ ProjectsView {
                     }
                 },
                 ProjectsListView.ColumnItem {
+                    id: durationColumn
+
+                    header: qsTrc("global", "Duration", "file duration")
+
+                    width: durationColumnWidth
+
+                    delegate: StyledTextLabel {
+                        id: durationLabel
+                        text: Boolean(item.duration) ? item.duration : "-"
+
+                        font: ui.theme.largeBodyFont
+                        horizontalAlignment: Text.AlignLeft
+
+                        NavigationFocusBorder {
+                            navigationCtrl: NavigationControl {
+                                name: "DurationLabel"
+                                panel: navigationPanel
+                                row: navigationRow
+                                column: navigationColumnStart
+                                enabled: durationLabel.visible && durationLabel.enabled && !durationLabel.isEmpty
+                                accessible.name: durationColumn.header + ": " + (Boolean(item.duration) ? item.duration : qsTrc("global", "Unknown"))
+                                accessible.role: MUAccessible.StaticText
+
+                                onActiveChanged: {
+                                    if (active) {
+                                        listItem.scrollIntoView()
+                                    }
+                                }
+                            }
+
+                            anchors.margins: -radius
+                            radius: 2 + border.width
+                        }
+                    }
+                },
+                ProjectsListView.ColumnItem {
                     id: sizeColumn
+
                     header: qsTrc("global", "Size", "file size")
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return 0.10 * parentWidthExclusingSpacing
-                    }
+                    width: sizeColumnWidth
 
                     delegate: StyledTextLabel {
                         id: sizeLabel
@@ -287,30 +389,35 @@ ProjectsView {
                 },
                 ProjectsListView.ColumnItem {
                     id: btnColumn
+
                     header: ""
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return 0.05 * parentWidthExclusingSpacing
-                    }
+                    width: btnColumnWidth
 
-                    delegate: MenuButton {
-                        id: menuButton
+                    delegate: Item {
+                        width: parent.width
+                        height: 48
 
-                        width: 16
-                        height: 16
+                        MenuButton {
+                            id: menuButton
 
-                        visible: Boolean(item.contextMenuModel)
+                            visible: Boolean(item.contextMenuModel)
 
-                        menuModel: item.contextMenuModel
+                            width: 28
+                            height: 28
 
-                        onHandleMenuItem: function (itemId) {
-                            item.contextMenuModel.handleMenuItem(itemId)
-                        }
+                            anchors.centerIn: parent
 
-                        Component.onCompleted: {
-                            if (item.contextMenuModel != null) {
-                                item.contextMenuModel.load()
+                            menuModel: item.contextMenuModel
+
+                            onHandleMenuItem: function (itemId) {
+                                item.contextMenuModel.handleMenuItem(itemId)
+                            }
+
+                            Component.onCompleted: {
+                                if (item.contextMenuModel != null) {
+                                    item.contextMenuModel.load()
+                                }
                             }
                         }
                     }
