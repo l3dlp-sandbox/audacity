@@ -85,6 +85,7 @@ BaseSection {
 
                     // Always laid out so the row height stays stable; only the text fades in/out
                     opacity: pathInvalid ? 1 : 0
+                    Accessible.ignored: !pathInvalid
 
                     text: qsTrc("preferences", "The directory does not exist")
                     color: ui.theme.extra["error_text_color"]
