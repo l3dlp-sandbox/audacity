@@ -64,6 +64,7 @@ ProjectsView {
     QtObject {
         id: prv
         property bool updateDesiredRowCountScheduled: false
+        property string placeholderFile: ":/resources/ProjectPlaceholder.svg"
 
         readonly property var activeView: root.item
 
@@ -166,6 +167,7 @@ ProjectsView {
 
             backgroundColor: root.backgroundColor
             sideMargin: root.sideMargin
+            placeholder: prv.placeholderFile
 
             indicatorButton: cloudIndicatorComp
 
@@ -248,6 +250,7 @@ ProjectsView {
                             anchors.verticalCenter: parent.verticalCenter
 
                             path: item.thumbnailUrl ?? ""
+                            placeholder: prv.placeholderFile
 
                             backgroundColor: ui.theme.backgroundSecondaryColor
                             lineColor: Qt.alpha(ui.theme.fontPrimaryColor, 0.8)

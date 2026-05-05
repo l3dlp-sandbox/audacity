@@ -65,7 +65,7 @@ ProjectsView {
 
     QtObject {
         id: prv
-        property string gridPlaceholderFile: ":/resources/AudioFilePlaceholder.svg"
+        property string placeholderFile: ":/resources/AudioFilePlaceholder.svg"
         property bool updateDesiredRowCountScheduled: false
 
         readonly property var activeView: root.item
@@ -158,7 +158,7 @@ ProjectsView {
 
             backgroundColor: root.backgroundColor
             sideMargin: root.sideMargin
-            placeholder: prv.gridPlaceholderFile
+            placeholder: prv.placeholderFile
 
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrder
@@ -229,6 +229,7 @@ ProjectsView {
                         height: 48
 
                         path: item.thumbnailUrl ?? ""
+                        placeholder: prv.placeholderFile
 
                         backgroundColor: "transparent"
                         lineColor: Qt.alpha(ui.theme.fontPrimaryColor, 0.8)

@@ -21,6 +21,11 @@ ProjectsView {
 
     sourceComponent: root.viewType === ProjectsPageModel.List ? listComp : gridComp
 
+    QtObject {
+        id: prv
+        property string placeholderFile: ":/resources/ProjectPlaceholder.svg"
+    }
+
     Component {
         id: cloudIndicatorComp
 
@@ -43,6 +48,7 @@ ProjectsView {
 
             backgroundColor: root.backgroundColor
             sideMargin: root.sideMargin
+            placeholder: prv.placeholderFile
 
             indicatorButton: cloudIndicatorComp
 
@@ -143,6 +149,7 @@ ProjectsView {
                             anchors.verticalCenter: parent.verticalCenter
 
                             path: item.thumbnailUrl ?? ""
+                            placeholder: prv.placeholderFile
 
                             backgroundColor: ui.theme.backgroundSecondaryColor
                             lineColor: Qt.alpha(ui.theme.fontPrimaryColor, 0.8)
