@@ -20,6 +20,10 @@
 #include "au3-components/PluginProvider.h"
 #include "VST3EffectBase.h"
 
+namespace BasicUI {
+class ProgressDialog;
+}
+
 namespace VST3 {
 namespace Hosting {
 class Module;
@@ -61,6 +65,8 @@ public:
     void AutoRegisterPlugins(PluginManagerInterface& pluginManager) override;
     bool SupportsCustomModulePaths() const override;
     PluginPaths FindModulePaths(PluginManagerInterface& pluginManager) const override;
+
+    PluginPaths FindModulePaths(PluginManagerInterface& pluginManager, BasicUI::ProgressDialog* progress) const;
     unsigned DiscoverPluginsAtPath(const PluginPath& path, TranslatableString& errMsg, const RegistrationCallback& callback) override;
     bool CheckPluginExist(const PluginPath& path) const override;
     std::unique_ptr<ComponentInterface>

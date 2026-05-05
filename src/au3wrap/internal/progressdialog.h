@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "au3-basic-ui/BasicUI.h" // For ProgressResult
 
 #include "framework/global/modularity/ioc.h"
@@ -43,4 +45,6 @@ private:
     std::string m_progressTitle;
     std::string m_progressMessage;
     bool m_cancelled = false;
+    bool m_canceledHooked = false;
+    std::chrono::steady_clock::time_point m_lastEventPump {};
 };

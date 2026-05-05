@@ -21,6 +21,8 @@
 #include "au3-strings/wxArrayStringEx.h"
 #include <wx/osx/core/private.h>
 
+#include "au3-basic-ui/BasicUI.h"
+
 static const struct
 {
     OSType componentManufacturer;
@@ -179,15 +181,38 @@ void AudioUnitEffectsModule::AutoRegisterPlugins(PluginManagerInterface&)
 {
 }
 
-PluginPaths AudioUnitEffectsModule::FindModulePaths(PluginManagerInterface&) const
+PluginPaths AudioUnitEffectsModule::FindModulePaths(PluginManagerInterface& pm) const
+{
+    return FindModulePaths(pm, nullptr);
+}
+
+PluginPaths AudioUnitEffectsModule::FindModulePaths(PluginManagerInterface&,
+                                                    BasicUI::ProgressDialog* progress) const
 {
     PluginPaths effects;
 
-    LoadAudioUnitsOfType(kAudioUnitType_Effect, effects);
-    LoadAudioUnitsOfType(kAudioUnitType_Generator, effects);
-    LoadAudioUnitsOfType(kAudioUnitType_Mixer, effects);
-    LoadAudioUnitsOfType(kAudioUnitType_MusicEffect, effects);
-    LoadAudioUnitsOfType(kAudioUnitType_Panner, effects);
+    struct Category {
+        OSType type;
+        TranslatableString label;
+    };
+    const Category categories[] = {
+        { kAudioUnitType_Effect, XO("Audio Unit Effects") },
+        { kAudioUnitType_Generator, XO("Audio Unit Generators") },
+        { kAudioUnitType_Mixer, XO("Audio Unit Mixers") },
+        { kAudioUnitType_MusicEffect, XO("Audio Unit Music Effects") },
+        { kAudioUnitType_Panner, XO("Audio Unit Panners") },
+    };
+
+    constexpr unsigned long long total = sizeof(categories) / sizeof(categories[0]);
+    for (unsigned long long i = 0; i < total; ++i) {
+        if (progress) {
+            const auto result = progress->Poll(i, total, categories[i].label);
+            if (result == BasicUI::ProgressResult::Cancelled) {
+                break;
+            }
+        }
+        LoadAudioUnitsOfType(categories[i].type, effects);
+    }
 
     return effects;
 }

@@ -27,6 +27,11 @@ void Au3AudioPluginScanner::deinit()
     m_pluginProvider.Terminate();
 }
 
+void Au3AudioPluginScanner::setProgressDialog(BasicUI::ProgressDialog* progress)
+{
+    m_progress = progress;
+}
+
 muse::io::paths_t Au3AudioPluginScanner::scanPlugins() const
 {
     // Push user-configured custom paths into PluginManager so that providers

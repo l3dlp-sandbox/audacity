@@ -36,6 +36,8 @@ Functions that find and load all LV2 plugins on the system.
 #include "au3-strings/Internat.h"
 #include "au3-strings/wxArrayStringEx.h"
 
+#include "au3-basic-ui/BasicUI.h"
+
 #include <unordered_map>
 
 // ============================================================================
@@ -231,13 +233,21 @@ void LV2EffectsModule::AutoRegisterPlugins(PluginManagerInterface& pluginManager
     lilv_world_load_all(LV2Symbols::gWorld);
 }
 
-PluginPaths LV2EffectsModule::FindModulePaths(PluginManagerInterface&) const
+PluginPaths LV2EffectsModule::FindModulePaths(PluginManagerInterface& pm) const
+{
+    return FindModulePaths(pm, nullptr);
+}
+
+PluginPaths LV2EffectsModule::FindModulePaths(PluginManagerInterface&,
+                                              BasicUI::ProgressDialog* progress) const
 {
     // Retrieve data about all LV2 plugins
     const LilvPlugins* plugs = lilv_world_get_all_plugins(LV2Symbols::gWorld);
+    const unsigned long long total = lilv_plugins_size(plugs);
 
     // Iterate over all plugins retrieve their URI
     PluginPaths plugins;
+    unsigned long long visited = 0;
     LILV_FOREACH(plugins, i, plugs)
     {
         const LilvPlugin* plug = lilv_plugins_get(plugs, i);
@@ -246,6 +256,20 @@ PluginPaths LV2EffectsModule::FindModulePaths(PluginManagerInterface&) const
 
         // Bypass unsupported plugin types
         const auto pluginUri = lilv_node_as_string(lilv_plugin_get_uri(plug));
+
+        if (progress) {
+            constexpr size_t kMaxProgressLen = 60;
+            wxString uriDisplay = wxString::FromUTF8(pluginUri);
+            if (uriDisplay.length() > kMaxProgressLen) {
+                uriDisplay = uriDisplay.Left(kMaxProgressLen - 1) + wxT("\u2026");
+            }
+            const auto result = progress->Poll(visited, total,
+                                               XO("Looking in: %s").Format(uriDisplay));
+            if (result == BasicUI::ProgressResult::Cancelled) {
+                break;
+            }
+        }
+        ++visited;
 
         using namespace LV2Symbols;
         if (lilv_node_equals(cls, node_InstrumentPlugin)

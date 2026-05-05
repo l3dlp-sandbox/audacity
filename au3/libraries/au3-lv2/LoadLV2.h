@@ -21,6 +21,10 @@
 #include "LV2EffectBase.h"
 #include "au3-components/PluginProvider.h"
 
+namespace BasicUI {
+class ProgressDialog;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // LV2EffectsModule
@@ -59,6 +63,8 @@ public:
 
     void AutoRegisterPlugins(PluginManagerInterface& pm) override;
     PluginPaths FindModulePaths(PluginManagerInterface& pm) const override;
+
+    PluginPaths FindModulePaths(PluginManagerInterface& pm, BasicUI::ProgressDialog* progress) const;
     unsigned DiscoverPluginsAtPath(
         const PluginPath& path, TranslatableString& errMsg, const RegistrationCallback& callback)
     override;

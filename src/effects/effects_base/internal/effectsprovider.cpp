@@ -4,11 +4,14 @@
 #include "effectsprovider.h"
 #include "effectsutils.h"
 
+#include "au3-basic-ui/BasicUI.h"
 #include "au3-effects/Effect.h"
 #include "au3-effects/EffectManager.h"
 #include "au3-realtime-effects/RealtimeEffectState.h"
 
 #include "au3-module-manager/ModuleManager.h"
+
+#include "internal/au3/au3audiopluginscanner.h"
 
 #include "framework/global/log.h"
 #include "stringutils.h"
@@ -71,7 +74,32 @@ EffectsProvider::NewPluginsRegistered EffectsProvider::doScanPlugins(
     const std::function<bool()>& doScanThirdPartyPlugins,
     const EffectFilter& exclude)
 {
+    // Show a progress dialog around the actual filesystem walk. The
+    // backend modules (VST3 / AU / LV2) call Poll() through the dialog
+    // pointer they receive on their Au3AudioPluginScanner, which both
+    // updates the bar and lets the user cancel a long custom-path scan.
+    auto progress = BasicUI::MakeProgress(
+        XO("Scanning audio plugins"),
+        XO("Looking for installed plugins\u2026"),
+        BasicUI::ProgressShowCancel | BasicUI::ProgressHideTime);
+    BasicUI::ProgressDialog* progressPtr = progress.get();
+
+    for (const auto& scanner : scannerRegister()->scanners()) {
+        if (auto* au3Scanner = dynamic_cast<Au3AudioPluginScanner*>(scanner.get())) {
+            au3Scanner->setProgressDialog(progressPtr);
+        }
+    }
+
     muse::audioplugins::PluginScanResult scanResult = registerAudioPluginsScenario.scanPlugins();
+
+    for (const auto& scanner : scannerRegister()->scanners()) {
+        if (auto* au3Scanner = dynamic_cast<Au3AudioPluginScanner*>(scanner.get())) {
+            au3Scanner->setProgressDialog(nullptr);
+        }
+    }
+    // Tear down the dialog before any subsequent question popup or the
+    // per-plugin registration progress dialog appears.
+    progress.reset();
 
     muse::io::paths_t& thirdPartyPluginPaths = scanResult.newPluginPaths;
     const auto metaReaders = metaReaderRegister()->readers();

@@ -12,12 +12,15 @@
 
 #include "VST3EffectsModule.h"
 
+#include <chrono>
 #include <stdexcept>
 
 #include <wx/stdpaths.h>
 #include <wx/dir.h>
 #include <wx/log.h>
 #include <wx/utils.h>
+
+#include "au3-basic-ui/BasicUI.h"
 
 #include "AudacityVst3HostApplication.h"
 #include "au3-module-manager/ModuleManager.h"
@@ -39,18 +42,39 @@ DECLARE_PROVIDER_ENTRY(AudacityModule)
 
 DECLARE_BUILTIN_PROVIDER(VST3Builtin);
 
+namespace {
+constexpr size_t kMaxProgressPathLen = 60;
+wxString elidePath(const wxString& path)
+{
+    if (path.length() <= kMaxProgressPathLen) {
+        return path;
+    }
+    return path.Left(kMaxProgressPathLen - 1) + wxT("\u2026");
+}
+}
+
 //Helper class used to find vst3 effects during folder traversal
 class VST3PluginTraverser final : public wxDirTraverser
 {
-    std::function<void(const wxString&)> mOnPluginFound;
 public:
-    VST3PluginTraverser(std::function<void(const wxString&)> onPluginFound)
+    VST3PluginTraverser(std::function<void(const wxString&)> onPluginFound,
+                        BasicUI::ProgressDialog* progress = nullptr,
+                        unsigned long long topIndex = 0,
+                        unsigned long long topTotal = 0)
         : mOnPluginFound(std::move(onPluginFound))
+        , mProgress(progress)
+        , mTopIndex(topIndex)
+        , mTopTotal(topTotal)
     {
     }
 
+    bool cancelled() const { return mCancelled; }
+
     wxDirTraverseResult OnFile(const wxString& filename) override
     {
+        if (!maybePoll(filename)) {
+            return wxDIR_STOP;
+        }
         if (filename.Matches("*.vst3")) {
             mOnPluginFound(filename);
         }
@@ -59,12 +83,68 @@ public:
 
     wxDirTraverseResult OnDir(const wxString& dirname) override
     {
+        if (!maybePoll(dirname)) {
+            return wxDIR_STOP;
+        }
         if (dirname.Matches("*.vst3")) {
             mOnPluginFound(dirname);
             return wxDIR_IGNORE;//do not look inside...
         }
         return wxDIR_CONTINUE;
     }
+
+    //! How many fake sub-steps each top-level dir is split into when reporting
+    //! progress from inside the recursive walk.
+    static constexpr unsigned long long kSubSteps = 1024;
+
+private:
+    //! Time-throttled wrapper around `mProgress->Poll`. We have to call
+    //! Poll periodically while traversing huge custom paths
+    //! both to keep the UI responsive (without it the GUI
+    //! thread never gets events and macOS shows the beachball) AND to give
+    //! the user a chance to cancel mid-walk.
+    bool maybePoll(const wxString& path)
+    {
+        if (!mProgress) {
+            return true;
+        }
+        using clock = std::chrono::steady_clock;
+        constexpr auto pollInterval = std::chrono::milliseconds(100);
+        const auto now = clock::now();
+        if (now - mLastPoll < pollInterval) {
+            return true;
+        }
+        mLastPoll = now;
+
+        // Advance the synthetic sub-step so the (numerator, denominator)
+        // pair changes each Poll. Without this muse::Progress::progress()
+        // bails on the unchanged fraction and the QML side never sees the
+        // message-only updates — making the dialog look frozen on big
+        // walks.
+        if (mSubStep + 1 < kSubSteps) {
+            ++mSubStep;
+        }
+        const unsigned long long numerator = mTopIndex * kSubSteps + mSubStep;
+        const unsigned long long denominator = mTopTotal * kSubSteps;
+
+        const auto result = mProgress->Poll(numerator, denominator,
+                                            XO("Looking in: %s").Format(elidePath(path)));
+        if (result == BasicUI::ProgressResult::Cancelled) {
+            mCancelled = true;
+            return false;
+        }
+        return true;
+    }
+
+    std::function<void(const wxString&)> mOnPluginFound;
+
+    BasicUI::ProgressDialog* mProgress { nullptr };
+    unsigned long long mTopIndex { 0 };
+    unsigned long long mTopTotal { 0 };
+    unsigned long long mSubStep { 0 };
+    bool mCancelled { false };
+
+    std::chrono::steady_clock::time_point mLastPoll {};
 };
 
 std::shared_ptr<VST3::Hosting::Module> VST3EffectsModule::GetModule(const wxString& path)
@@ -158,6 +238,13 @@ bool VST3EffectsModule::SupportsCustomModulePaths() const
 PluginPaths
 VST3EffectsModule::FindModulePaths(PluginManagerInterface& pluginManager) const
 {
+    return FindModulePaths(pluginManager, nullptr);
+}
+
+PluginPaths
+VST3EffectsModule::FindModulePaths(PluginManagerInterface& pluginManager,
+                                   BasicUI::ProgressDialog* progress) const
+{
     //Note: The host recursively scans these folders at startup in this order (User/Global/Application).
     //https://developer.steinberg.help/display/VST/Plug-in+Locations
 
@@ -196,14 +283,32 @@ VST3EffectsModule::FindModulePaths(PluginManagerInterface& pluginManager) const
     }
 
     PluginPaths result;
-    VST3PluginTraverser vst3PluginTraverser([&](const wxString& pluginPath){
-        result.push_back(pluginPath);
-    });
 
-    for (const auto& path : pathList) {
-        wxDir dir(path);
+    constexpr unsigned long long kSubSteps = VST3PluginTraverser::kSubSteps;
+    const unsigned long long topTotalScaled = pathList.size() * kSubSteps;
+
+    const auto pollTopLevel = [progress, topTotalScaled](size_t i, const wxString& path) -> bool {
+        if (!progress) {
+            return true;
+        }
+        const auto pollResult = progress->Poll(i * kSubSteps, topTotalScaled,
+                                               XO("Looking in: %s").Format(elidePath(path)));
+        return pollResult != BasicUI::ProgressResult::Cancelled;
+    };
+
+    for (size_t i = 0; i < pathList.size(); ++i) {
+        if (!pollTopLevel(i, pathList[i])) {
+            break;
+        }
+        VST3PluginTraverser vst3PluginTraverser([&](const wxString& pluginPath){
+            result.push_back(pluginPath);
+        }, progress, i, pathList.size());
+        wxDir dir(pathList[i]);
         if (dir.IsOpened()) {
             dir.Traverse(vst3PluginTraverser, wxEmptyString, wxDIR_DEFAULT);
+        }
+        if (vst3PluginTraverser.cancelled()) {
+            break;
         }
     }
     return result;

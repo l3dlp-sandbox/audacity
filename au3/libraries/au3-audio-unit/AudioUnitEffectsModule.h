@@ -19,6 +19,10 @@
 #include "au3-components/PluginProvider.h"
 #include "AudioUnitEffectBase.h"
 
+namespace BasicUI {
+class ProgressDialog;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // AudioUnitEffectsModule
@@ -55,6 +59,8 @@ public:
 
     void AutoRegisterPlugins(PluginManagerInterface& pm) override;
     PluginPaths FindModulePaths(PluginManagerInterface& pm) const override;
+
+    PluginPaths FindModulePaths(PluginManagerInterface& pm, BasicUI::ProgressDialog* progress) const;
     unsigned DiscoverPluginsAtPath(
         const PluginPath& path, TranslatableString& errMsg, const RegistrationCallback& callback)
     override;
