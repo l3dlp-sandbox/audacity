@@ -42,6 +42,17 @@ Item {
     signal openProjectRequested(var projectPath, var displayName)
     signal openCloudProjectRequested(var projectId, var projectPath, var displayName)
 
+    function scrollColumnIntoView(columnX, columnWidth) {
+        var viewport = headerFlickable.width
+        var cx = headerFlickable.contentX
+
+        if (columnX < cx) {
+            headerFlickable.contentX = columnX
+        } else if (columnX + columnWidth > cx + viewport) {
+            headerFlickable.contentX = columnX + columnWidth - viewport
+        }
+    }
+
     component ColumnItem: QtObject {
         property string header
         property real width: 0
@@ -241,7 +252,7 @@ Item {
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
 
-                                policy: headerFlickable.contentWidth > headerFlickable.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                                visible: headerFlickable.contentWidth > headerFlickable.width
                                 z: 2
                             }
                         }
@@ -292,6 +303,10 @@ Item {
                         navigation.panel: navPanel
                         navigation.row: index + 1
                         navigation.column: 0
+
+                        onColumnScrollRequested: function (columnX, columnWidth) {
+                            root.scrollColumnIntoView(columnX, columnWidth)
+                        }
 
                         onClicked: {
                             if (item.isCloud) {

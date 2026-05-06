@@ -136,7 +136,7 @@ ProjectsView {
                                 accessible.name: nameColumn.header + ": " + nameLabel.text
                                 accessible.role: MUAccessible.StaticText
 
-                                onActiveChanged: {
+                                onActiveChanged: function (active) {
                                     if (active) {
                                         listItem.scrollIntoView()
                                     }
@@ -196,6 +196,7 @@ ProjectsView {
                             anchors.centerIn: parent
 
                             sourceComponent: CloudProjectIndicatorButton {
+                                mouseArea.enabled: false
                                 isProgress: false
                                 isDownloadedAndUpToDate: true
 
@@ -209,9 +210,10 @@ ProjectsView {
                                         accessible.name: qsTrc("project", "Cloud project indicator")
                                         accessible.role: MUAccessible.Information
 
-                                        onActiveChanged: {
+                                        onActiveChanged: function (active) {
                                             if (active) {
                                                 listItem.scrollIntoView()
+                                                listItem.scrollColumnIntoView(remainingColumnIndex)
                                             }
                                         }
                                     }
@@ -244,9 +246,10 @@ ProjectsView {
                                 accessible.name: modifiedColumn.header + ": " + modifiedLabel.text
                                 accessible.role: MUAccessible.StaticText
 
-                                onActiveChanged: {
+                                onActiveChanged: function (active) {
                                     if (active) {
                                         listItem.scrollIntoView()
+                                        listItem.scrollColumnIntoView(remainingColumnIndex)
                                     }
                                 }
                             }
@@ -280,9 +283,10 @@ ProjectsView {
                                 accessible.name: sizeColumn.header + ": " + (Boolean(item.fileSize) ? item.fileSize : qsTrc("global", "Unknown"))
                                 accessible.role: MUAccessible.StaticText
 
-                                onActiveChanged: {
+                                onActiveChanged: function (active) {
                                     if (active) {
                                         listItem.scrollIntoView()
+                                        listItem.scrollColumnIntoView(remainingColumnIndex)
                                     }
                                 }
                             }
@@ -320,8 +324,14 @@ ProjectsView {
                             }
 
                             Component.onCompleted: {
-                                if (item.contextMenuModel != null) {
-                                    item.contextMenuModel.load()
+                                if (menuModel != null) {
+                                    menuModel.load()
+                                }
+                            }
+
+                            onMenuModelChanged: {
+                                if (menuModel != null) {
+                                    menuModel.load()
                                 }
                             }
 
@@ -343,9 +353,10 @@ ProjectsView {
                                     accessible.name: qsTrc("project", "Project item menu")
                                     accessible.role: MUAccessible.Button
 
-                                    onActiveChanged: {
+                                    onActiveChanged: function (active) {
                                         if (active) {
                                             listItem.scrollIntoView()
+                                            listItem.scrollColumnIntoView(remainingColumnIndex)
                                         }
                                     }
 

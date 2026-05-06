@@ -16,6 +16,16 @@ ListItemBlank {
     property var columns: []
     property real columnsContentX: 0
     property real columnsMinWidth: 0
+    signal columnScrollRequested(real columnX, real columnWidth)
+
+    function scrollColumnIntoView(remainingColumnIndex) {
+        var x = 0
+        for (var i = 0; i < remainingColumnIndex; i++) {
+            x += root.columns[i + 1].width + root.columnSpacing
+        }
+        var colWidth = root.columns[remainingColumnIndex + 1].width
+        root.columnScrollRequested(x, colWidth)
+    }
 
     property real itemInset: 12
     property real columnSpacing: 44
@@ -48,6 +58,7 @@ ListItemBlank {
             active: columnData !== null
 
             Layout.preferredWidth: columnData ? columnData.width : 0
+            Layout.minimumWidth: columnData ? columnData.width : 0
 
             readonly property ProjectListItem listItem: root
             readonly property var item: root.item
@@ -93,6 +104,7 @@ ListItemBlank {
                         readonly property NavigationPanel navigationPanel: root.navigation.panel
                         readonly property int navigationRow: root.navigation.row
                         readonly property int navigationColumnStart: 100 * (model.index + 2)
+                        readonly property int remainingColumnIndex: model.index
 
                         sourceComponent: columnData.delegate
                     }

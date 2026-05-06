@@ -60,7 +60,10 @@ void RecentProjectsModel::clearContextMenuModels()
 {
     for (QVariantMap& item : m_items) {
         auto* model = item[CONTEXT_MENU_MODEL_KEY].value<RecentProjectContextMenuModel*>();
-        delete model;
+        item[CONTEXT_MENU_MODEL_KEY] = QVariant();
+        if (model != nullptr) {
+            model->deleteLater();
+        }
     }
 }
 

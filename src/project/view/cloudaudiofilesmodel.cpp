@@ -62,8 +62,6 @@ void CloudAudioFilesModel::clear()
 
     emit hasMoreChanged();
     emit desiredRowCountChanged();
-
-    setState(State::Fine);
 }
 
 CloudAudioFilesModel::State CloudAudioFilesModel::state() const
@@ -185,6 +183,9 @@ void CloudAudioFilesModel::clearContextMenuModels()
 {
     for (QVariantMap& item : m_items) {
         auto* model = item[CONTEXT_MENU_MODEL_KEY].value<CloudAudioFileContextMenuModel*>();
-        delete model;
+        item[CONTEXT_MENU_MODEL_KEY] = QVariant();
+        if (model != nullptr) {
+            model->deleteLater();
+        }
     }
 }

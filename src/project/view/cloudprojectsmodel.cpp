@@ -53,8 +53,6 @@ void CloudProjectsModel::clear()
 
     emit hasMoreChanged();
     emit desiredRowCountChanged();
-
-    setState(State::Fine);
 }
 
 CloudProjectsModel::State CloudProjectsModel::state() const
@@ -179,6 +177,9 @@ void CloudProjectsModel::clearContextMenuModels()
 {
     for (QVariantMap& item : m_items) {
         auto* model = item[CONTEXT_MENU_MODEL_KEY].value<CloudProjectContextMenuModel*>();
-        delete model;
+        item[CONTEXT_MENU_MODEL_KEY] = QVariant();
+        if (model != nullptr) {
+            model->deleteLater();
+        }
     }
 }

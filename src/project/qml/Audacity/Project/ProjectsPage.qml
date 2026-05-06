@@ -395,7 +395,7 @@ FocusScope {
             name: "RecentProjectsBottom"
             section: navSec
             direction: NavigationPanel.Horizontal
-            order: 5
+            order: 7
 
             //: accessibility name for the panel at the bottom of the "Projects" page
             accessible.name: qsTrc("project", "Projects actions")
