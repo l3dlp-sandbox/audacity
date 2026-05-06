@@ -394,6 +394,14 @@ ProjectsView {
                                 }
                             }
 
+                            Rectangle {
+                                anchors.fill: parent
+                                color: "transparent"
+                                radius: 3
+                                border.width: 1
+                                border.color: ui.theme.strokeColor
+                            }
+
                             NavigationFocusBorder {
                                 navigationCtrl: NavigationControl {
                                     name: "MenuButton"
