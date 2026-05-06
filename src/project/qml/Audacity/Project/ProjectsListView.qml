@@ -92,6 +92,10 @@ Item {
             navigation.row: 0
             navigation.column: 0
 
+            onClicked: {
+                root.createNewProjectRequested()
+            }
+
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: view.itemInset
@@ -122,11 +126,6 @@ Item {
 
                         font.pixelSize: 16
                         color: ui.theme.extra["black_color"]
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: root.createNewProjectRequested()
                     }
                 }
 

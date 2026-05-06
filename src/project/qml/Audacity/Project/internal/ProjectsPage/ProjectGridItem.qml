@@ -52,6 +52,12 @@ FocusScope {
         }
     }
 
+    onContextMenuModelChanged: {
+        if (root.contextMenuModel != null) {
+            root.contextMenuModel.load()
+        }
+    }
+
     NavigationControl {
         id: navCtrl
         name: root.name
