@@ -43,13 +43,14 @@ DECLARE_PROVIDER_ENTRY(AudacityModule)
 DECLARE_BUILTIN_PROVIDER(VST3Builtin);
 
 namespace {
-constexpr size_t kMaxProgressPathLen = 60;
+constexpr size_t kMaxProgressPathLen = 30;
 wxString elidePath(const wxString& path)
 {
     if (path.length() <= kMaxProgressPathLen) {
         return path;
     }
-    return wxT("\u2026") + path.Mid(path.length() - (kMaxProgressPathLen - 1));
+    // elide from the beginning:
+    return wxT("\u2026") + path.Right(kMaxProgressPathLen - 3);
 }
 }
 
@@ -108,27 +109,9 @@ private:
         if (!mProgress) {
             return true;
         }
-        using clock = std::chrono::steady_clock;
-        constexpr auto pollInterval = std::chrono::milliseconds(100);
-        const auto now = clock::now();
-        if (now - mLastPoll < pollInterval) {
-            return true;
-        }
-        mLastPoll = now;
 
-        // Advance the synthetic sub-step so the (numerator, denominator)
-        // pair changes each Poll. Without this muse::Progress::progress()
-        // bails on the unchanged fraction and the QML side never sees the
-        // message-only updates — making the dialog look frozen on big
-        // walks.
-        if (mSubStep + 1 < kSubSteps) {
-            ++mSubStep;
-        }
-        const unsigned long long numerator = mTopIndex * kSubSteps + mSubStep;
-        const unsigned long long denominator = mTopTotal * kSubSteps;
-
-        const auto result = mProgress->Poll(numerator, denominator,
-                                            XO("Looking in: %s").Format(elidePath(path)));
+        const auto result = mProgress->Poll(mTopIndex, mTopTotal,
+                                            XO("Looking for VST3 in: %s").Format(elidePath(path)));
         if (result == BasicUI::ProgressResult::Cancelled) {
             mCancelled = true;
             return false;
@@ -143,8 +126,6 @@ private:
     unsigned long long mTopTotal { 0 };
     unsigned long long mSubStep { 0 };
     bool mCancelled { false };
-
-    std::chrono::steady_clock::time_point mLastPoll {};
 };
 
 std::shared_ptr<VST3::Hosting::Module> VST3EffectsModule::GetModule(const wxString& path)

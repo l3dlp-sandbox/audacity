@@ -64,25 +64,14 @@ ProgressResult ProgressDialog::Poll(unsigned long long numerator, unsigned long 
     // The framework throttles the *visual* update internally;
     m_progress.progress(numerator, denominator, m_progressMessage);
 
-    // muse::Progress's internal throttle only fires when the numerator/
-    // denominator pair has advanced — callers inside a recursive walk can
-    // call Poll() many times with the *same* (numerator, denominator) and
-    // only the message changing. In that window the QML side
-    // never wakes up, the GUI thread starves, and macOS shows the
-    // beachball cursor. Pump the event loop on an independent time-based
-    // throttle so the dialog stays responsive even when the bar is idle.
+    // Make sure that the user can press Cancel even if the progress bar
+    // doesn't update itself
     using clock = std::chrono::steady_clock;
-    constexpr auto pumpInterval = std::chrono::milliseconds(50);
+    constexpr auto pumpInterval = std::chrono::milliseconds(100);
     const auto now = clock::now();
     if (now - m_lastEventPump >= pumpInterval) {
         m_lastEventPump = now;
-        // Give the GUI thread a short time budget inside the event loop so
-        // the render thread can grab a sync window and actually paint the
-        // updated dialog. On macOS with Qt's threaded render loop, calling
-        // `processEvents()` with no budget returns immediately and the
-        // pending QML sync never lands until something else (e.g. window
-        // focus change) wakes the loop.
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+        QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
 
     return ProgressResult::Success;
