@@ -379,10 +379,16 @@ FocusScope {
 
         anchors.bottom: parent.bottom
 
-        height: 100
+        height: 48
         width: parent.width
 
         color: ui.theme.backgroundSecondaryColor
+
+        SeparatorLine {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+        }
 
         NavigationPanel {
             id: navBottomPanel
