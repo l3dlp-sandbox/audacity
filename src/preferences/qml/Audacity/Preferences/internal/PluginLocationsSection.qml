@@ -20,6 +20,15 @@ BaseSection {
     signal pathChanged(int index, string newPath)
     signal removePathRequested(int index)
 
+    readonly property bool hasEmptyRow: {
+        for (let i = 0; i < paths.length; ++i) {
+            if (!paths[i] || paths[i].length === 0) {
+                return true
+            }
+        }
+        return false
+    }
+
     navigation.direction: NavigationPanel.Both
 
     Column {
@@ -96,6 +105,8 @@ BaseSection {
 
         FlatButton {
             text: qsTrc("preferences", "Add new location")
+
+            enabled: !root.hasEmptyRow
 
             navigation.panel: root.navigation
             navigation.row: root.paths.length
