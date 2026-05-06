@@ -14,6 +14,8 @@ ListItemBlank {
 
     required property var item
     property var columns: []
+    property real columnsContentX: 0
+    property real columnsMinWidth: 0
 
     property real itemInset: 12
     property real columnSpacing: 44
@@ -60,16 +62,16 @@ ListItemBlank {
             orientation: Qt.Vertical
         }
 
-        // Remaining columns — clipped container
+        // Remaining columns — clipped, offset follows header scroll
         Item {
             Layout.preferredHeight: parent.height
             Layout.fillWidth: true
-
             clip: true
 
             RowLayout {
-                anchors.right: parent.right
-                width: Math.max(parent.width, implicitWidth)
+                id: columnsRow
+                x: -root.columnsContentX
+                width: Math.max(parent.width, root.columnsMinWidth)
                 height: parent.height
 
                 spacing: root.columnSpacing

@@ -21,6 +21,18 @@ Item {
 
     property color backgroundColor: ui.theme.backgroundSecondaryColor
     property real sideMargin: 46
+    property real _columnsContentX: 0
+
+    readonly property real _remainingColumnsMinWidth: {
+        var total = 0
+        for (var i = 1; i < columns.length; i++) {
+            total += columns[i].width
+        }
+        if (columns.length > 2) {
+            total += (columns.length - 2) * 24
+        }
+        return total
+    }
 
     property alias view: view
 
@@ -182,30 +194,55 @@ Item {
                     Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: parent.height
-                        clip: true
 
-                        RowLayout {
-                            anchors.right: parent.right
-                            width: Math.max(parent.width, implicitWidth)
-                            height: parent.height
-                            spacing: view.columnSpacing
+                        Flickable {
+                            id: headerFlickable
 
-                            Repeater {
-                                id: headerColumnsRepeater
-                                model: Math.max(root.columns.length - 1, 0)
+                            anchors.fill: parent
+                            clip: true
 
-                                delegate: Loader {
-                                    readonly property var columnData: root.columns[model.index + 1]
+                            flickableDirection: Flickable.HorizontalFlick
+                            contentWidth: Math.max(width, root._remainingColumnsMinWidth)
+                            contentHeight: height
+                            boundsBehavior: Flickable.StopAtBounds
 
-                                    Layout.preferredWidth: columnData.width
-                                    Layout.minimumWidth: columnData.width
-                                    //Layout.preferredHeight: parent.height
-                                    Layout.fillWidth: columnData.fillWidth
+                            onContentXChanged: {
+                                root._columnsContentX = contentX
+                            }
 
-                                    sourceComponent: headerLabelComp
+                            RowLayout {
+                                id: headerColumnsRow
+                                width: headerFlickable.contentWidth
+                                height: headerFlickable.height
+                                spacing: view.columnSpacing
 
-                                    readonly property string headerText: columnData.header
+                                Repeater {
+                                    id: headerColumnsRepeater
+                                    model: Math.max(root.columns.length - 1, 0)
+
+                                    delegate: Loader {
+                                        readonly property var columnData: root.columns[model.index + 1]
+
+                                        Layout.preferredWidth: columnData.width
+                                        Layout.minimumWidth: columnData.width
+                                        Layout.fillWidth: columnData.fillWidth
+
+                                        sourceComponent: headerLabelComp
+
+                                        readonly property string headerText: columnData.header
+                                    }
                                 }
+                            }
+
+                            ScrollBar.horizontal: StyledScrollBar {
+                                parent: listViewContainer
+
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+
+                                policy: headerFlickable.contentWidth > headerFlickable.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                                z: 2
                             }
                         }
                     }
@@ -244,6 +281,8 @@ Item {
                         required property int index
 
                         columns: root.columns
+                        columnsContentX: root._columnsContentX
+                        columnsMinWidth: root._remainingColumnsMinWidth
 
                         itemInset: view.itemInset
                         implicitHeight: view.rowHeight
