@@ -198,6 +198,22 @@ FocusScope {
                     onHandleMenuItem: function (itemId) {
                         root.contextMenuModel.handleMenuItem(itemId)
                     }
+
+                    NavigationFocusBorder {
+                        navigationCtrl: NavigationControl {
+                            name: "MenuButton"
+                            panel: navCtrl.panel
+                            row: navCtrl.row
+                            column: navCtrl.column + 1
+                            enabled: menuButton.visible && menuButton.enabled
+                            accessible.name: qsTrc("project", "Project item menu")
+                            accessible.role: MUAccessible.Button
+
+                            onTriggered: {
+                                menuButton.clicked(null)
+                            }
+                        }
+                    }
                 }
             }
 
