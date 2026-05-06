@@ -111,7 +111,7 @@ private:
         }
 
         const auto result = mProgress->Poll(mTopIndex, mTopTotal,
-                                            XO("Looking for VST3 in: %s").Format(elidePath(path)));
+                                            XO("Searching VST3 in: %s").Format(elidePath(path)));
         if (result == BasicUI::ProgressResult::Cancelled) {
             mCancelled = true;
             return false;

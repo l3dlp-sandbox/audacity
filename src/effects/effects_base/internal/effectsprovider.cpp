@@ -25,20 +25,20 @@ void EffectsProvider::initOnce(muse::IInteractive& interactive,
                                muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario)
 {
     const auto doScanThirdPartyPlugins = [&interactive]() {
-        auto ret = interactive.questionSync(muse::trc("appshell", "Scanning audio plugins"),
+        auto ret = interactive.questionSync(muse::trc("appshell", "Validate audio plugins"),
                                             muse::trc(
                                                 "appshell",
-                                                "Audacity has found plugins that need to be scanned before use. Would you like to scan them now or skip?"),
+                                                "Audacity has found plugins that need to be validated before use. Would you like to validate them now or skip?"),
                                             { muse::IInteractive::ButtonData(
                                                   muse::IInteractive::Button::Cancel,
                                                   muse::trc("appshell", "Skip this time"),
                                                   false),
                                               muse::IInteractive::ButtonData(
-                                                  muse::IInteractive::Button::Apply, muse::trc("appshell", "Scan plugins"),
+                                                  muse::IInteractive::Button::Apply, muse::trc("appshell", "Validate"),
                                                   true) },
                                             int(muse::IInteractive::Button::NoButton),
                                             {},
-                                            muse::trc("appshell", "Audio plugin scan"));
+                                            muse::trc("appshell", "Audio plugin validation"));
         return ret.standardButton() == muse::IInteractive::Button::Apply;
     };
 
