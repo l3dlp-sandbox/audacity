@@ -30,6 +30,9 @@ ProgressDialog::~ProgressDialog()
 
 void ProgressDialog::Reinit()
 {
+    m_cancelled = false;
+    m_canceledHooked = false;
+    m_lastEventPump = {};
 }
 
 void ProgressDialog::SetDialogTitle(const TranslatableString& title)
