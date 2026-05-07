@@ -5,14 +5,19 @@
 
 #include "numberscale.h"
 
+#include "framework/global/log.h"
+#include "framework/global/types/number.h"
+
 #include <algorithm>
 #include <cmath>
 
-namespace au::shared {
+namespace au {
 namespace {
 // Sorted by decreasing value.
-std::vector<double> getTicksValues(double maxVal, double minVal, double step, AxisScale scale)
+std::vector<double> getTicksValues(double maxVal, double minVal, double step, shared::AxisScale scale)
 {
+    using namespace shared;
+
     std::vector<double> values;
     auto tick = std::floor(maxVal / step) * step;
     while (tick >= minVal) {
@@ -25,8 +30,10 @@ std::vector<double> getTicksValues(double maxVal, double minVal, double step, Ax
     return values;
 }
 
-std::vector<AxisTick> toTicks(const std::vector<double>& values, const NumberScale& numberScale, double labelExtentFraction)
+std::vector<shared::AxisTick> toTicks(const std::vector<double>& values, const shared::NumberScale& numberScale, double labelExtentFraction)
 {
+    using namespace shared;
+
     std::vector<AxisTick> ticks;
     ticks.reserve(values.size());
     std::transform(values.begin(), values.end(), std::back_inserter(ticks), [&numberScale](double value) {
@@ -38,12 +45,22 @@ std::vector<AxisTick> toTicks(const std::vector<double>& values, const NumberSca
         return a.position < b.position;
     });
 
-    auto nextTop = -labelExtentFraction / 2;
-    auto it = ticks.begin();
-    while (it != ticks.end()) {
+    // First and last ticks have priority over inner ticks: they are kept
+    // unconditionally, and inner ticks must fit between them. Bookends are
+    // edge-aligned (their labels extend a full extent into the axis rather
+    // than half-and-half around the tick), matching the view's rendering.
+    if (ticks.size() < 2) {
+        return ticks;
+    }
+
+    auto nextTop = ticks.front().position + labelExtentFraction;
+    const auto lastTop = ticks.back().position - labelExtentFraction;
+
+    auto it = ticks.begin() + 1;
+    while (it != ticks.end() - 1) {
         const auto tickTop = it->position - labelExtentFraction / 2;
         const auto tickBottom = it->position + labelExtentFraction / 2;
-        if (tickTop < nextTop || tickBottom > 1.0 + labelExtentFraction / 2) {
+        if (tickTop < nextTop || tickBottom > lastTop) {
             it = ticks.erase(it);
         } else {
             nextTop = tickBottom;
@@ -54,29 +71,59 @@ std::vector<AxisTick> toTicks(const std::vector<double>& values, const NumberSca
     return ticks;
 }
 
-std::vector<AxisTick> getTicks(double min, double max, AxisScale scale, const NumberScale& numberScale,
-                               double labelExtentFraction, double step)
+std::vector<shared::AxisTick> getTicks(double min, double max, shared::AxisScale scale, const shared::NumberScale& numberScale,
+                                       double labelExtentFraction, double step)
 {
     const std::vector<double> values = getTicksValues(max, min, step, scale);
     return toTicks(values, numberScale, labelExtentFraction);
 }
 }
 
-AxisTicks axisTicks(double min, double max, AxisScale scale, double labelExtent, double axisLength)
+shared::AxisTicks shared::axisTicks(double min, double max, AxisScale scale, double labelExtent, double axisLength,
+                                    std::optional<double> majorStep)
 {
-    const auto range = max - min;
-    if (range <= 0 || axisLength <= 0) {
+    if (majorStep.has_value() && *majorStep <= 0) {
+        LOGE() << "Invalid major step: " << *majorStep;
         return {};
     }
 
-    const auto safeMin = scale == AxisScale::Logarithmic ? std::max(min, 1.) : min;
+    if (axisLength <= 0) {
+        LOGE() << "Invalid axis length: " << axisLength;
+        return {};
+    }
+
+    const auto range = max - min;
+    if (range <= 0) {
+        LOGE() << "Invalid range: " << range;
+        return {};
+    }
+
+    const auto safeMin = scale == AxisScale::Logarithmic ? std::max(min, 1e-6) : min;
     const auto numberScale = NumberScale{ scale, safeMin, max };
 
     const auto extentFraction = labelExtent / axisLength;
-    const auto majorStep = std::pow(10., std::floor(std::log10(range)));
-    const std::vector<AxisTick> majorTicks = getTicks(safeMin, max, scale, numberScale, extentFraction, majorStep);
+    if (!majorStep.has_value()) {
+        majorStep = std::pow(10, std::floor(std::log10(range)));
+        if (muse::is_equal(*majorStep, range)) {
+            majorStep = range / 10;
+        }
+        // Too sparse major ticks don't look good.
+        if (range / *majorStep < kMinMajorTicks) {
+            *majorStep /= 2;
+        }
+    }
 
-    const auto minorStep = majorStep / 10;
+    // Major ticks: ensure min and max are bookends, on top of the on-grid values.
+    auto majorValues = getTicksValues(max, safeMin, *majorStep, scale);
+    if (majorValues.empty() || majorValues.front() < max) {
+        majorValues.insert(majorValues.begin(), max);
+    }
+    if (majorValues.empty() || majorValues.back() > safeMin) {
+        majorValues.push_back(safeMin);
+    }
+    const std::vector<AxisTick> majorTicks = toTicks(majorValues, numberScale, extentFraction);
+
+    const auto minorStep = *majorStep / 10;
     std::vector<AxisTick> minorTicks = getTicks(safeMin, max, scale, numberScale, extentFraction, minorStep);
 
     // Remove minor ticks that overlap with major ticks.

@@ -6,7 +6,12 @@
 #include "axisscale.h"
 #include "axistypes.h"
 
+#include <optional>
+
 namespace au::shared {
+/** Minimum number of major ticks returned by `axisTicks()`. */
+static constexpr auto kMinMajorTicks = 4;
+
 /**
  * @brief Picks "good" round-number major and minor ticks across [min, max]
  *        under the given scale, dropping any that would visually overlap.
@@ -19,9 +24,12 @@ namespace au::shared {
  *                    the same unit as @p axisLength (e.g. pixels).
  * @param axisLength  Total length of the axis in the same unit as
  *                    @p labelExtent.
+ * @param majorStep   Optional step between major ticks. If not provided, a base-10
+ *                    step is automatically computed based on the range.
  *
- * @return Major and minor ticks, each carrying a fractional @c position in
- *         [0, 1] where 0 corresponds to @p min and 1 to @p max.
+ * @return Major and minor ticks to display on the axis, with values and positions.
+ * Major steps contain at least `kMinMajorTicks` ticks, provided that the ratio `labelExtent / axisLength` is small enough to fit them without overlap.
  */
-AxisTicks axisTicks(double min, double max, AxisScale scale, double labelExtent, double axisLength);
+AxisTicks axisTicks(double min, double max, AxisScale scale, double labelExtent, double axisLength,
+                    std::optional<double> majorStep = std::nullopt);
 }

@@ -18,3 +18,7 @@ set(MODULE_SRC
 )
 
 setup_module()
+
+if (AU_BUILD_SHARED_TESTS)
+    add_subdirectory(tests)
+endif()
