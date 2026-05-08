@@ -58,6 +58,7 @@ signals:
     void desiredRowCountChanged();
 
 private:
+    void doClear();
     void setState(State state);
 
     void loadItemsIfNecessary();

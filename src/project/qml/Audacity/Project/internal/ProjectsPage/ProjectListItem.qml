@@ -20,9 +20,15 @@ ListItemBlank {
 
     function scrollColumnIntoView(remainingColumnIndex) {
         var x = 0
+
+        if (remainingColumnIndex + 1 >= root.columns.length) {
+            return
+        }
+
         for (var i = 0; i < remainingColumnIndex; i++) {
             x += root.columns[i + 1].width + root.columnSpacing
         }
+
         var colWidth = root.columns[remainingColumnIndex + 1].width
         root.columnScrollRequested(x, colWidth)
     }

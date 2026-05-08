@@ -32,11 +32,17 @@ void CloudProjectsModel::load()
 
 void CloudProjectsModel::reload()
 {
-    clear();
+    doClear();
     setState(State::Loading);
 }
 
 void CloudProjectsModel::clear()
+{
+    doClear();
+    setState(State::Fine);
+}
+
+void CloudProjectsModel::doClear()
 {
     audioComService()->clearProjectListCache();
     m_isWaitingForPromise = false;

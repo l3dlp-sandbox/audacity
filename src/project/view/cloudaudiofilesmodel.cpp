@@ -47,6 +47,12 @@ void CloudAudioFilesModel::reload()
 
 void CloudAudioFilesModel::clear()
 {
+    doClear();
+    setState(State::Fine);
+}
+
+void CloudAudioFilesModel::doClear()
+{
     audioComService()->clearAudioListCache();
     m_isWaitingForPromise = false;
     ++m_reloadGeneration;
