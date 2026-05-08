@@ -64,7 +64,6 @@ ProjectsView {
     QtObject {
         id: prv
         property bool updateDesiredRowCountScheduled: false
-        property string placeholderFile: ":/resources/ProjectPlaceholder.svg"
 
         readonly property var activeView: root.item
 
@@ -140,331 +139,33 @@ ProjectsView {
             return emptyComp
         }
 
-        return root.viewType === ProjectsPageModel.List ? listComp : gridComp
+        return projectListComp
     }
 
     Component {
-        id: cloudIndicatorComp
+        id: projectListComp
 
-        CloudProjectIndicatorButton {
-            mouseArea.enabled: false
-
-            isProgress: false
-            isDownloadedAndUpToDate: true
-        }
-    }
-
-    Component {
-        id: gridComp
-
-        ProjectsGridView {
-            id: gridView
-
+        DefaultProjectListView {
             anchors.fill: parent
 
             model: cloudProjectsModel
-            searchText: root.searchText
-
-            backgroundColor: root.backgroundColor
-            sideMargin: root.sideMargin
-            placeholder: prv.placeholderFile
-
-            indicatorButton: cloudIndicatorComp
-
-            navigation.section: root.navigationSection
-            navigation.order: root.navigationOrder
-            navigation.name: "CloudProjectsGrid"
-            navigation.accessible.name: qsTrc("project", "Cloud projects grid")
-
-            onOpenCloudProjectRequested: function (cloudItemId, projectPath, displayName) {
-                root.openCloudProjectRequested(cloudItemId, projectPath, displayName)
-            }
-        }
-    }
-
-    Component {
-        id: listComp
-
-        ProjectsListView {
-            id: list
-
-            readonly property int nameColumnWidth: 200
-            readonly property int thumbnailColumnWidth: 200
-            readonly property int iconColumnWidth: 48
-            readonly property int modifiedColumnWidth: 100
-            readonly property int sizeColumnWidth: 75
-            readonly property int btnColumnWidth: 44
-
-            anchors.fill: parent
-
-            model: cloudProjectsModel
+            viewType: root.viewType
             searchText: root.searchText
 
             backgroundColor: root.backgroundColor
             sideMargin: root.sideMargin
 
-            navigation.section: root.navigationSection
-            navigation.order: root.navigationOrder
-            navigation.name: "CloudProjectsList"
-            navigation.accessible.name: qsTrc("project", "Cloud projects list")
+            cloudIndicatorAlwaysVisible: true
 
-            onOpenCloudProjectRequested: function (cloudItemId, projectPath, displayName) {
-                root.openCloudProjectRequested(cloudItemId, projectPath, displayName)
+            navigationSection: root.navigationSection
+            navigationOrder: root.navigationOrder
+            navigationName: "CloudProjects"
+            gridAccessibleName: qsTrc("project", "Cloud projects grid")
+            listAccessibleName: qsTrc("project", "Cloud projects list")
+
+            onOpenCloudProjectRequested: function (projectId, projectPath, displayName) {
+                root.openCloudProjectRequested(projectId, projectPath, displayName)
             }
-
-            columns: [
-                ProjectsListView.ColumnItem {
-                    id: nameColumn
-
-                    header: qsTrc("project", "Name")
-
-                    width: nameColumnWidth
-
-                    delegate: StyledTextLabel {
-                        id: nameLabel
-
-                        text: item.name ?? ""
-                        font: ui.theme.largeBodyFont
-                        horizontalAlignment: Text.AlignLeft
-
-                        NavigationFocusBorder {
-                            navigationCtrl: NavigationControl {
-                                name: "NameLabel"
-                                panel: navigationPanel
-                                row: navigationRow
-                                column: navigationColumnStart
-                                enabled: nameLabel.visible && nameLabel.enabled && !nameLabel.isEmpty
-                                accessible.name: nameColumn.header + ": " + nameLabel.text
-                                accessible.role: MUAccessible.StaticText
-
-                                onActiveChanged: function (active) {
-                                    if (active) {
-                                        listItem.scrollIntoView()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                ProjectsListView.ColumnItem {
-                    id: thumbnailColumn
-
-                    header: ""
-
-                    width: thumbnailColumnWidth
-                    fillWidth: true
-
-                    delegate: Row {
-                        spacing: 0
-
-                        ProjectThumbnail {
-                            id: thumbnail
-
-                            height: 48
-                            width: 90
-
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            path: item.thumbnailUrl ?? ""
-                            placeholder: prv.placeholderFile
-
-                            backgroundColor: ui.theme.backgroundSecondaryColor
-                            lineColor: Qt.alpha(ui.theme.fontPrimaryColor, 0.8)
-                            borderColor: ui.theme.strokeColor
-                        }
-
-                        Item {
-                            width: parent.width - thumbnail.width
-                            height: parent.height
-                        }
-                    }
-                },
-                ProjectsListView.ColumnItem {
-                    id: cloudIndicatorColumn
-
-                    header: ""
-
-                    width: iconColumnWidth
-
-                    delegate: Item {
-                        width: parent.width
-                        height: parent.height
-
-                        CloudProjectIndicatorButton {
-                            anchors.centerIn: parent
-
-                            mouseArea.enabled: false
-                            isProgress: false
-                            isDownloadedAndUpToDate: true
-
-                            NavigationFocusBorder {
-                                navigationCtrl: NavigationControl {
-                                    name: "CloudIndicator"
-                                    panel: navigationPanel
-                                    row: navigationRow
-                                    column: navigationColumnStart
-                                    enabled: true
-                                    accessible.name: qsTrc("project", "Cloud project indicator")
-                                    accessible.role: MUAccessible.Information
-
-                                    onActiveChanged: function (active) {
-                                        if (active) {
-                                            listItem.scrollIntoView()
-                                            listItem.scrollColumnIntoView(remainingColumnIndex)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                ProjectsListView.ColumnItem {
-                    id: modifiedColumn
-
-                    header: qsTrc("project", "Modified")
-
-                    width: modifiedColumnWidth
-
-                    delegate: StyledTextLabel {
-                        id: modifiedLabel
-                        text: item.timeSinceModified ?? ""
-
-                        font.capitalization: Font.AllUppercase
-                        horizontalAlignment: Text.AlignLeft
-
-                        NavigationFocusBorder {
-                            navigationCtrl: NavigationControl {
-                                name: "ModifiedLabel"
-                                panel: navigationPanel
-                                row: navigationRow
-                                column: navigationColumnStart
-                                enabled: modifiedLabel.visible && modifiedLabel.enabled && !modifiedLabel.isEmpty
-                                accessible.name: modifiedColumn.header + ": " + modifiedLabel.text
-                                accessible.role: MUAccessible.StaticText
-
-                                onActiveChanged: function (active) {
-                                    if (active) {
-                                        listItem.scrollIntoView()
-                                        listItem.scrollColumnIntoView(remainingColumnIndex)
-                                    }
-                                }
-                            }
-
-                            anchors.margins: -radius
-                            radius: 2 + border.width
-                        }
-                    }
-                },
-                ProjectsListView.ColumnItem {
-                    id: sizeColumn
-
-                    header: qsTrc("global", "Size", "file size")
-
-                    width: sizeColumnWidth
-
-                    delegate: StyledTextLabel {
-                        id: sizeLabel
-                        text: Boolean(item.fileSize) ? item.fileSize : "-"
-
-                        font: ui.theme.largeBodyFont
-                        horizontalAlignment: Text.AlignLeft
-
-                        NavigationFocusBorder {
-                            navigationCtrl: NavigationControl {
-                                name: "SizeLabel"
-                                panel: navigationPanel
-                                row: navigationRow
-                                column: navigationColumnStart
-                                enabled: sizeLabel.visible && sizeLabel.enabled && !sizeLabel.isEmpty
-                                accessible.name: sizeColumn.header + ": " + (Boolean(item.fileSize) ? item.fileSize : qsTrc("global", "Unknown"))
-                                accessible.role: MUAccessible.StaticText
-
-                                onActiveChanged: function (active) {
-                                    if (active) {
-                                        listItem.scrollIntoView()
-                                        listItem.scrollColumnIntoView(remainingColumnIndex)
-                                    }
-                                }
-                            }
-
-                            anchors.margins: -radius
-                            radius: 2 + border.width
-                        }
-                    }
-                },
-                ProjectsListView.ColumnItem {
-                    id: btnColumn
-
-                    header: ""
-
-                    width: btnColumnWidth
-
-                    delegate: Item {
-                        width: parent.width
-                        height: 28
-
-                        MenuButton {
-                            id: menuButton
-
-                            visible: Boolean(item.contextMenuModel)
-
-                            width: 28
-                            height: 28
-
-                            anchors.centerIn: parent
-
-                            menuModel: item.contextMenuModel
-
-                            onHandleMenuItem: function (itemId) {
-                                item.contextMenuModel.handleMenuItem(itemId)
-                            }
-
-                            Component.onCompleted: {
-                                if (menuModel != null) {
-                                    menuModel.load()
-                                }
-                            }
-
-                            onMenuModelChanged: {
-                                if (menuModel != null) {
-                                    menuModel.load()
-                                }
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                color: "transparent"
-                                radius: 3
-                                border.width: 1
-                                border.color: ui.theme.strokeColor
-                            }
-
-                            NavigationFocusBorder {
-                                navigationCtrl: NavigationControl {
-                                    name: "MenuButton"
-                                    panel: navigationPanel
-                                    row: navigationRow
-                                    column: navigationColumnStart
-                                    enabled: menuButton.visible && menuButton.enabled
-                                    accessible.name: qsTrc("project", "Project item menu")
-                                    accessible.role: MUAccessible.Button
-
-                                    onActiveChanged: function (active) {
-                                        if (active) {
-                                            listItem.scrollIntoView()
-                                            listItem.scrollColumnIntoView(remainingColumnIndex)
-                                        }
-                                    }
-
-                                    onTriggered: {
-                                        menuButton.clicked(null)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            ]
         }
     }
 
