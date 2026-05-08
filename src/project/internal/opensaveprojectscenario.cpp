@@ -641,9 +641,6 @@ Ret OpenSaveProjectScenario::showCloudOpenError(const Ret& error, const muse::io
         }
         break;
     }
-    case Err::Cancelled:
-    case Err::OpenProjectCancelled:
-        break;
     case Err::CloudProjectNotFullySynced: {
         const int visitAudioComBtn = static_cast<int>(IInteractive::Button::CustomButton);
         const int loadLatestBtn = static_cast<int>(IInteractive::Button::CustomButton) + 1;
@@ -679,6 +676,9 @@ Ret OpenSaveProjectScenario::showCloudOpenError(const Ret& error, const muse::io
         }
         break;
     }
+    case Err::OpenProjectCancelled:
+    case Err::Cancelled:
+        break;
     default:
         interactive()->infoSync(trc("project", OPEN_DEFAULT_ERROR_TITLE), trc("project", OPEN_DEFAULT_ERROR_MESSAGE));
         break;
@@ -769,7 +769,6 @@ Ret OpenSaveProjectScenario::showCloudSaveError(const Ret& ret) const
     case Err::ServerError:
     case Err::ClientFailure:
     case Err::UploadFailed:
-    case Err::SyncCancelled:
     {
         if (cloudConfiguration()->shouldWarnOnSyncError()) {
             const IInteractive::ButtonData okBtn = interactive()->buttonData(IInteractive::Button::Ok);
@@ -783,6 +782,9 @@ Ret OpenSaveProjectScenario::showCloudSaveError(const Ret& ret) const
         }
         break;
     }
+    case Err::SyncCancelled:
+    case Err::Cancelled:
+        break;
     default:
         interactive()->infoSync(DEFAULT_CLOUD_ERROR_TITLE, DEFAULT_CLOUD_ERROR_TEXT);
         break;
@@ -803,6 +805,8 @@ Ret OpenSaveProjectScenario::showCloudAudioOpenError(const Ret& error) const
         break;
     case Err::DownloadAudioResultCancelled:
     case Err::DownloadAudioResultBlocked:
+        break;
+    case Err::Cancelled:
         break;
     default:
         interactive()->infoSync(trc("cloud", "Open audio from cloud"), error.toString());
