@@ -445,17 +445,14 @@ bool ProjectActionsController::closeOpenedProject(const bool quitApp)
     }
 
     m_isProjectClosing = true;
-    DEFER {
-        m_isProjectClosing = false;
-    };
 
     const IAudacityProjectPtr project = globalContext()->currentProject();
     if (!project) {
+        m_isProjectClosing = false;
         return true;
     }
 
     bool result = true;
-
     if (project->hasUnsavedChanges()) {
         IInteractive::Button btn = askAboutSavingProject(project);
 
@@ -468,27 +465,62 @@ bool ProjectActionsController::closeOpenedProject(const bool quitApp)
         }
     }
 
-    if (result) {
-        interactive()->closeAllDialogsSync();
-
-        project->close();
-
-        globalContext()->setCurrentProject(nullptr);
-
-        if (quitApp) {
-            //! NOTE: we need to call `quit` in the next event loop due to controlling the lifecycle of this method
-            muse::async::Async::call(this, [this](){
-                dispatcher()->dispatch("quit", actions::ActionData::make_arg1<bool>(false));
-            });
-        } else {
-            Ret ret = openPageIfNeed(HOME_PAGE_URI);
-            if (!ret) {
-                LOGE() << ret.toString();
-            }
-        }
+    if (result && project->isCloudProject() && askAboutStoppingCloudSync(quitApp)) {
+        return false;
     }
 
+    if (result) {
+        finalizeProjectClose(quitApp);
+    }
+
+    m_isProjectClosing = false;
     return result;
+}
+
+bool ProjectActionsController::askAboutStoppingCloudSync(bool quitApp)
+{
+    static const Uri CLOUD_PROJECT_SYNC_URI("audacity://project/cloudprojectsyncing");
+
+    if (!audioComService()->syncingInProgressChanged().val) {
+        return false;
+    }
+
+    interactive()->open(CLOUD_PROJECT_SYNC_URI).onResolve(this, [this, quitApp](const Val& val) {
+        std::string status = val.toString();
+
+        if (status == "stopped" || status == "synced") {
+            finalizeProjectClose(quitApp);
+        }
+
+        m_isProjectClosing = false;
+    });
+
+    return true;
+}
+
+void ProjectActionsController::finalizeProjectClose(bool quitApp)
+{
+    auto project = globalContext()->currentProject();
+    if (!project) {
+        return;
+    }
+
+    interactive()->closeAllDialogsSync();
+
+    project->close();
+
+    globalContext()->setCurrentProject(nullptr);
+
+    if (quitApp) {
+        muse::async::Async::call(this, [this](){
+            dispatcher()->dispatch("quit", actions::ActionData::make_arg1<bool>(false));
+        });
+    } else {
+        Ret ret = openPageIfNeed(HOME_PAGE_URI);
+        if (!ret) {
+            LOGE() << ret.toString();
+        }
+    }
 }
 
 bool ProjectActionsController::saveProject(const muse::io::path_t& path)
@@ -570,9 +602,16 @@ bool ProjectActionsController::saveProjectToCloud(const CloudProjectInfo& cloudI
         progress,
         muse::ui::IconCode::Code::CLOUD,
         dismissible,
-        {},
+    {
+        { trc("project", "Dismiss"), au::toast::ToastActionCode::None },
+        { trc("global", "Stop"), au::toast::ToastActionCode::Custom }
+    },
         showProgressInfo
-        );
+        ).onResolve(this, [progress = progress](const au::toast::ToastActionCode& actionCode) {
+        if (actionCode == au::toast::ToastActionCode::Custom) {
+            progress->cancel();
+        }
+    });
 
     return true;
 }
@@ -925,9 +964,16 @@ Ret ProjectActionsController::openCloudProject(const io::path_t& localPath, cons
             syncProgress,
             muse::ui::IconCode::Code::CLOUD,
             dismissible,
-            {},
+        {
+            { trc("project", "Dismiss"), au::toast::ToastActionCode::None },
+            { trc("global", "Stop"), au::toast::ToastActionCode::Custom }
+        },
             showProgressInfo
-            );
+            ).onResolve(this, [progress = syncProgress](const au::toast::ToastActionCode& actionCode) {
+            if (actionCode == au::toast::ToastActionCode::Custom) {
+                progress->cancel();
+            }
+        });
     });
 
     interactive()->showProgress(trc("project", "Syncing project from cloud…"), *progress);
