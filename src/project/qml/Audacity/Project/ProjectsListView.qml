@@ -125,16 +125,6 @@ Item {
 
                 spacing: view.columnSpacing
 
-                StyledTextLabel {
-                    id: projectName
-
-                    Layout.preferredWidth: 100
-
-                    text: qsTrc("project", "New project")
-                    font: ui.theme.largeBodyFont
-                    horizontalAlignment: Text.AlignLeft
-                }
-
                 Rectangle {
                     Layout.preferredWidth: 90
                     Layout.preferredHeight: 48
@@ -149,6 +139,16 @@ Item {
                         font.pixelSize: 16
                         color: ui.theme.extra["black_color"]
                     }
+                }
+
+                StyledTextLabel {
+                    id: projectName
+
+                    Layout.preferredWidth: 100
+
+                    text: qsTrc("project", "New project")
+                    font: ui.theme.largeBodyFont
+                    horizontalAlignment: Text.AlignLeft
                 }
 
                 Item {
@@ -198,8 +198,6 @@ Item {
                     }
 
                     Item {
-                        id: headerInfoFields
-
                         Layout.preferredHeight: parent.height
                         Layout.preferredWidth: root._remainingColumnsMinWidth
                         Layout.maximumWidth: root._remainingColumnsMinWidth
