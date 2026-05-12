@@ -215,6 +215,11 @@ IEffectLoaderPtr EffectsProvider::loader(const EffectId& effectId) const
     return effectLoadersRegister()->loader(it->family);
 }
 
+bool EffectsProvider::hasEffectFamily(EffectFamily family) const
+{
+    return effectLoadersRegister()->loader(family) != nullptr;
+}
+
 bool EffectsProvider::loadEffect(const EffectId& effectId) const
 {
     const IEffectLoaderPtr loader = this->loader(effectId);

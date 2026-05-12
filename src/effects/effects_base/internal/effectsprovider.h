@@ -51,6 +51,8 @@ public:
 
     bool paramsAreInputAgnostic(const EffectId& effectId) const override;
 
+    bool hasEffectFamily(EffectFamily family) const override;
+
     void rescanPlugins(const muse::modularity::ContextPtr& ctx, muse::IInteractive& interactive,
                        muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario,
                        const EffectFilter& exclude = nullptr) override;

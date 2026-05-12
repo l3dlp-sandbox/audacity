@@ -8,6 +8,7 @@
 
 #include "effects/effects_base/effectstypes.h"
 #include "effects/effects_base/ieffectsconfiguration.h"
+#include "effects/effects_base/ieffectsprovider.h"
 #include "async/asyncable.h"
 #include "modularity/ioc.h"
 
@@ -28,6 +29,7 @@ class PluginPreferencesModel : public QObject, public muse::async::Asyncable
     Q_PROPERTY(bool vst3Supported READ vst3Supported CONSTANT)
 
     muse::GlobalInject<effects::IEffectsConfiguration> effectsConfiguration;
+    muse::GlobalInject<effects::IEffectsProvider> effectsProvider;
 
 public:
     explicit PluginPreferencesModel(QObject* parent = nullptr);

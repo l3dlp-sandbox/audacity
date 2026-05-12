@@ -138,10 +138,11 @@ bool PluginPreferencesModel::pathExists(const QString& path) const
 
 bool PluginPreferencesModel::lv2Supported() const
 {
-    // Mirrors AU_MODULE_EFFECTS_LV2 build gating in CMakeLists.txt:
-    // LV2 is currently only built on Linux.
+    // `EffectFamily::LV2` is only declared in the platform-gated enum on
+    // Linux (see `effects::EffectFamilies::EffectFamily`). On other
+    // platforms there is nothing to ask the provider about.
 #ifdef Q_OS_LINUX
-    return true;
+    return effectsProvider()->hasEffectFamily(effects::EffectFamily::LV2);
 #else
     return false;
 #endif
@@ -149,7 +150,6 @@ bool PluginPreferencesModel::lv2Supported() const
 
 bool PluginPreferencesModel::vst3Supported() const
 {
-    // VST3 is built on all supported platforms by default.
-    return true;
+    return effectsProvider()->hasEffectFamily(effects::EffectFamily::VST3);
 }
 }

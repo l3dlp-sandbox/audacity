@@ -33,6 +33,8 @@ public:
     virtual std::string effectPath(const std::string& effectId) const = 0;
     virtual bool paramsAreInputAgnostic(const EffectId& effectId) const = 0;
 
+    virtual bool hasEffectFamily(EffectFamily family) const = 0;
+
     virtual muse::async::Notification effectMetaListChanged() const = 0;
 
     virtual bool loadEffect(const EffectId& effectId) const = 0;
