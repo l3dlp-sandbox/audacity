@@ -15,6 +15,7 @@
 #include "au3wrap/internal/wxtypes_convert.h"
 
 #include "framework/global/io/dir.h"
+#include "framework/global/log.h"
 #include "framework/global/progress.h"
 
 namespace au::effects {
@@ -67,8 +68,9 @@ Au3AudioPluginScanner::Au3AudioPluginScanner(PluginProvider& provider)
 {
 }
 
-void Au3AudioPluginScanner::init()
+void Au3AudioPluginScanner::init(muse::IApplication::RunMode mode)
 {
+    m_runMode = mode;
     m_pluginProvider.Initialize();
     doInit();
 }
@@ -82,9 +84,6 @@ muse::io::paths_t Au3AudioPluginScanner::scanPlugins(muse::Progress* progress) c
 {
     // Push user-configured custom paths into PluginManager so that providers
     // (e.g. VST3) which read them via ReadCustomPaths(*this) pick them up.
-    // This must NOT run during plugin-registration subprocesses
-    // (`--register-audio-plugin`), which never invoke scanPlugins() and don't
-    // load effects_base / IEffectsConfiguration / PluginManager::Initialize().
     syncCustomPathsToProvider();
 
     muse::io::paths_t result;
@@ -112,6 +111,15 @@ PluginPaths Au3AudioPluginScanner::pluginPaths(BasicUI::ProgressDialog*) const
 
 void Au3AudioPluginScanner::syncCustomPathsToProvider() const
 {
+    // Must NOT run during plugin-registration subprocesses
+    // (`--register-audio-plugin`), which never call this code path and
+    // don't load IEffectsConfiguration / PluginManager::Initialize().
+    // Catching the case here guards against future callers wiring up an
+    // init/scan sequence without setting the run mode first.
+    IF_ASSERT_FAILED(m_runMode.has_value() && *m_runMode != muse::IApplication::RunMode::AudioPluginRegistration) {
+        return;
+    }
+
     const muse::io::paths_t userPaths = customPaths();
     ::PluginPaths customPathsForProvider;
     customPathsForProvider.reserve(userPaths.size());

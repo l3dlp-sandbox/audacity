@@ -65,11 +65,11 @@ void au::effects::AudioUnitEffectsModule::registerUiTypes()
     REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(AudioUnitViewModelFactory);
 }
 
-void au::effects::AudioUnitEffectsModule::onInit(const muse::IApplication::RunMode&)
+void au::effects::AudioUnitEffectsModule::onInit(const muse::IApplication::RunMode& mode)
 {
     m_metaReader->init();
     m_effectLoader->init();
-    m_pluginsScanner->init();
+    m_pluginsScanner->init(mode);
 }
 
 void au::effects::AudioUnitEffectsModule::onDeinit()

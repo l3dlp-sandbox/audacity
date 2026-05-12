@@ -67,10 +67,10 @@ void BuiltinEffectsModule::registerUiTypes()
     qmlRegisterType<BuiltinEffectViewLoader>("Audacity.BuiltinEffects", 1, 0, "BuiltinEffectViewLoader");
 }
 
-void BuiltinEffectsModule::onInit(const muse::IApplication::RunMode&)
+void BuiltinEffectsModule::onInit(const muse::IApplication::RunMode& mode)
 {
     m_effectLoader->init();
-    m_pluginsScanner->init();
+    m_pluginsScanner->init(mode);
     m_metaReader->init();
 }
 
