@@ -45,29 +45,6 @@ std::vector<shared::AxisTick> toTicks(const std::vector<double>& values, const s
         return a.position < b.position;
     });
 
-    // First and last ticks have priority over inner ticks: they are kept
-    // unconditionally, and inner ticks must fit between them. Bookends are
-    // edge-aligned (their labels extend a full extent into the axis rather
-    // than half-and-half around the tick), matching the view's rendering.
-    if (ticks.size() < 2) {
-        return ticks;
-    }
-
-    auto nextTop = ticks.front().position + labelExtentFraction;
-    const auto lastTop = ticks.back().position - labelExtentFraction;
-
-    auto it = ticks.begin() + 1;
-    while (it != ticks.end() - 1) {
-        const auto tickTop = it->position - labelExtentFraction / 2;
-        const auto tickBottom = it->position + labelExtentFraction / 2;
-        if (tickTop < nextTop || tickBottom > lastTop) {
-            it = ticks.erase(it);
-        } else {
-            nextTop = tickBottom;
-            ++it;
-        }
-    }
-
     return ticks;
 }
 
@@ -79,14 +56,8 @@ std::vector<shared::AxisTick> getTicks(double min, double max, shared::AxisScale
 }
 }
 
-shared::AxisTicks shared::axisTicks(double min, double max, AxisScale scale, double labelExtent, double axisLength,
-                                    std::optional<double> majorStep)
+shared::AxisTicks shared::axisTicks(double min, double max, AxisScale scale, double labelExtent, double axisLength)
 {
-    if (majorStep.has_value() && *majorStep <= 0) {
-        LOGE() << "Invalid major step: " << *majorStep;
-        return {};
-    }
-
     if (axisLength <= 0) {
         LOGE() << "Invalid axis length: " << axisLength;
         return {};
@@ -102,35 +73,44 @@ shared::AxisTicks shared::axisTicks(double min, double max, AxisScale scale, dou
     const auto numberScale = NumberScale{ scale, safeMin, max };
 
     const auto extentFraction = labelExtent / axisLength;
-    if (!majorStep.has_value()) {
-        majorStep = std::pow(10, std::floor(std::log10(range)));
-        if (muse::is_equal(*majorStep, range)) {
-            majorStep = range / 10;
-        }
-        // Too sparse major ticks don't look good.
-        if (range / *majorStep < kMinMajorTicks) {
-            *majorStep /= 2;
-        }
+    auto minorPerMajor = 10;
+
+    auto majorStep = std::pow(10, std::floor(std::log10(range)));
+    if (muse::is_equal(majorStep, range)) {
+        majorStep = range / 10;
+    }
+    // Too sparse major ticks don't look good. Double the rate of major ticks,
+    // but preserve 10 steps per decade.
+    if (range / majorStep < kMinMajorTicks) {
+        majorStep /= 2;
+        minorPerMajor = 5;
     }
 
     // Major ticks: ensure min and max are bookends, on top of the on-grid values.
-    auto majorValues = getTicksValues(max, safeMin, *majorStep, scale);
-    if (majorValues.empty() || majorValues.front() < max) {
+    auto majorValues = getTicksValues(max, safeMin, majorStep, scale);
+    if (majorValues.empty() || !muse::is_equal(majorValues.front(), max)) {
         majorValues.insert(majorValues.begin(), max);
     }
-    if (majorValues.empty() || majorValues.back() > safeMin) {
+    if (!muse::is_equal(majorValues.back(), safeMin)) {
         majorValues.push_back(safeMin);
     }
-    const std::vector<AxisTick> majorTicks = toTicks(majorValues, numberScale, extentFraction);
+    std::vector<AxisTick> majorTicks = toTicks(majorValues, numberScale, extentFraction);
+    // By making sure that min and max are "bookends", we might have created major ticks that are too close to the edge. Remove them if they overlap with the edge tick.
+    // And because end ticks are not center-aligned, add half of the extentFraction.
+    if (majorTicks.size() > 1u && std::abs(majorTicks.front().position - (majorTicks.begin() + 1)->position) < extentFraction * 1.5) {
+        majorTicks.erase(majorTicks.begin() + 1);
+    }
+    if (majorTicks.size() > 1u && std::abs(majorTicks.back().position - (majorTicks.end() - 2)->position) < extentFraction * 1.5) {
+        majorTicks.erase(majorTicks.end() - 2);
+    }
 
-    const auto minorStep = *majorStep / 10;
+    const auto minorStep = majorStep / minorPerMajor;
     std::vector<AxisTick> minorTicks = getTicks(safeMin, max, scale, numberScale, extentFraction, minorStep);
 
     // Remove minor ticks that overlap with major ticks.
-    minorTicks.erase(std::remove_if(minorTicks.begin(), minorTicks.end(),
-                                    [&majorTicks, extentFraction](const AxisTick& minorTick) {
-        return std::any_of(majorTicks.begin(), majorTicks.end(), [&minorTick, extentFraction](const AxisTick& majorTick) {
-            return std::abs(majorTick.position - minorTick.position) < extentFraction;
+    minorTicks.erase(std::remove_if(minorTicks.begin(), minorTicks.end(), [&majorTicks](const AxisTick& minorTick) {
+        return std::any_of(majorTicks.begin(), majorTicks.end(), [&minorTick](const AxisTick& majorTick) {
+            return muse::is_equal(minorTick.val, majorTick.val);
         });
     }),
                      minorTicks.end());

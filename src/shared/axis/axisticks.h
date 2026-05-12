@@ -24,12 +24,9 @@ static constexpr auto kMinMajorTicks = 4;
  *                    the same unit as @p axisLength (e.g. pixels).
  * @param axisLength  Total length of the axis in the same unit as
  *                    @p labelExtent.
- * @param majorStep   Optional step between major ticks. If not provided, a base-10
- *                    step is automatically computed based on the range.
  *
  * @return Major and minor ticks to display on the axis, with values and positions.
  * Major steps contain at least `kMinMajorTicks` ticks, provided that the ratio `labelExtent / axisLength` is small enough to fit them without overlap.
  */
-AxisTicks axisTicks(double min, double max, AxisScale scale, double labelExtent, double axisLength,
-                    std::optional<double> majorStep = std::nullopt);
+AxisTicks axisTicks(double min, double max, AxisScale scale, double labelExtent, double axisLength);
 }

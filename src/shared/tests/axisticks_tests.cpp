@@ -19,8 +19,7 @@ TEST(axisTicks, real_world_cases)
         constexpr auto scale = AxisScale::Linear;
         constexpr auto labelExtent = 37.0;
         constexpr auto axisLength = 770.0;
-        constexpr auto majorStep = 1000;
-        const AxisTicks ticks = axisTicks(min, max, scale, labelExtent, axisLength, majorStep);
+        const AxisTicks ticks = axisTicks(min, max, scale, labelExtent, axisLength);
 
         EXPECT_GE(ticks.major.size(), kMinMajorTicks);
 
@@ -28,10 +27,11 @@ TEST(axisTicks, real_world_cases)
         EXPECT_EQ(ticks.major.front().val, min);
         EXPECT_EQ(ticks.major.back().val, max);
 
-        // Pick some multiple of the major step in the middle as a sanity check.
-        EXPECT_TRUE(std::any_of(ticks.major.begin(), ticks.major.end(), [](const AxisTick& tick) {
-            return tick.val == 12000.0;
-        }));
+        for (const auto freq : { 5000.0, 10000.0, 15000.0, 20000.0 }) {
+            EXPECT_TRUE(std::any_of(ticks.major.begin(), ticks.major.end(), [freq](const AxisTick& tick) {
+                return muse::is_equal(tick.val, freq);
+            })) << "Expected major tick at " << freq;
+        }
     }
 
     {
@@ -40,8 +40,7 @@ TEST(axisTicks, real_world_cases)
         constexpr auto scale = AxisScale::Mel;
         constexpr auto labelExtent = 14.0;
         constexpr auto axisLength = 401.0;
-        constexpr auto majorStep = std::nullopt;
-        const AxisTicks ticks = axisTicks(min, max, scale, labelExtent, axisLength, majorStep);
+        const AxisTicks ticks = axisTicks(min, max, scale, labelExtent, axisLength);
 
         EXPECT_GE(ticks.major.size(), kMinMajorTicks);
 
@@ -60,8 +59,7 @@ TEST(axisTicks, real_world_cases)
         constexpr auto scale = AxisScale::Linear;
         constexpr auto labelExtent = 14.0;
         constexpr auto axisLength = 400.0;
-        constexpr auto majorStep = std::nullopt;
-        const AxisTicks ticks = axisTicks(min, max, scale, labelExtent, axisLength, majorStep);
+        const AxisTicks ticks = axisTicks(min, max, scale, labelExtent, axisLength);
 
         EXPECT_GE(ticks.major.size(), kMinMajorTicks);
 
@@ -80,17 +78,4 @@ TEST(axisTicks, normalized_scales_are_supported) {
     constexpr auto axisLength = 100.0;
     const AxisTicks ticks = axisTicks(min, max, scale, labelExtent, axisLength);
     EXPECT_GE(ticks.major.size(), kMinMajorTicks);
-}
-
-TEST(axisTicks, sanity_checks) {
-    {
-        constexpr auto min = 0.0;
-        constexpr auto max = 1.0;
-        constexpr auto scale = AxisScale::Logarithmic;
-        constexpr auto labelExtent = 1.0;
-        constexpr auto axisLength = 100.0;
-        constexpr auto majorSteps = -1.0; // invalid major step
-        axisTicks(min, max, scale, labelExtent, axisLength, majorSteps);
-        // No expectation, just check that it doesn't crash or hangs.
-    }
 }

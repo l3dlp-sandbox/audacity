@@ -67,7 +67,14 @@ signals:
     void xTicksChanged();
 
 private:
+    struct LabelAndPos {
+        QString label;
+        double position = 0.;
+    };
+
     void doReload() override;
+    std::vector<LabelAndPos> xTicksLin() const;
+    std::vector<LabelAndPos> xTicksLog() const;
 
     FilterCurveModel* const m_curveModel;
     int m_labelWidth = 0;

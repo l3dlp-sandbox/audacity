@@ -12,6 +12,7 @@
 #include "../equalization_common/equalizationenvelopeutils.h"
 
 #include "shared/axis/axislabel.h"
+#include "shared/axis/axisscale.h"
 #include "shared/axis/axisticks.h"
 #include "types/number.h"
 
@@ -194,26 +195,83 @@ QVariantList FilterCurveEqViewModel::xTicks() const
     if (m_labelWidth <= 0 || m_axisWidth <= 0) {
         return {};
     }
-    const auto scale = linFreqScale() ? au::shared::AxisScale::Linear : au::shared::AxisScale::Logarithmic;
+    std::vector<LabelAndPos> labelAndPos = linFreqScale() ? xTicksLin() : xTicksLog();
 
-    // We don't differentiate major and minor ticks in this view. Mix both.
-    auto allTicks = au::shared::axisTicks(loFreq(), hiFreq(), scale, m_labelWidth, m_axisWidth, 1000);
-    auto ticks = allTicks.major;
-    ticks.insert(ticks.end(), allTicks.minor.begin(), allTicks.minor.end());
-    std::sort(ticks.begin(), ticks.end(), [](const au::shared::AxisTick& a, const au::shared::AxisTick& b) {
+    std::sort(labelAndPos.begin(), labelAndPos.end(), [](const LabelAndPos& a, const LabelAndPos& b) {
         return a.position < b.position;
     });
 
-    const auto labels = au::shared::labelsForTicks(ticks);
     QVariantList list;
-    list.reserve(ticks.size());
-    for (size_t i = 0; i < ticks.size(); ++i) {
+    list.reserve(labelAndPos.size());
+    for (const auto& lp : labelAndPos) {
         list.append(QVariant::fromValue(QVariantMap {
-                { "label", labels[i] },
-                { "position", ticks[i].position },
+                { "label", lp.label },
+                { "position", lp.position },
             }));
     }
 
     return list;
+}
+
+std::vector<FilterCurveEqViewModel::LabelAndPos> FilterCurveEqViewModel::xTicksLin() const
+{
+    const shared::AxisTicks ticks = shared::axisTicks(loFreq(), hiFreq(), shared::AxisScale::Linear, m_labelWidth, m_axisWidth);
+    const auto labels = shared::labelsForTicks(ticks.major);
+    std::vector<LabelAndPos> labelAndPos;
+    labelAndPos.reserve(ticks.major.size() + ticks.minor.size());
+    for (size_t i = 0; i < ticks.major.size(); ++i) {
+        labelAndPos.push_back({ labels[i], ticks.major[i].position });
+    }
+    for (const auto& tick : ticks.minor) {
+        labelAndPos.push_back({ QString(), tick.position });
+    }
+    return labelAndPos;
+}
+
+std::vector<FilterCurveEqViewModel::LabelAndPos> FilterCurveEqViewModel::xTicksLog() const
+{
+    const auto left = std::log10(loFreq());
+    const auto right = std::log10(hiFreq());
+    const auto range = right - left;
+    auto exponent = std::floor(left);
+    auto increment = std::pow(10, exponent);
+    int multiplier = std::ceil(loFreq() / increment);
+
+    std::vector<shared::AxisTick> majors;
+    std::vector<shared::AxisTick> minors;
+    auto freq = 0.;
+    while (true) {
+        freq = std::round(multiplier * std::pow(10, exponent));
+        if (freq > hiFreq()) {
+            break;
+        }
+        const auto pos = (std::log10(freq) - left) / range;
+        const auto isMajor = muse::is_equal(freq, loFreq()) || muse::is_equal(freq, hiFreq()) || multiplier == 1 || multiplier == 5;
+        (isMajor ? majors : minors).push_back({ freq, pos });
+        if (++multiplier % 10 == 0) {
+            multiplier = 1;
+            ++exponent;
+        }
+    }
+    if (majors.empty() || !muse::is_equal(majors.front().val, loFreq())) {
+        majors.insert(majors.begin(), { loFreq(), 0. });
+    }
+    if (!muse::is_equal(majors.back().val, hiFreq())) {
+        majors.insert(majors.end(), { hiFreq(), 1. });
+    }
+
+    const auto majorLabels = shared::labelsForTicks(majors);
+
+    std::vector<LabelAndPos> labelAndPos;
+    labelAndPos.reserve(majors.size() + minors.size());
+
+    for (size_t i = 0; i < majors.size(); ++i) {
+        labelAndPos.push_back({ majorLabels[i], majors[i].position });
+    }
+    for (size_t i = 0; i < minors.size(); ++i) {
+        labelAndPos.push_back({ QString(), minors[i].position });
+    }
+
+    return labelAndPos;
 }
 }

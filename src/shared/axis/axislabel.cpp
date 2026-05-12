@@ -5,7 +5,8 @@
 
 #include <algorithm>
 
-namespace au::shared {
+namespace au {
+namespace {
 QString valueToLabel(double value, int decimalDigits)
 {
     if (value >= 1000 && decimalDigits < 3) {
@@ -19,8 +20,9 @@ QString valueToLabel(double value, int decimalDigits)
         return QString::number(value, 'f', decimalDigits);
     }
 }
+}
 
-std::vector<QString> labelsForTicks(const std::vector<AxisTick>& ticks, int maxDecimalDigits)
+std::vector<QString> shared::labelsForTicks(const std::vector<AxisTick>& ticks, int maxDecimalDigits)
 {
     std::vector<QString> labels;
     labels.reserve(ticks.size());

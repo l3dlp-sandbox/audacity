@@ -10,17 +10,6 @@
 
 namespace au::shared {
 /**
- * @brief Formats a numeric value for an axis label.
- *
- * Values >= 1000 are abbreviated with a trailing 'k' and trailing zeros (and
- * a trailing decimal point) are trimmed.
- *
- * @param value         Numeric value to format.
- * @param decimalDigits Number of decimals kept before trimming.
- */
-QString valueToLabel(double value, int decimalDigits);
-
-/**
  * @brief Builds labels for the given ticks using the smallest number of
  *        decimal digits that keeps adjacent labels distinct.
  *
