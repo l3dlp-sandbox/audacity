@@ -90,11 +90,15 @@ Item {
             id: list
 
             readonly property int nameColumnWidth: 200
-            readonly property int thumbnailColumnWidth: 200
             readonly property int iconColumnWidth: 48
             readonly property int modifiedColumnWidth: 100
             readonly property int sizeColumnWidth: 75
             readonly property int btnColumnWidth: 44
+
+            readonly property int thumbnailWidth: 90
+            readonly property int thumbnailHeight: 48
+
+            readonly property int nameSpacing: 24
 
             anchors.fill: parent
 
@@ -129,48 +133,15 @@ Item {
 
                     width: nameColumnWidth
 
-                    delegate: StyledTextLabel {
-                        id: nameLabel
-
-                        text: item.name ?? ""
-                        font: ui.theme.largeBodyFont
-                        horizontalAlignment: Text.AlignLeft
-
-                        NavigationFocusBorder {
-                            navigationCtrl: NavigationControl {
-                                name: "NameLabel"
-                                panel: navigationPanel
-                                row: navigationRow
-                                column: navigationColumnStart
-                                enabled: nameLabel.visible && nameLabel.enabled && !nameLabel.isEmpty
-                                accessible.name: nameColumn.header + ": " + nameLabel.text
-                                accessible.role: MUAccessible.StaticText
-
-                                onActiveChanged: function (active) {
-                                    if (active) {
-                                        listItem.scrollIntoView()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                ProjectsListView.ColumnItem {
-                    id: thumbnailColumn
-
-                    header: ""
-
-                    width: thumbnailColumnWidth
-                    fillWidth: true
-
                     delegate: Row {
-                        spacing: 0
+                        height: parent.height
+                        width: parent.width
 
                         ProjectThumbnail {
                             id: thumbnail
 
-                            height: 48
-                            width: 90
+                            height: list.thumbnailHeight
+                            width: list.thumbnailWidth
 
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -183,7 +154,40 @@ Item {
                         }
 
                         Item {
-                            width: parent.width - thumbnail.width
+                            height: parent.height
+                            width: list.nameSpacing
+                        }
+
+                        StyledTextLabel {
+                            id: nameLabel
+
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            text: item.name ?? ""
+                            font: ui.theme.largeBodyFont
+                            verticalAlignment: Text.AlignVCenter
+
+                            NavigationFocusBorder {
+                                navigationCtrl: NavigationControl {
+                                    name: "NameLabel"
+                                    panel: navigationPanel
+                                    row: navigationRow
+                                    column: navigationColumnStart
+                                    enabled: nameLabel.visible && nameLabel.enabled && !nameLabel.isEmpty
+                                    accessible.name: nameColumn.header + ": " + nameLabel.text
+                                    accessible.role: MUAccessible.StaticText
+
+                                    onActiveChanged: function (active) {
+                                        if (active) {
+                                            listItem.scrollIntoView()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Item {
+                            width: parent.width - thumbnail.width - nameLabel.width - list.nameSpacing
                             height: parent.height
                         }
                     }

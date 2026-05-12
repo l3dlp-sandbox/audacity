@@ -57,7 +57,6 @@ ListItemBlank {
 
         spacing: root.columnSpacing
 
-        // First column — fixed width, never clipped
         Loader {
             readonly property var columnData: root.columns.length > 0 ? root.columns[0] : null
 
@@ -65,6 +64,7 @@ ListItemBlank {
 
             Layout.preferredWidth: columnData ? columnData.width : 0
             Layout.minimumWidth: columnData ? columnData.width : 0
+            Layout.fillWidth: true
 
             readonly property ProjectListItem listItem: root
             readonly property var item: root.item
@@ -75,14 +75,13 @@ ListItemBlank {
             sourceComponent: columnData ? columnData.delegate : null
         }
 
-        SeparatorLine {
-            orientation: Qt.Vertical
-        }
-
-        // Remaining columns — clipped, offset follows header scroll
         Item {
             Layout.preferredHeight: parent.height
+            Layout.preferredWidth: root.columnsMinWidth
+            Layout.maximumWidth: root.columnsMinWidth
+            Layout.minimumWidth: 0
             Layout.fillWidth: true
+
             clip: true
 
             RowLayout {
@@ -103,7 +102,6 @@ ListItemBlank {
 
                         Layout.preferredWidth: columnData.width
                         Layout.minimumWidth: columnData.width
-                        Layout.fillWidth: columnData.fillWidth
 
                         readonly property ProjectListItem listItem: root
                         readonly property var item: root.item

@@ -240,7 +240,6 @@ ProjectsView {
                     header: ""
 
                     width: thumbnailColumnWidth
-                    fillWidth: true
 
                     delegate: ProjectThumbnail {
                         height: 48

@@ -56,7 +56,6 @@ Item {
     component ColumnItem: QtObject {
         property string header
         property real width: 0
-        property bool fillWidth: false
         property Component delegate
     }
 
@@ -188,23 +187,24 @@ Item {
 
                         active: columnData !== null
 
-                        Layout.preferredWidth: columnData ? columnData.width : 0
                         Layout.preferredHeight: parent.height
+                        Layout.preferredWidth: columnData ? columnData.width : 0
+                        Layout.minimumWidth: columnData ? columnData.width : 0
+                        Layout.fillWidth: true
 
                         sourceComponent: columnData ? headerLabelComp : null
 
                         readonly property string headerText: columnData ? columnData.header : ""
                     }
 
-                    SeparatorLine {
-                        orientation: Qt.Vertical
-                        Layout.preferredHeight: 44
-                        Layout.maximumHeight: 44
-                    }
-
                     Item {
-                        Layout.fillWidth: true
+                        id: headerInfoFields
+
                         Layout.preferredHeight: parent.height
+                        Layout.preferredWidth: root._remainingColumnsMinWidth
+                        Layout.maximumWidth: root._remainingColumnsMinWidth
+                        Layout.minimumWidth: 0
+                        Layout.fillWidth: true
 
                         Flickable {
                             id: headerFlickable
@@ -213,7 +213,7 @@ Item {
                             clip: true
 
                             flickableDirection: Flickable.HorizontalFlick
-                            contentWidth: Math.max(width, root._remainingColumnsMinWidth)
+                            contentWidth: root._remainingColumnsMinWidth
                             contentHeight: height
                             boundsBehavior: Flickable.StopAtBounds
 
@@ -236,7 +236,6 @@ Item {
 
                                         Layout.preferredWidth: columnData.width
                                         Layout.minimumWidth: columnData.width
-                                        Layout.fillWidth: columnData.fillWidth
 
                                         sourceComponent: headerLabelComp
 
@@ -251,6 +250,8 @@ Item {
                                 anchors.left: parent.left
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
+
+                                policy: ScrollBar.AlwaysOn
 
                                 visible: headerFlickable.contentWidth > headerFlickable.width
                                 z: 2
@@ -281,6 +282,8 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
                         anchors.right: parent.right
+
+                        policy: ScrollBar.AlwaysOn
 
                         visible: view.contentHeight > view.height
                         z: 2
