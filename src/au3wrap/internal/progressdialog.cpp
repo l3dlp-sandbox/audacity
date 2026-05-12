@@ -2,14 +2,12 @@
 * Audacity: A Digital Audio Editor
 */
 
-#include <chrono>
-
 #include <QCoreApplication>
-#include <QEventLoop>
 
 #include "progressdialog.h"
 #include "wxtypes_convert.h"
 
+namespace au::au3 {
 ProgressDialog::ProgressDialog(const muse::modularity::ContextPtr& ctx, const std::string& title)
     : muse::Contextable(ctx), m_progressTitle{title}
 {
@@ -23,27 +21,9 @@ ProgressDialog::ProgressDialog(const muse::modularity::ContextPtr& ctx, const Tr
 {
 }
 
-ProgressDialog::ProgressDialog(muse::IInteractive& interactive, const std::string& title)
-    : muse::Contextable(muse::modularity::globalCtx()),
-    m_explicitInteractive{&interactive},
-    m_progressTitle{title}
-{
-    m_progress.setMaxNumIncrements(200);
-}
-
-ProgressDialog::ProgressDialog(muse::IInteractive& interactive, const TranslatableString& title)
-    : ProgressDialog{interactive, au::au3::wxToStdString(title.Translation())}
-{
-}
-
 ProgressDialog::~ProgressDialog()
 {
     m_progress.finish(muse::make_ok());
-}
-
-muse::IInteractive* ProgressDialog::interactive() const
-{
-    return m_explicitInteractive ? m_explicitInteractive : m_injectedInteractive().get();
 }
 
 void ProgressDialog::Reinit()
@@ -58,31 +38,20 @@ void ProgressDialog::SetDialogTitle(const TranslatableString& title)
     m_progressTitle = au::au3::wxToStdString(title.Translation());
 }
 
-void ProgressDialog::start()
-{
-    if (m_progress.isStarted()) {
-        return;
-    }
-
-    interactive()->showProgress(m_progressTitle, m_progress);
-
-    if (!m_canceledHooked) {
-        m_progress.canceled().onNotify(this, [this]() {
-            m_cancelled = true;
-        });
-        m_canceledHooked = true;
-    }
-
-    m_progress.start();
-}
-
 ProgressResult ProgressDialog::Poll(unsigned long long numerator, unsigned long long denominator, const TranslatableString& message)
 {
-    if (m_cancelled) {
-        return ProgressResult::Cancelled;
-    }
+    if (!m_progress.isStarted()) {
+        interactive()->showProgress(m_progressTitle, m_progress);
 
-    start();
+        if (!m_canceledHooked) {
+            m_progress.canceled().onNotify(this, [this]() {
+                m_cancelled = true;
+            });
+            m_canceledHooked = true;
+        }
+
+        m_progress.start();
+    }
 
     if (!message.empty()) {
         m_progressMessage = au::au3::wxToStdString(message.Translation());
@@ -108,4 +77,5 @@ ProgressResult ProgressDialog::Poll(unsigned long long numerator, unsigned long 
 void ProgressDialog::SetMessage(const TranslatableString& message)
 {
     m_progressMessage = au::au3::wxToStdString(message.Translation());
+}
 }

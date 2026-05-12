@@ -35,7 +35,7 @@ class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable
 public:
     void deinit();
 
-    void initOnce(muse::IInteractive& interactive,
+    void initOnce(const muse::modularity::ContextPtr& ctx, muse::IInteractive& interactive,
                   muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario) override;
 
     EffectMetaList effectMetaList() const override;
@@ -51,7 +51,8 @@ public:
 
     bool paramsAreInputAgnostic(const EffectId& effectId) const override;
 
-    void rescanPlugins(muse::IInteractive& interactive, muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario,
+    void rescanPlugins(const muse::modularity::ContextPtr& ctx, muse::IInteractive& interactive,
+                       muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario,
                        const EffectFilter& exclude = nullptr) override;
     void forgetPlugins(const EffectFilter& forget = nullptr) override;
     void save() override;
@@ -65,7 +66,7 @@ private:
         No,
     };
 
-    NewPluginsRegistered doScanPlugins(muse::IInteractive& interactive,
+    NewPluginsRegistered doScanPlugins(const muse::modularity::ContextPtr& ctx,
                                        muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario,
                                        const std::function<bool()>& doScanThirdPartyPlugins = nullptr, const EffectFilter& accept = nullptr);
     void doSave(EffectFilter removeFromConfig = nullptr);

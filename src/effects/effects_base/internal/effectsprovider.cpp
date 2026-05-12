@@ -21,7 +21,7 @@
 using namespace muse;
 using namespace au::effects;
 
-void EffectsProvider::initOnce(muse::IInteractive& interactive,
+void EffectsProvider::initOnce(const muse::modularity::ContextPtr& ctx, muse::IInteractive& interactive,
                                muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario)
 {
     const auto doScanThirdPartyPlugins = [&interactive]() {
@@ -42,7 +42,7 @@ void EffectsProvider::initOnce(muse::IInteractive& interactive,
         return ret.standardButton() == muse::IInteractive::Button::Apply;
     };
 
-    doScanPlugins(interactive, registerAudioPluginsScenario, doScanThirdPartyPlugins);
+    doScanPlugins(ctx, registerAudioPluginsScenario, doScanThirdPartyPlugins);
 
     // Providers must be available in ModuleManager for on-demand plugin loading.
     ModuleManager::Get().DiscoverProviders();
@@ -60,26 +60,25 @@ void EffectsProvider::forgetPlugins(const EffectFilter& forget)
     });
 }
 
-void EffectsProvider::rescanPlugins(muse::IInteractive& interactive,
+void EffectsProvider::rescanPlugins(const muse::modularity::ContextPtr& ctx, muse::IInteractive& interactive,
                                     muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario,
                                     const EffectFilter& exclude)
 {
-    if (doScanPlugins(interactive, registerAudioPluginsScenario, {}, exclude) == NewPluginsRegistered::No) {
+    if (doScanPlugins(ctx, registerAudioPluginsScenario, {}, exclude) == NewPluginsRegistered::No) {
         interactive.infoSync(muse::trc("audio", "Audio plugins scan completed"), muse::trc("audio", "All audio plugins are up to date."));
     }
 }
 
 EffectsProvider::NewPluginsRegistered EffectsProvider::doScanPlugins(
-    muse::IInteractive& interactive,
+    const muse::modularity::ContextPtr& ctx,
     muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario,
     const std::function<bool()>& doScanThirdPartyPlugins,
     const EffectFilter& exclude)
 {
     muse::audioplugins::PluginScanResult scanResult;
     {
-        ProgressDialog progressDialog(interactive, muse::trc("audio", "Scanning audio plugins"));
-        progressDialog.start();
-        scanResult = registerAudioPluginsScenario.scanPlugins(&progressDialog.progress());
+        au3::ProgressDialog progressDialog(ctx, muse::trc("audio", "Scanning audio plugins"));
+        scanResult = registerAudioPluginsScenario.scanPlugins(&progressDialog.museProgress());
     }
 
     muse::io::paths_t& thirdPartyPluginPaths = scanResult.newPluginPaths;
