@@ -89,7 +89,7 @@ Item {
         ProjectsListView {
             id: list
 
-            readonly property int nameColumnWidth: 200
+            readonly property int nameColumnWidth: 100 + thumbnailWidth + nameSpacing
             readonly property int iconColumnWidth: 48
             readonly property int modifiedColumnWidth: 100
             readonly property int sizeColumnWidth: 75
@@ -155,7 +155,7 @@ Item {
 
                         Item {
                             height: parent.height
-                            width: list.nameSpacing
+                            width: nameSpacing
                         }
 
                         StyledTextLabel {
@@ -163,9 +163,13 @@ Item {
 
                             anchors.verticalCenter: parent.verticalCenter
 
+                            width: parent.width - thumbnail.width - nameSpacing
+
                             text: item.name ?? ""
                             font: ui.theme.largeBodyFont
                             verticalAlignment: Text.AlignVCenter
+                            horizontalAlignment: Text.AlignLeft
+                            elide: Text.ElideRight
 
                             NavigationFocusBorder {
                                 navigationCtrl: NavigationControl {
@@ -184,11 +188,6 @@ Item {
                                     }
                                 }
                             }
-                        }
-
-                        Item {
-                            width: parent.width - thumbnail.width - nameLabel.width - list.nameSpacing
-                            height: parent.height
                         }
                     }
                 },
