@@ -38,7 +38,7 @@ Item {
 
         readonly property int labelWidth: 140
         readonly property int controlWidth: 140
-        readonly property int numericControlWidth: 100
+        readonly property int numericControlWidth: 90
         readonly property int compactInputWidth: 80
         readonly property int valueDisplayWidth: 160
         readonly property int descriptionMaxWidth: 200
