@@ -37,6 +37,7 @@
 #include "view/projectspagemodel.h"
 #include "view/recentprojectsmodel.h"
 #include "view/cloudprojectsmodel.h"
+#include "view/cloudprojectsyncmodel.h"
 #include "view/cloudaudiofilesmodel.h"
 #include "view/cloudaudiofilecontextmenumodel.h"
 #include "view/projectthumbnailloader.h"
@@ -91,6 +92,7 @@ void ProjectModule::resolveImports()
         ir->registerQmlUri(muse::Uri("audacity://project/new"), "Audacity/Project/NewProjectDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://project/asksavelocationtype"), "Audacity/Project/AskSaveLocationTypeDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://project/savetocloud"), "Audacity/Project/SaveToCloudDialog.qml");
+        ir->registerQmlUri(muse::Uri("audacity://project/cloudprojectsyncing"), "Audacity/Project/CloudProjectSyncDialog.qml");
     }
 }
 
@@ -113,6 +115,7 @@ void ProjectModule::registerUiTypes()
     qmlRegisterType<ThumbnailLoader>("Audacity.Project", 1, 0, "ThumbnailLoader");
     qmlRegisterType<PixmapProjectThumbnailView>("Audacity.Project", 1, 0, "PixmapProjectThumbnailView");
     qmlRegisterType<ProjectPropertiesModel>("Audacity.Project", 1, 0, "ProjectPropertiesModel");
+    qmlRegisterType<CloudProjectSyncModel>("Audacity.Project", 1, 0, "CloudProjectSyncModel");
 
     qmlRegisterUncreatableType<QMLSaveLocationType>("Audacity.Project", 1, 0, "SaveLocationType",
                                                     "Not creatable as it is an enum type");

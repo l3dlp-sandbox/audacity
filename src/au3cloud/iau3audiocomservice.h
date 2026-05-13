@@ -13,6 +13,7 @@
 #include "framework/global/progress.h"
 #include "framework/global/io/path.h"
 #include "framework/global/async/channel.h"
+#include "framework/global/types/retval.h"
 
 #include "project/iaudacityproject.h"
 #include "cloudtypes.h"
@@ -53,6 +54,8 @@ public:
     virtual muse::RetVal<muse::ProgressPtr> openCloudProject(const muse::io::path_t& localPath, const std::string& projectId = {},
                                                              bool forceOverwrite = false) = 0;
     virtual muse::RetVal<muse::ProgressPtr> resumeProjectSync(au::project::IAudacityProjectPtr project) = 0;
+    virtual muse::ValCh<bool> syncingInProgressChanged() const = 0;
+    virtual void stopProjectSync() = 0;
 
     virtual muse::RetVal<muse::ProgressPtr> shareAudio(const std::string& title) = 0;
     virtual muse::RetVal<muse::ProgressPtr> downloadAudioFile(const std::string& audioId) = 0;

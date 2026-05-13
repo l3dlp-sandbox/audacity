@@ -67,6 +67,8 @@ public:
                                                      bool forceOverwrite = false) override;
 
     muse::RetVal<muse::ProgressPtr> resumeProjectSync(au::project::IAudacityProjectPtr project) override;
+    muse::ValCh<bool> syncingInProgressChanged() const override;
+    void stopProjectSync() override;
 
     muse::RetVal<muse::ProgressPtr> shareAudio(const std::string& title) override;
     muse::RetVal<muse::ProgressPtr> downloadAudioFile(const std::string& audioId) override;
@@ -77,9 +79,8 @@ public:
     void deinit() override;
 
 private:
-    std::string getCloudProjectPage(au::project::IAudacityProjectPtr project) const;
-
     static void removeProjectFromDatabase(const muse::io::path_t& localPath);
+    muse::ProgressPtr createSyncProgress();
     bool isSnapshotUpToDate(
         const std::optional<audacity::cloud::audiocom::sync::DBProjectData>& dbProjectData,
         audacity::cloud::audiocom::sync::ProgressCallback progressCallback, audacity::concurrency::CancellationContextPtr context);
@@ -117,5 +118,8 @@ private:
 
     std::unique_ptr<DownloadManager> m_downloadManager;
     muse::async::Channel<std::string, muse::io::path_t> m_audioThumbnailFileUpdatedChannel;
+
+    muse::ValCh<bool> m_syncingInProgressChangedChannel;
+    std::vector<muse::ProgressPtr> m_syncInProgress;
 };
 }

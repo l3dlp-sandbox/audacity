@@ -96,6 +96,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/cloudaudiofilesmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/cloudaudiofilecontextmenumodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/cloudaudiofilecontextmenumodel.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/cloudprojectsyncmodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/cloudprojectsyncmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/cloudprojectsmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/cloudprojectsmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/cloudprojectstatuswatcher.cpp
