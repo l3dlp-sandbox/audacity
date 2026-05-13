@@ -140,7 +140,7 @@ void VSTEffectsModule::AutoRegisterPlugins(PluginManagerInterface&)
 {
 }
 
-PluginPaths VSTEffectsModule::FindModulePaths(PluginManagerInterface& pm) const
+PluginPaths VSTEffectsModule::FindModulePaths(PluginManagerInterface& pm, BasicUI::ProgressDialog*) const
 {
     FilePaths pathList;
     FilePaths files;

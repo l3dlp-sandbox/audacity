@@ -79,11 +79,11 @@ void Lv2EffectsModule::registerUiTypes()
     REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(Lv2ViewModelFactory);
 }
 
-void Lv2EffectsModule::onInit(const muse::IApplication::RunMode&)
+void Lv2EffectsModule::onInit(const muse::IApplication::RunMode& mode)
 {
     m_metaReader->init();
     m_effectLoader->init();
-    m_pluginsScanner->init();
+    m_pluginsScanner->init(mode);
 }
 
 void Lv2EffectsModule::onDeinit()

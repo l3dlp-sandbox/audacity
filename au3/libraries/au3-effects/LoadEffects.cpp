@@ -157,7 +157,7 @@ void BuiltinEffectsModule::AutoRegisterPlugins(PluginManagerInterface& pm)
     }
 }
 
-PluginPaths BuiltinEffectsModule::FindModulePaths(PluginManagerInterface&) const
+PluginPaths BuiltinEffectsModule::FindModulePaths(PluginManagerInterface&, BasicUI::ProgressDialog*) const
 {
     // Not really libraries
     PluginPaths names;

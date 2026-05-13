@@ -622,7 +622,7 @@ muse::Ret EffectExecutionScenario::performEffectInternal(au3::Au3Project& projec
                    == EffectTypeGenerate ? muse::qtrc("effects", "Generating %1…") : muse::qtrc("effects", "Applying %1…")).arg(
                       QString::fromUtf8(name.Translation().ToUTF8().data())).toStdString();
 
-            ::ProgressDialog progress{ iocContext(), title };
+            au3::ProgressDialog progress{ iocContext(), title };
             auto vr = valueRestorer<BasicUI::ProgressDialog*>(effect->mProgress, &progress);
 
             assert(pInstanceEx); // null check above

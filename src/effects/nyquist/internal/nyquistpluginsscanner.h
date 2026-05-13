@@ -14,7 +14,7 @@ public:
         : Au3AudioPluginScanner(m_nyquistModule) {}
 
 private:
-    ::PluginPaths pluginPaths() const override;
+    ::PluginPaths pluginPaths(BasicUI::ProgressDialog* progress) const override;
 
     ::NyquistEffectsModule m_nyquistModule;
 };

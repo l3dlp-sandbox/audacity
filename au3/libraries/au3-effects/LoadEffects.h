@@ -64,7 +64,7 @@ public:
     FilePath InstallPath() override { return {}; }
 
     void AutoRegisterPlugins(PluginManagerInterface& pm) override;
-    PluginPaths FindModulePaths(PluginManagerInterface& pm) const override;
+    PluginPaths FindModulePaths(PluginManagerInterface& pm, BasicUI::ProgressDialog* progress = nullptr) const override;
     unsigned DiscoverPluginsAtPath(
         const PluginPath& path, ::TranslatableString& errMsg, const RegistrationCallback& callback)
     override;

@@ -177,7 +177,7 @@ void LadspaEffectsModule::AutoRegisterPlugins(PluginManagerInterface& pm)
     }
 }
 
-PluginPaths LadspaEffectsModule::FindModulePaths(PluginManagerInterface& pm) const
+PluginPaths LadspaEffectsModule::FindModulePaths(PluginManagerInterface& pm, BasicUI::ProgressDialog*) const
 {
     auto pathList = GetSearchPaths(pm);
     FilePaths files;

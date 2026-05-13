@@ -173,7 +173,7 @@ private:
     template<typename Func, typename ... Args>
     muse::Ret withProgress(Func&& method, Args&&... args) const
     {
-        auto progressDialog = std::make_unique<ProgressDialog>(iocContext());
+        auto progressDialog = std::make_unique<au3::ProgressDialog>(iocContext());
         progress().progressChanged().onReceive(progressDialog.get(),
                                                [&](int64_t current, int64_t total, const std::string&) {
             const auto result = progressDialog->Poll(current, total);

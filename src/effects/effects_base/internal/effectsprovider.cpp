@@ -4,6 +4,9 @@
 #include "effectsprovider.h"
 #include "effectsutils.h"
 
+#include "au3-basic-ui/BasicUI.h"
+#include "au3wrap/internal/progressdialog.h"
+
 #include "au3-effects/Effect.h"
 #include "au3-effects/EffectManager.h"
 #include "au3-realtime-effects/RealtimeEffectState.h"
@@ -18,28 +21,28 @@
 using namespace muse;
 using namespace au::effects;
 
-void EffectsProvider::initOnce(muse::IInteractive& interactive,
+void EffectsProvider::initOnce(const muse::modularity::ContextPtr& ctx, muse::IInteractive& interactive,
                                muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario)
 {
     const auto doScanThirdPartyPlugins = [&interactive]() {
-        auto ret = interactive.questionSync(muse::trc("appshell", "Scanning audio plugins"),
+        auto ret = interactive.questionSync(muse::trc("appshell", "Validate audio plugins"),
                                             muse::trc(
                                                 "appshell",
-                                                "Audacity has found plugins that need to be scanned before use. Would you like to scan them now or skip?"),
+                                                "Audacity has found plugins that need to be validated before use. Would you like to validate them now or skip?"),
                                             { muse::IInteractive::ButtonData(
                                                   muse::IInteractive::Button::Cancel,
                                                   muse::trc("appshell", "Skip this time"),
                                                   false),
                                               muse::IInteractive::ButtonData(
-                                                  muse::IInteractive::Button::Apply, muse::trc("appshell", "Scan plugins"),
+                                                  muse::IInteractive::Button::Apply, muse::trc("appshell", "Validate"),
                                                   true) },
                                             int(muse::IInteractive::Button::NoButton),
                                             {},
-                                            muse::trc("appshell", "Audio plugin scan"));
+                                            muse::trc("appshell", "Audio plugin validation"));
         return ret.standardButton() == muse::IInteractive::Button::Apply;
     };
 
-    doScanPlugins(registerAudioPluginsScenario, doScanThirdPartyPlugins);
+    doScanPlugins(ctx, registerAudioPluginsScenario, doScanThirdPartyPlugins);
 
     // Providers must be available in ModuleManager for on-demand plugin loading.
     ModuleManager::Get().DiscoverProviders();
@@ -57,21 +60,30 @@ void EffectsProvider::forgetPlugins(const EffectFilter& forget)
     });
 }
 
-void EffectsProvider::rescanPlugins(muse::IInteractive& interactive,
+void EffectsProvider::rescanPlugins(const muse::modularity::ContextPtr& ctx, muse::IInteractive& interactive,
                                     muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario,
                                     const EffectFilter& exclude)
 {
-    if (doScanPlugins(registerAudioPluginsScenario, {}, exclude) == NewPluginsRegistered::No) {
+    if (doScanPlugins(ctx, registerAudioPluginsScenario, {}, exclude) == NewPluginsRegistered::No) {
         interactive.infoSync(muse::trc("audio", "Audio plugins scan completed"), muse::trc("audio", "All audio plugins are up to date."));
     }
 }
 
 EffectsProvider::NewPluginsRegistered EffectsProvider::doScanPlugins(
+    const muse::modularity::ContextPtr& ctx,
     muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario,
     const std::function<bool()>& doScanThirdPartyPlugins,
     const EffectFilter& exclude)
 {
-    muse::audioplugins::PluginScanResult scanResult = registerAudioPluginsScenario.scanPlugins();
+    muse::audioplugins::PluginScanResult scanResult;
+    {
+        au3::ProgressDialog progressDialog(ctx, muse::trc("audio", "Scanning audio plugins"));
+        // Scanners publish through `muse::Progress` directly (not via
+        // Poll), so the QML dialog wouldn't mount on its own. Open it
+        // explicitly before exposing the channel.
+        progressDialog.start();
+        scanResult = registerAudioPluginsScenario.scanPlugins(&progressDialog.museProgress());
+    }
 
     muse::io::paths_t& thirdPartyPluginPaths = scanResult.newPluginPaths;
     const auto metaReaders = metaReaderRegister()->readers();
@@ -205,6 +217,11 @@ IEffectLoaderPtr EffectsProvider::loader(const EffectId& effectId) const
         return nullptr;
     }
     return effectLoadersRegister()->loader(it->family);
+}
+
+bool EffectsProvider::hasEffectFamily(EffectFamily family) const
+{
+    return effectLoadersRegister()->loader(family) != nullptr;
 }
 
 bool EffectsProvider::loadEffect(const EffectId& effectId) const

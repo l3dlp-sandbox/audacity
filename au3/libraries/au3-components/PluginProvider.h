@@ -49,6 +49,10 @@
 #include "ComponentInterface.h"
 #include "ComponentInterfaceSymbol.h"
 
+namespace BasicUI {
+class ProgressDialog;
+}
+
 using PluginID = wxString;
 using PluginIDs = wxArrayString;
 // Incomplete type not defined in libraries -- TODO clean that up:
@@ -143,10 +147,11 @@ public:
      the paths.
 
      Modules may be associated with plug-ins, one-to-many.
+
      @see GetFileExtensions DiscoverPluginsAtPath
      */
     virtual PluginPaths
-    FindModulePaths(PluginManagerInterface& pluginManager) const = 0;
+    FindModulePaths(PluginManagerInterface& pluginManager, BasicUI::ProgressDialog* progress = nullptr) const = 0;
 
     //! Further expand a path reported by FindModulePaths
     /*!
