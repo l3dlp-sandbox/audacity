@@ -14,8 +14,13 @@
             ],
             "environment": [
                 {
+                    "name": "QT_QPA_PLATFORM_PLUGIN_PATH",
+                    "value": "${env:QTDIR}/plugins/platforms"
+                },
+                {
+                    // The install step copies everything needed to `app/bin`
                     "name": "PATH",
-                    "value": "${env:PATH};${command:cmake.launchTargetDirectory}"
+                    "value": "${env:PATH};${workspaceFolder}/build/audacity-debug/src/app/bin"
                 }
             ],
             "sourceFileMap": {
