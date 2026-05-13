@@ -445,14 +445,17 @@ bool ProjectActionsController::closeOpenedProject(const bool quitApp)
     }
 
     m_isProjectClosing = true;
+    DEFER {
+        m_isProjectClosing = false;
+    };
 
     const IAudacityProjectPtr project = globalContext()->currentProject();
     if (!project) {
-        m_isProjectClosing = false;
         return true;
     }
 
     bool result = true;
+
     if (project->hasUnsavedChanges()) {
         IInteractive::Button btn = askAboutSavingProject(project);
 
@@ -465,62 +468,44 @@ bool ProjectActionsController::closeOpenedProject(const bool quitApp)
         }
     }
 
-    if (result && project->isCloudProject() && askAboutStoppingCloudSync(quitApp)) {
-        return false;
+    if (result && project->isCloudProject()) {
+        result = askAboutStoppingCloudSync();
     }
 
     if (result) {
-        finalizeProjectClose(quitApp);
+        interactive()->closeAllDialogsSync();
+
+        project->close();
+
+        globalContext()->setCurrentProject(nullptr);
+
+        if (quitApp) {
+            //! NOTE: we need to call `quit` in the next event loop due to controlling the lifecycle of this method
+            muse::async::Async::call(this, [this](){
+                dispatcher()->dispatch("quit", actions::ActionData::make_arg1<bool>(false));
+            });
+        } else {
+            Ret ret = openPageIfNeed(HOME_PAGE_URI);
+            if (!ret) {
+                LOGE() << ret.toString();
+            }
+        }
     }
 
-    m_isProjectClosing = false;
     return result;
 }
 
-bool ProjectActionsController::askAboutStoppingCloudSync(bool quitApp)
+bool ProjectActionsController::askAboutStoppingCloudSync()
 {
+    if (!audioComService()->syncingInProgressChanged().val) {
+        return true;
+    }
+
     static const Uri CLOUD_PROJECT_SYNC_URI("audacity://project/cloudprojectsyncing");
 
-    if (!audioComService()->syncingInProgressChanged().val) {
-        return false;
-    }
-
-    interactive()->open(CLOUD_PROJECT_SYNC_URI).onResolve(this, [this, quitApp](const Val& val) {
-        std::string status = val.toString();
-
-        if (status == "stopped" || status == "synced") {
-            finalizeProjectClose(quitApp);
-        }
-
-        m_isProjectClosing = false;
-    });
-
-    return true;
-}
-
-void ProjectActionsController::finalizeProjectClose(bool quitApp)
-{
-    auto project = globalContext()->currentProject();
-    if (!project) {
-        return;
-    }
-
-    interactive()->closeAllDialogsSync();
-
-    project->close();
-
-    globalContext()->setCurrentProject(nullptr);
-
-    if (quitApp) {
-        muse::async::Async::call(this, [this](){
-            dispatcher()->dispatch("quit", actions::ActionData::make_arg1<bool>(false));
-        });
-    } else {
-        Ret ret = openPageIfNeed(HOME_PAGE_URI);
-        if (!ret) {
-            LOGE() << ret.toString();
-        }
-    }
+    RetVal<Val> rv = interactive()->openSync(CLOUD_PROJECT_SYNC_URI);
+    std::string status = rv.val.toString();
+    return status == "stopped" || status == "synced";
 }
 
 bool ProjectActionsController::saveProject(const muse::io::path_t& path)

@@ -118,8 +118,7 @@ private:
     void undo();
     void redo();
 
-    bool askAboutStoppingCloudSync(bool quitApp);
-    void finalizeProjectClose(bool quitApp);
+    bool askAboutStoppingCloudSync();
     muse::Ret openPageIfNeed(muse::Uri pageUri);
 
     void handleCloudOpenError(const muse::Ret& error, const muse::io::path_t& localPath, const std::string& cloudProjectId = {});
