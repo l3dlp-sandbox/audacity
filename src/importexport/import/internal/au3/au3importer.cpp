@@ -17,6 +17,7 @@
 #include "au3wrap/au3types.h"
 #include "au3wrap/internal/wxtypes_convert.h"
 #include "au3wrap/internal/domaccessor.h"
+#include "au3wrap/internal/domconverter.h"
 #include "projectscene/view/tracksitemsview/dropcontroller.h"
 #include "trackedit/internal/au3/au3trackdata.h"
 
@@ -398,4 +399,16 @@ void au::importexport::Au3Importer::addImportedTracks(const muse::io::path_t& fi
     }
 
     applyImportedProjectTitleIfNeeded(fileName);
+
+    auto prj = globalContext()->currentTrackeditProject();
+    if (!prj) {
+        return;
+    }
+
+    for (const auto& newTrack : results) {
+        prj->notifyAboutTrackAdded(DomConverter::track(newTrack));
+        for (const auto& clip : prj->clipList(newTrack->GetId())) {
+            prj->notifyAboutClipAdded(clip);
+        }
+    }
 }
