@@ -52,8 +52,11 @@ public:
         m_record = std::make_shared<record::RecordMock>();
         m_controller->record.set(m_record);
 
+        //! NOTE: Store the channel in the fixture so tests can publish to the
+        //! exact channel the controller subscribes to during init(). Channel
+        //! is shared_ptr-backed; copies returned from the mock share state.
         EXPECT_CALL(*m_record, recordPositionChanged())
-        .WillRepeatedly(Return(muse::async::Channel<muse::secs_t>()));
+        .WillRepeatedly(Return(m_recordPositionChannel));
 
         m_selectionController = std::make_shared<trackedit::SelectionControllerMock>();
         m_controller->selectionController.set(m_selectionController);
@@ -142,6 +145,8 @@ public:
 
     std::shared_ptr<PlaybackMock> m_playback;
     std::shared_ptr<PlayerMock> m_player;
+
+    muse::async::Channel<muse::secs_t> m_recordPositionChannel;
 };
 
 /**
@@ -703,5 +708,121 @@ TEST_F(PlaybackControllerTests, Rewind_ToEnd_CheckSelectionReset)
 
     //! [WHEN] Rewind to end
     rewindToEnd();
+}
+
+/**
+ * @brief Seek then stopSeekAndUpdatePlaybackRegion should keep the cursor.
+ * @details User clicks the cursor at 42s, then triggers a stop-and-update
+ *          (e.g. via Shift+Space while playing). The playback region forwarded
+ *          to the player should be the cursor, not an empty region.
+ */
+TEST_F(PlaybackControllerTests, StopSeekAndUpdatePlaybackRegion_PreservesSeekPosition)
+{
+    //! [GIVEN] Playback is stopped
+    ON_CALL(*m_player, playbackStatus())
+    .WillByDefault(Return(PlaybackStatus::Stopped));
+
+    //! [GIVEN] No active playback region (seek-validity check uses totalPlayTime)
+    ON_CALL(*m_player, playbackRegion())
+    .WillByDefault(Return(PlaybackRegion {}));
+
+    const secs_t cursor = 42.0;
+
+    //! [THEN] Player is seeked to the cursor (once by the click, once by
+    //! the subsequent stop-and-update)
+    EXPECT_CALL(*m_player, seek(cursor, false))
+    .Times(2);
+
+    //! [THEN] stopSeekAndUpdatePlaybackRegion stops the player
+    EXPECT_CALL(*m_player, stop())
+    .Times(1);
+
+    //! [THEN] The playback region forwarded to the player is the cursor
+    EXPECT_CALL(*m_player, setPlaybackRegion(PlaybackRegion { cursor, cursor }))
+    .Times(1);
+
+    //! [WHEN] User clicks the cursor at 42s
+    seek(cursor, false);
+
+    //! [WHEN] Then triggers a stop-and-update
+    m_controller->stopSeekAndUpdatePlaybackRegion();
+}
+
+/**
+ * @brief Toggle play with no selection plays from the cursor to project end.
+ * @details Cursor is at 30s (e.g. just after recording finished), nothing
+ *          is selected. Pressing Space should set the playback region to
+ *          {cursor, totalPlayTime} and start playing.
+ */
+TEST_F(PlaybackControllerTests, TogglePlay_AfterRecord_PlaysFromSeekToProjectEnd)
+{
+    //! [GIVEN] Playback is stopped
+    ON_CALL(*m_player, playbackStatus())
+    .WillByDefault(Return(PlaybackStatus::Stopped));
+
+    //! [GIVEN] Cursor is at 30s
+    const secs_t recordEnd = 30.0;
+    m_controller->setLastPlaybackSeekTime(recordEnd);
+
+    //! [GIVEN] Playhead is at the cursor (not at project end)
+    EXPECT_CALL(*m_player, playbackPosition())
+    .WillRepeatedly(Return(recordEnd));
+
+    //! [GIVEN] No selection
+    EXPECT_CALL(*m_selectionController, leftMostSelectedItemStartTime())
+    .WillOnce(Return(std::nullopt));
+    EXPECT_CALL(*m_selectionController, rightMostSelectedItemEndTime())
+    .WillOnce(Return(std::nullopt));
+    EXPECT_CALL(*m_selectionController, timeSelectionIsEmpty())
+    .WillOnce(Return(true));
+
+    //! [THEN] Playback region is {cursor, totalPlayTime}
+    EXPECT_CALL(*m_player, setPlaybackRegion(PlaybackRegion { recordEnd, secs_t(100.0) }))
+    .Times(1);
+
+    //! [THEN] Player starts playing
+    EXPECT_CALL(*m_player, play())
+    .Times(1);
+
+    //! [WHEN] User presses Space
+    togglePlay();
+}
+
+/**
+ * @brief Record-position updates drive the playhead while recording.
+ * @details While recording is active, each record-position update should be
+ *          forwarded to the player as a new playhead position.
+ */
+TEST_F(PlaybackControllerTests, RecordPositionChanged_UpdatesPlayhead_WhileRecording)
+{
+    //! [GIVEN] Recording is active
+    EXPECT_CALL(*m_recordController, isRecording())
+    .WillRepeatedly(Return(true));
+
+    //! [THEN] The new record position is forwarded to the player
+    EXPECT_CALL(*m_player, setPlaybackPosition(secs_t(5.5)))
+    .Times(1);
+
+    //! [WHEN] A record-position update is published
+    m_recordPositionChannel.send(muse::secs_t(5.5));
+}
+
+/**
+ * @brief Record-position updates do not affect the playhead when not recording.
+ * @details A record-position update arriving while recording is inactive
+ *          must not change the playback position.
+ */
+TEST_F(PlaybackControllerTests, RecordPositionChanged_DoesNotUpdatePlayhead_WhenNotRecording)
+{
+    //! [GIVEN] Not recording
+    EXPECT_CALL(*m_recordController, isRecording())
+    .WillRepeatedly(Return(false));
+
+    //! [THEN] No playhead write
+    EXPECT_CALL(*m_player, setPlaybackPosition(_))
+    .Times(0);
+
+    //! [WHEN] A record-position update is published
+    m_recordPositionChannel.send(muse::secs_t(5.5));
 }
 }
