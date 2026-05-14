@@ -336,10 +336,16 @@ void PlaybackController::doPlay(bool ignoreSelection)
         if (selectionRegion.isValid()) {
             doChangePlaybackRegion(selectionRegion);
         } else {
-            LOGW() << "playback region is not valid";
-            // update the playback region "manually" even when not paused
-            // (that's why we aren't using the doChangePlaybackRegion)
-            updatePlaybackRegion();
+            //! NOTE: no selection — fall back to the user's cursor (lastPlaybackSeekTime)
+            //! and the project end.
+            const muse::secs_t end = totalPlayTime();
+            const muse::secs_t start = lastPlaybackSeekTime();
+            if (end > start) {
+                doChangePlaybackRegion({ start, end });
+            } else {
+                LOGW() << "playback region is not valid";
+                updatePlaybackRegion();
+            }
         }
     } else {
         doChangePlaybackRegion({});

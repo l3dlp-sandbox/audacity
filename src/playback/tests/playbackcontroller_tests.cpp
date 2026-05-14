@@ -182,8 +182,9 @@ TEST_F(PlaybackControllerTests, TogglePlay_WhenStopped)
     EXPECT_CALL(*m_player, seek(_, _))
     .Times(0);
 
-    //! [THEN] Playback region should be reset to empty (no selection, no loop)
-    EXPECT_CALL(*m_player, setPlaybackRegion(PlaybackRegion()))
+    //! [THEN] Playback region falls back to {lastPlaybackSeekTime, totalPlayTime}.
+    //! lastPlaybackSeekTime is 0 (default, no prior seek) and totalPlayTime is 100.
+    EXPECT_CALL(*m_player, setPlaybackRegion(PlaybackRegion { secs_t(0.0), secs_t(100.0) }))
     .Times(1);
 
     //! [THEN] Player should start playing from current position

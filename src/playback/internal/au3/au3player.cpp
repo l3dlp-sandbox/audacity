@@ -199,9 +199,15 @@ void Au3Player::play()
             opts.mixerEndTime = mixerEndTime;
             ret = doPlayTracks(TrackList::Get(project), t0, t1, opts);
         }
-    }
 
-    m_playbackStatus.set(PlaybackStatus::Running);
+        //! NOTE: only flip to Running when a stream was actually started.
+        //! Doing it unconditionally (as before) left the UI in a "playing"
+        //! state when t1 == t0 short-circuits doPlayTracks, with no audible
+        //! playback and no playhead movement.
+        if (ret) {
+            m_playbackStatus.set(PlaybackStatus::Running);
+        }
+    }
 }
 
 muse::Ret Au3Player::playTracks(TrackList& trackList, double startTime, double endTime, const PlayTracksOptions& options)
