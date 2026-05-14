@@ -400,6 +400,11 @@ muse::ValCh<int> ProjectViewState::trackHeight(const trackedit::TrackId& trackId
         return it->second.height;
     }
 
+    trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    if (!prj || !prj->track(trackId)) {
+        return {};
+    }
+
     const ProjectViewState::TrackData& d = makeTrackData(trackId);
     return d.height;
 }
@@ -411,6 +416,11 @@ muse::ValCh<bool> ProjectViewState::isTrackCollapsed(const trackedit::TrackId& t
         return it->second.collapsed;
     }
 
+    trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    if (!prj || !prj->track(trackId)) {
+        return {};
+    }
+
     const ProjectViewState::TrackData& d = makeTrackData(trackId);
     return d.collapsed;
 }
@@ -420,6 +430,11 @@ muse::ValCh<double> ProjectViewState::channelHeightRatio(const trackedit::TrackI
     auto it = m_tracks.find(trackId);
     if (it != m_tracks.end()) {
         return it->second.channelHeightRatio;
+    }
+
+    trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    if (!prj || !prj->track(trackId)) {
+        return {};
     }
 
     const ProjectViewState::TrackData& d = makeTrackData(trackId);
@@ -644,6 +659,11 @@ muse::ValCh<std::pair<float, float> > ProjectViewState::verticalDisplayBounds(co
         return it->second.verticalDisplayBounds;
     }
 
+    trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    if (!prj || !prj->track(trackId)) {
+        return {};
+    }
+
     const ProjectViewState::TrackData& d = makeTrackData(trackId);
     return d.verticalDisplayBounds;
 }
@@ -792,6 +812,11 @@ muse::ValCh<bool> ProjectViewState::isHalfWave(const trackedit::TrackId& trackId
         return it->second.isHalfWave;
     }
 
+    trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    if (!prj || !prj->track(trackId)) {
+        return {};
+    }
+
     const ProjectViewState::TrackData& d = makeTrackData(trackId);
     return d.isHalfWave;
 }
@@ -822,6 +847,11 @@ muse::ValCh<au::trackedit::TrackViewType> ProjectViewState::trackViewType(const 
     auto it = m_tracks.find(trackId);
     if (it != m_tracks.end()) {
         return it->second.viewType;
+    }
+
+    trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    if (!prj || !prj->track(trackId)) {
+        return {};
     }
 
     const ProjectViewState::TrackData& d = makeTrackData(trackId);
@@ -897,6 +927,11 @@ muse::ValCh<int> ProjectViewState::trackRulerType(const trackedit::TrackId& trac
     auto it = m_tracks.find(trackId);
     if (it != m_tracks.end()) {
         return it->second.rulerType;
+    }
+
+    trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    if (!prj || !prj->track(trackId)) {
+        return {};
     }
 
     const ProjectViewState::TrackData& d = makeTrackData(trackId);
