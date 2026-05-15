@@ -68,6 +68,10 @@ QVariant EffectParametersListModel::data(const QModelIndex& index, int role) con
         return param.stepSize;
     case StepCountRole:
         return param.stepCount;
+    case NumDecimalsRole:
+        return param.numDecimals();
+    case DescriptionRole:
+        return param.description.toQString();
     case CurrentValueStringRole:
         return param.currentValueString.toQString();
     case FormattedValueRole:
@@ -162,6 +166,8 @@ QHash<int, QByteArray> EffectParametersListModel::roleNames() const
         { CurrentValueRole, "currentValue" },
         { StepSizeRole, "stepSize" },
         { StepCountRole, "stepCount" },
+        { NumDecimalsRole, "numDecimals" },
+        { DescriptionRole, "description" },
         { CurrentValueStringRole, "currentValueString" },
         { FormattedValueRole, "formattedValue" },
         { IsToggleCheckedRole, "isToggleChecked" },

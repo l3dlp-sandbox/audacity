@@ -3,6 +3,8 @@
  */
 #include "nyquistparameterextractorservice.h"
 
+#include <cmath>
+
 #include "au3wrap/internal/wxtypes_convert.h"
 
 // AU3 Nyquist effect base class
@@ -19,9 +21,13 @@ ParameterType convertControlType(int nyqType)
     switch (nyqType) {
     case NYQ_CTRL_INT:
     case NYQ_CTRL_INT_TEXT:
+    case NYQ_CTRL_FLOAT_TEXT:
+        // `float-text` renders as a plain numeric input (no slider) to match
+        // legacy AU3 semantics (au3/src/effects/nyquist/Nyquist.cpp:487-522)
+        // and to avoid creating an unusable slider when the high bound is
+        // `nil` (parsed as FLT_MAX in NyquistBase.cpp).
         return ParameterType::Numeric;
     case NYQ_CTRL_FLOAT:
-    case NYQ_CTRL_FLOAT_TEXT:
         return ParameterType::Slider;
     case NYQ_CTRL_CHOICE:
         return ParameterType::Dropdown;
@@ -46,7 +52,9 @@ ParameterInfo convertControl(const NyqControl& ctrl)
     // Use variable name as ID
     info.id = String::fromStdString(au::au3::wxToStdString(ctrl.var));
     info.name = String::fromStdString(au::au3::wxToStdString(ctrl.name));
-    info.units = String::fromStdString(au::au3::wxToStdString(ctrl.label));
+    // Nyquist's ctrl.label is a freeform descriptor (e.g. "30 - 300 beats/minute"),
+    // not a unit symbol. Map it to `description`; leave `units` empty.
+    info.description = String::fromStdString(au::au3::wxToStdString(ctrl.label));
 
     info.type = convertControlType(ctrl.type);
 
@@ -61,10 +69,17 @@ ParameterInfo convertControl(const NyqControl& ctrl)
         info.isInteger = true;
         info.stepSize = 1.0;
     } else if (ctrl.ticks > 0) {
-        // Calculate step size from ticks
+        // Calculate step size from ticks.
+        // Nyquist `float-text` / `time` controls with a `nil` bound are parsed
+        // as ±FLT_MAX in NyquistBase.cpp, and ticks is hard-coded to 1000
+        // there. Refuse to synthesise a stepSize from a non-finite or
+        // absurdly wide range: leave stepSize=0 so the QML fallback
+        // (step=0.01 in GeneratedIncrementalPropertyControl.qml) kicks in.
         const double range = ctrl.high - ctrl.low;
-        info.stepSize = range / ctrl.ticks;
-        info.stepCount = ctrl.ticks;
+        if (std::isfinite(range) && range > 0 && range < 1e15) {
+            info.stepSize = range / ctrl.ticks;
+            info.stepCount = ctrl.ticks;
+        }
     }
 
     // For choice controls, extract enum values

@@ -3,6 +3,8 @@
 */
 #pragma once
 
+#include <algorithm>
+#include <cmath>
 #include <vector>
 
 #include "framework/global/types/string.h"
@@ -118,7 +120,33 @@ struct ParameterInfo {
     bool isInteger = false;
     bool canAutomate = true;
 
+    // -1 means "auto-derive from stepSize / isInteger". Effects can override
+    // for cases where display precision and stepSize differ (e.g. sliding-stretch).
+    int numDecimalsOverride = -1;
+
     bool isValid() const { return !id.empty(); }
+
+    //! Number of decimals to display for numeric input.
+    //! Honors `numDecimalsOverride` if set; otherwise derives from `stepSize`.
+    int numDecimals() const
+    {
+        if (numDecimalsOverride >= 0) {
+            return numDecimalsOverride;
+        }
+        if (isInteger) {
+            return 0;
+        }
+        if (!(stepSize > 0)) {
+            return 2;
+        }
+        int n = 0;
+        double s = stepSize;
+        while (n < 6 && std::abs(s - std::round(s)) > 1e-9 * std::max(1.0, std::abs(s))) {
+            s *= 10.0;
+            ++n;
+        }
+        return n;
+    }
 
     //! Convert current "Full Range" value to normalized [0,1] for plugin API calls
     double getNormalizedValue() const
