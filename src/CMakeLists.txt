@@ -23,6 +23,8 @@ if (AU_BUILD_APPSHELL_MODULE)
     add_subdirectory(appshell)
 endif()
 
+add_subdirectory(shared)
+
 add_subdirectory(au3wrap)
 
 add_subdirectory(audio)

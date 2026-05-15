@@ -137,6 +137,9 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/fade/fadeeffect.cpp
     ${CMAKE_CURRENT_LIST_DIR}/fade/fadeeffect.h
 
+    ${CMAKE_CURRENT_LIST_DIR}/equalization_common/equalizationenvelopeutils.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/equalization_common/equalizationenvelopeutils.h
+
     ${CMAKE_CURRENT_LIST_DIR}/graphiceq/equalizationbandsliders.cpp
     ${CMAKE_CURRENT_LIST_DIR}/graphiceq/equalizationbandsliders.h
     ${CMAKE_CURRENT_LIST_DIR}/graphiceq/graphiceq.cpp
@@ -145,6 +148,13 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/graphiceq/graphiceqbandsmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/graphiceq/graphiceqviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/graphiceq/graphiceqviewmodel.h
+
+    ${CMAKE_CURRENT_LIST_DIR}/filtercurveeq/filtercurveeq.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/filtercurveeq/filtercurveeq.h
+    ${CMAKE_CURRENT_LIST_DIR}/filtercurveeq/filtercurvemodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/filtercurveeq/filtercurvemodel.h
+    ${CMAKE_CURRENT_LIST_DIR}/filtercurveeq/filtercurveeqviewmodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/filtercurveeq/filtercurveeqviewmodel.h
 
     ${CMAKE_CURRENT_LIST_DIR}/invert/inverteffect.cpp
     ${CMAKE_CURRENT_LIST_DIR}/invert/inverteffect.h
