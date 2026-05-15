@@ -9,14 +9,20 @@
 
 using namespace au::uicomponents;
 
+namespace {
+QList<NumericViewFormat> makeFrequencyFormats()
+{
+    // translate all
+    return { NumericViewFormat { static_cast<NumericViewFormatType>(FrequencyFormatType::Centihertz),
+                                 muse::qtrc("uicomponents", "Hz"), "010,01000>0100 Hz" },
+             NumericViewFormat { static_cast<NumericViewFormatType>(FrequencyFormatType::Hertz),
+                                 muse::qtrc("uicomponents", "kHz"), "01000>01000 kHz|0.001" },
+    };
+}
+}
+
 FrequencyModel::FrequencyModel(QObject* parent)
-    : NumericViewModel(parent,
-                       // translate all
-                       { NumericViewFormat { static_cast<NumericViewFormatType>(FrequencyFormatType::Centihertz),
-                                             muse::qtrc("uicomponents", "Hz"), "010,01000>0100 Hz" },
-                         NumericViewFormat { static_cast<NumericViewFormatType>(FrequencyFormatType::Hertz),
-                                             muse::qtrc("uicomponents", "kHz"), "01000>01000 kHz|0.001" },
-                       })
+    : NumericViewModel(parent, makeFrequencyFormats())
 {
     setCurrentFormat(static_cast<int>(FrequencyFormatType::Centihertz));
 
