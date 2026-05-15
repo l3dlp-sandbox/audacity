@@ -236,6 +236,8 @@ BuiltinEffectBase {
                     pointCentreColor: ui.theme.accentColor
                     pointOutlineWidth: 2.0
 
+                    isSnapEnabled: false
+
                     ghostPointRadius: 3.0
                     ghostPointOutlineColor: ui.theme.accentColor
 
