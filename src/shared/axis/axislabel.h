@@ -5,7 +5,7 @@
 
 #include "axistypes.h"
 
-#include <QString>
+#include <string>
 #include <vector>
 
 namespace au::shared {
@@ -14,7 +14,9 @@ namespace au::shared {
  *        decimal digits that keeps adjacent labels distinct.
  *
  * @param ticks            Ticks to label, expected sorted by value.
+ * @param labelSize        Size of the label.
+ * @param axisSize         Size of the axis.
  * @param maxDecimalDigits Cap on the number of decimal digits to try.
  */
-std::vector<QString> labelsForTicks(const std::vector<AxisTick>& ticks, int maxDecimalDigits = 3);
+std::vector<std::string> labelsForTicks(const std::vector<AxisTick>& ticks, double labelSize, double axisSize, int maxDecimalDigits = 3);
 }

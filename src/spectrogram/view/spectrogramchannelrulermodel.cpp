@@ -49,8 +49,7 @@ void SpectrogramChannelRulerModel::updateTicks()
     IF_ASSERT_FAILED(config) {
         return;
     }
-    m_ticks = au::shared::axisTicks(config->minFreq(), config->maxFreq(), config->scale(),
-                                    m_labelHeight, m_channelHeight);
+    m_ticks = au::shared::axisTicks(config->minFreq(), config->maxFreq(), config->scale());
 }
 
 int SpectrogramChannelRulerModel::trackId() const
@@ -286,13 +285,13 @@ QVariantList SpectrogramChannelRulerModel::minorTicks() const
 
 QVariantList SpectrogramChannelRulerModel::tickListToVariants(const std::vector<au::shared::AxisTick>& ticks) const
 {
-    const auto labels = au::shared::labelsForTicks(ticks);
+    const std::vector<std::string> labels = au::shared::labelsForTicks(ticks, m_labelHeight, m_channelHeight);
     QVariantList list;
     list.reserve(ticks.size());
     for (auto i = 0; i < static_cast<int>(ticks.size()); ++i) {
         list.append(QVariant::fromValue(QVariantMap {
                 { "y", (1.0 - ticks[i].position) * m_channelHeight },
-                { "label", labels[i] },
+                { "label", QString::fromStdString(labels[i]) },
             }));
     }
     return list;

@@ -30,7 +30,7 @@ std::vector<double> getTicksValues(double maxVal, double minVal, double step, sh
     return values;
 }
 
-std::vector<shared::AxisTick> toTicks(const std::vector<double>& values, const shared::NumberScale& numberScale, double labelExtentFraction)
+std::vector<shared::AxisTick> toTicks(const std::vector<double>& values, const shared::NumberScale& numberScale)
 {
     using namespace shared;
 
@@ -48,21 +48,15 @@ std::vector<shared::AxisTick> toTicks(const std::vector<double>& values, const s
     return ticks;
 }
 
-std::vector<shared::AxisTick> getTicks(double min, double max, shared::AxisScale scale, const shared::NumberScale& numberScale,
-                                       double labelExtentFraction, double step)
+std::vector<shared::AxisTick> getTicks(double min, double max, shared::AxisScale scale, const shared::NumberScale& numberScale, double step)
 {
     const std::vector<double> values = getTicksValues(max, min, step, scale);
-    return toTicks(values, numberScale, labelExtentFraction);
+    return toTicks(values, numberScale);
 }
 }
 
-shared::AxisTicks shared::axisTicks(double min, double max, AxisScale scale, double labelExtent, double axisLength)
+shared::AxisTicks shared::axisTicks(double min, double max, AxisScale scale)
 {
-    if (axisLength <= 0) {
-        LOGE() << "Invalid axis length: " << axisLength;
-        return {};
-    }
-
     const auto range = max - min;
     if (range <= 0) {
         LOGE() << "Invalid range: " << range;
@@ -72,7 +66,6 @@ shared::AxisTicks shared::axisTicks(double min, double max, AxisScale scale, dou
     const auto safeMin = scale == AxisScale::Logarithmic ? std::max(min, 1e-6) : min;
     const auto numberScale = NumberScale{ scale, safeMin, max };
 
-    const auto extentFraction = labelExtent / axisLength;
     auto minorPerMajor = 10;
 
     auto majorStep = std::pow(10, std::floor(std::log10(range)));
@@ -94,18 +87,10 @@ shared::AxisTicks shared::axisTicks(double min, double max, AxisScale scale, dou
     if (!muse::is_equal(majorValues.back(), safeMin)) {
         majorValues.push_back(safeMin);
     }
-    std::vector<AxisTick> majorTicks = toTicks(majorValues, numberScale, extentFraction);
-    // By making sure that min and max are "bookends", we might have created major ticks that are too close to the edge. Remove them if they overlap with the edge tick.
-    // And because end ticks are not center-aligned, add half of the extentFraction.
-    if (majorTicks.size() > 1u && std::abs(majorTicks.front().position - (majorTicks.begin() + 1)->position) < extentFraction * 1.5) {
-        majorTicks.erase(majorTicks.begin() + 1);
-    }
-    if (majorTicks.size() > 1u && std::abs(majorTicks.back().position - (majorTicks.end() - 2)->position) < extentFraction * 1.5) {
-        majorTicks.erase(majorTicks.end() - 2);
-    }
+    const std::vector<AxisTick> majorTicks = toTicks(majorValues, numberScale);
 
     const auto minorStep = majorStep / minorPerMajor;
-    std::vector<AxisTick> minorTicks = getTicks(safeMin, max, scale, numberScale, extentFraction, minorStep);
+    std::vector<AxisTick> minorTicks = getTicks(safeMin, max, scale, numberScale, minorStep);
 
     // Remove minor ticks that overlap with major ticks.
     minorTicks.erase(std::remove_if(minorTicks.begin(), minorTicks.end(), [&majorTicks](const AxisTick& minorTick) {

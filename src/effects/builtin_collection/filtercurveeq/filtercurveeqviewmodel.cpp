@@ -215,12 +215,12 @@ QVariantList FilterCurveEqViewModel::xTicks() const
 
 std::vector<FilterCurveEqViewModel::LabelAndPos> FilterCurveEqViewModel::xTicksLin() const
 {
-    const shared::AxisTicks ticks = shared::axisTicks(loFreq(), hiFreq(), shared::AxisScale::Linear, m_labelWidth, m_axisWidth);
-    const auto labels = shared::labelsForTicks(ticks.major);
+    const shared::AxisTicks ticks = shared::axisTicks(loFreq(), hiFreq(), shared::AxisScale::Linear);
+    const auto labels = shared::labelsForTicks(ticks.major, m_labelWidth, m_axisWidth);
     std::vector<LabelAndPos> labelAndPos;
     labelAndPos.reserve(ticks.major.size() + ticks.minor.size());
     for (size_t i = 0; i < ticks.major.size(); ++i) {
-        labelAndPos.push_back({ labels[i], ticks.major[i].position });
+        labelAndPos.push_back({ QString::fromStdString(labels[i]), ticks.major[i].position });
     }
     for (const auto& tick : ticks.minor) {
         labelAndPos.push_back({ QString(), tick.position });
@@ -260,13 +260,13 @@ std::vector<FilterCurveEqViewModel::LabelAndPos> FilterCurveEqViewModel::xTicksL
         majors.insert(majors.end(), { hiFreq(), 1. });
     }
 
-    const auto majorLabels = shared::labelsForTicks(majors);
+    const auto majorLabels = shared::labelsForTicks(majors, m_labelWidth, m_axisWidth);
 
     std::vector<LabelAndPos> labelAndPos;
     labelAndPos.reserve(majors.size() + minors.size());
 
     for (size_t i = 0; i < majors.size(); ++i) {
-        labelAndPos.push_back({ majorLabels[i], majors[i].position });
+        labelAndPos.push_back({ QString::fromStdString(majorLabels[i]), majors[i].position });
     }
     for (size_t i = 0; i < minors.size(); ++i) {
         labelAndPos.push_back({ QString(), minors[i].position });
