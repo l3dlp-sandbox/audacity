@@ -74,9 +74,7 @@ TimecodeModel::TimecodeModel(QObject* parent)
                         "bar:beat:tick" },
 })
 {
-    m_currentFormat = static_cast<NumericViewFormatType>(TimecodeFormatType::HHMMSS);
-
-    initFieldInteractionController();
+    setCurrentFormat(static_cast<int>(TimecodeFormatType::HHMMSS));
 
     reloadFormatter();
 

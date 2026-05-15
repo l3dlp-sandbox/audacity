@@ -31,9 +31,19 @@ muse::uicomponents::MenuItemList makeMenuItemList(const QList<NumericViewFormat>
 }
 
 NumericViewModel::NumericViewModel(QObject* parent, QList<NumericViewFormat> availableViewFormats)
-    : QAbstractListModel(parent), m_availableViewFormats(std::move(availableViewFormats)),
+    : QAbstractListModel(parent),
+    m_fieldsInteractionController(std::make_shared<FieldsInteractionController>(this)),
+    m_availableViewFormats(std::move(availableViewFormats)),
     m_availableFormatsCache(makeMenuItemList(m_availableViewFormats, this))
 {
+    connect(m_fieldsInteractionController.get(), &FieldsInteractionController::currentEditedFieldIndexChanged,
+            this, &NumericViewModel::currentEditedFieldIndexChanged);
+
+    connect(m_fieldsInteractionController.get(), &FieldsInteractionController::valueChanged,
+            this, &NumericViewModel::setValue);
+
+    connect(m_fieldsInteractionController.get(), &FieldsInteractionController::editingFinished,
+            this, &NumericViewModel::editingFinished);
 }
 
 int NumericViewModel::rowCount(const QModelIndex& parent) const
@@ -242,20 +252,6 @@ void NumericViewModel::setLowerTimeSignature(int timeSignature)
 
     initFormatter();
     updateValueString();
-}
-
-void NumericViewModel::initFieldInteractionController()
-{
-    m_fieldsInteractionController = std::make_shared<FieldsInteractionController>(this);
-
-    connect(m_fieldsInteractionController.get(), &FieldsInteractionController::currentEditedFieldIndexChanged,
-            this, &NumericViewModel::currentEditedFieldIndexChanged);
-
-    connect(m_fieldsInteractionController.get(), &FieldsInteractionController::valueChanged,
-            this, &NumericViewModel::setValue);
-
-    connect(m_fieldsInteractionController.get(), &FieldsInteractionController::editingFinished,
-            this, &NumericViewModel::editingFinished);
 }
 
 void NumericViewModel::initFormatter()

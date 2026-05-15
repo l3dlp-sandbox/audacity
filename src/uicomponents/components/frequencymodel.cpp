@@ -18,9 +18,7 @@ FrequencyModel::FrequencyModel(QObject* parent)
                                              muse::qtrc("uicomponents", "kHz"), "01000>01000 kHz|0.001" },
                        })
 {
-    m_currentFormat = static_cast<NumericViewFormatType>(FrequencyFormatType::Centihertz);
-
-    initFieldInteractionController();
+    setCurrentFormat(static_cast<int>(FrequencyFormatType::Centihertz));
 
     reloadFormatter();
 

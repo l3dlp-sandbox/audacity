@@ -93,7 +93,6 @@ signals:
     void editingFinished();
 
 protected:
-    void initFieldInteractionController();
     void initFormatter();
     void updateValueString(bool toNearest = true);
     const NumericViewFormat& currentViewFormat() const;
@@ -103,7 +102,7 @@ protected:
     NumericViewFormatType m_currentFormat = NumericViewFormatType::Undefined;
 
     std::shared_ptr<TimecodeFormatter> m_formatter;
-    std::shared_ptr<FieldsInteractionController> m_fieldsInteractionController;
+    const std::shared_ptr<FieldsInteractionController> m_fieldsInteractionController;
 
 private:
     enum Roles {
