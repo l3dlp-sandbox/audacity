@@ -3,9 +3,11 @@
 */
 #include "cloudaudiofilesmodel.h"
 
-#include "framework/global/async/asyncable.h"
+#include "async/asyncable.h"
 #include "framework/global/dataformatter.h"
 #include "framework/global/types/datetime.h"
+
+#include "view/cloudaudiofilecontextmenumodel.h"
 
 using namespace muse;
 using namespace au::project;
@@ -34,10 +36,22 @@ void CloudAudioFilesModel::load()
                 break;
             }
         }
-    });
+    }, async::Asyncable::Mode::SetReplace);
 }
 
 void CloudAudioFilesModel::reload()
+{
+    clear();
+    setState(State::Loading);
+}
+
+void CloudAudioFilesModel::clear()
+{
+    doClear();
+    setState(State::Fine);
+}
+
+void CloudAudioFilesModel::doClear()
 {
     audioComService()->clearAudioListCache();
     m_isWaitingForPromise = false;
@@ -45,6 +59,7 @@ void CloudAudioFilesModel::reload()
 
     beginResetModel();
 
+    clearContextMenuModels();
     m_items.clear();
     m_totalItems = muse::nidx;
     m_desiredRowCount = 0;
@@ -53,8 +68,6 @@ void CloudAudioFilesModel::reload()
 
     emit hasMoreChanged();
     emit desiredRowCountChanged();
-
-    setState(State::Loading);
 }
 
 CloudAudioFilesModel::State CloudAudioFilesModel::state() const
@@ -124,7 +137,7 @@ void CloudAudioFilesModel::loadItemsIfNecessary()
 
                     obj[NAME_KEY] = QString::fromStdString(item.title);
                     obj[SLUG_KEY] = QString::fromStdString(item.slug);
-                    obj[PATH_KEY] = ""; //configuration()->cloudProjectPath(item.id).toQString();
+                    obj[PATH_KEY] = "";
                     obj[THUMBNAIL_URL_KEY] = fileSystem()->exists(item.waveformPath) ? item.waveformPath.toQString() : QString();
                     obj[IS_CLOUD_KEY] = true;
                     obj[CLOUD_ITEM_ID_KEY] = QString::fromStdString(item.id);
@@ -136,6 +149,11 @@ void CloudAudioFilesModel::loadItemsIfNecessary()
                         "hh:mm:ss") : QString();
                     obj[IS_CREATE_NEW_KEY] = false;
                     obj[IS_NO_RESULTS_FOUND_KEY] = false;
+                    obj[SHOW_INDICATOR_KEY] = false;
+
+                    const auto id = obj[CLOUD_ITEM_ID_KEY].toString();
+                    const auto slug = obj[SLUG_KEY].toString();
+                    obj[CONTEXT_MENU_MODEL_KEY] = QVariant::fromValue(new CloudAudioFileContextMenuModel(id, slug, this));
 
                     m_items.push_back(obj);
                 }
@@ -165,4 +183,15 @@ void CloudAudioFilesModel::loadItemsIfNecessary()
 bool CloudAudioFilesModel::needsLoading()
 {
     return hasMore() && static_cast<int>(m_items.size()) < m_desiredRowCount;
+}
+
+void CloudAudioFilesModel::clearContextMenuModels()
+{
+    for (QVariantMap& item : m_items) {
+        auto* model = item[CONTEXT_MENU_MODEL_KEY].value<CloudAudioFileContextMenuModel*>();
+        item[CONTEXT_MENU_MODEL_KEY] = QVariant();
+        if (model != nullptr) {
+            model->deleteLater();
+        }
+    }
 }

@@ -12,6 +12,11 @@ constexpr const char* OPEN_AUDIO_FILE_ACTION = "audacity://cloud/open-audio-file
 constexpr const char* OPEN_AUDIO_PAGE_ACTION = "audacity://cloud/open-audio-page";
 }
 
+CloudAudioFileContextMenuModel::CloudAudioFileContextMenuModel(QString audioId, QString slug, QObject* parent)
+    : AbstractMenuModel(parent), m_audioId(std::move(audioId)), m_slug(std::move(slug))
+{
+}
+
 void CloudAudioFileContextMenuModel::load()
 {
     muse::uicomponents::AbstractMenuModel::load();
@@ -30,7 +35,7 @@ void CloudAudioFileContextMenuModel::handleMenuItem(const QString& itemId)
         }
 
         muse::actions::ActionQuery query(OPEN_AUDIO_PAGE_ACTION);
-        query.addParam("slug", muse::Val(m_slug.toStdString()));
+        query.addParam("slug", muse::Val(m_slug));
         dispatch(query);
         return;
     }
@@ -41,38 +46,10 @@ void CloudAudioFileContextMenuModel::handleMenuItem(const QString& itemId)
         }
 
         muse::actions::ActionQuery query(OPEN_AUDIO_FILE_ACTION);
-        query.addParam("audioId", muse::Val(m_audioId.toStdString()));
+        query.addParam("audioId", muse::Val(m_audioId));
         dispatch(query);
         return;
     }
 
     AbstractMenuModel::handleMenuItem(itemId);
-}
-
-QString CloudAudioFileContextMenuModel::audioId() const
-{
-    return m_audioId;
-}
-
-void CloudAudioFileContextMenuModel::setAudioId(const QString& audioId)
-{
-    if (m_audioId == audioId) {
-        return;
-    }
-    m_audioId = audioId;
-    emit audioIdChanged();
-}
-
-QString CloudAudioFileContextMenuModel::slug() const
-{
-    return m_slug;
-}
-
-void CloudAudioFileContextMenuModel::setSlug(const QString& slug)
-{
-    if (m_slug == slug) {
-        return;
-    }
-    m_slug = slug;
-    emit slugChanged();
 }

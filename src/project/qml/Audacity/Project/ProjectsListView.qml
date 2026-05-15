@@ -1,24 +1,6 @@
 /*
- * SPDX-License-Identifier: GPL-3.0-only
- * Audacity-CLA-applies
- *
- * Audacity
- * Music Composition & Notation
- *
- * Copyright (C) 2024 Audacity BVBA and others
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 3 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+* Audacity: A Digital Audio Editor
+*/
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -39,11 +21,18 @@ Item {
 
     property color backgroundColor: ui.theme.backgroundSecondaryColor
     property real sideMargin: 46
-    property string placeholder: ""
+    property real _columnsContentX: 0
 
-    property bool isCloudList: false
-
-    property bool thumbnailFull: false
+    readonly property real _remainingColumnsMinWidth: {
+        var total = 0
+        for (var i = 1; i < columns.length; i++) {
+            total += columns[i].width
+        }
+        if (columns.length > 2) {
+            total += (columns.length - 2) * 24
+        }
+        return total
+    }
 
     property alias view: view
 
@@ -53,13 +42,20 @@ Item {
     signal openProjectRequested(var projectPath, var displayName)
     signal openCloudProjectRequested(var projectId, var projectPath, var displayName)
 
+    function scrollColumnIntoView(columnX, columnWidth) {
+        var viewport = headerFlickable.width
+        var cx = headerFlickable.contentX
+
+        if (columnX < cx) {
+            headerFlickable.contentX = columnX
+        } else if (columnX + columnWidth > cx + viewport) {
+            headerFlickable.contentX = columnX + columnWidth - viewport
+        }
+    }
+
     component ColumnItem: QtObject {
         property string header
-
-        property var width: function (parentWidth) {
-            return parentWidth / 5
-        }
-
+        property real width: 0
         property Component delegate
     }
 
@@ -85,6 +81,19 @@ Item {
         accessible.name: qsTrc("project", "Projects list")
     }
 
+    Component {
+        id: headerLabelComp
+
+        StyledTextLabel {
+            text: headerText
+
+            font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, {
+                capitalization: Font.AllUppercase
+            }))
+            horizontalAlignment: Text.AlignLeft
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.leftMargin: sideMargin
@@ -92,7 +101,7 @@ Item {
 
         spacing: 12
 
-        ProjectListItem {
+        ListItemBlank {
             id: newProjectItem
 
             Layout.fillWidth: true
@@ -100,34 +109,52 @@ Item {
             implicitHeight: view.rowHeight
 
             visible: false
-            itemInset: view.itemInset
-            showBottomBorder: false
-
-            thumbnailFull: root.thumbnailFull
 
             navigation.panel: navPanel
             navigation.row: 0
             navigation.column: 0
 
-            item: {
-                "name": qsTrc("project", "New project")
+            onClicked: {
+                root.createNewProjectRequested()
             }
 
-            thumbnailComponent: Rectangle {
+            RowLayout {
                 anchors.fill: parent
-                color: ui.theme.extra["white_color"]
+                anchors.leftMargin: view.itemInset
+                anchors.rightMargin: view.itemInset
 
-                StyledIconLabel {
-                    anchors.centerIn: parent
+                spacing: view.columnSpacing
 
-                    iconCode: IconCode.PLUS
+                Rectangle {
+                    Layout.preferredWidth: 90
+                    Layout.preferredHeight: 48
 
-                    font.pixelSize: 16
-                    color: ui.theme.extra["black_color"]
+                    color: ui.theme.extra["white_color"]
+
+                    StyledIconLabel {
+                        anchors.centerIn: parent
+
+                        iconCode: IconCode.PLUS
+
+                        font.pixelSize: 16
+                        color: ui.theme.extra["black_color"]
+                    }
+                }
+
+                StyledTextLabel {
+                    id: projectName
+
+                    Layout.preferredWidth: 100
+
+                    text: qsTrc("project", "New project")
+                    font: ui.theme.largeBodyFont
+                    horizontalAlignment: Text.AlignLeft
+                }
+
+                Item {
+                    Layout.fillWidth: true
                 }
             }
-
-            onClicked: root.createNewProjectRequested()
         }
 
         Item {
@@ -155,39 +182,78 @@ Item {
 
                     spacing: view.columnSpacing
 
-                    StyledTextLabel {
+                    Loader {
+                        readonly property var columnData: root.columns.length > 0 ? root.columns[0] : null
+
+                        active: columnData !== null
+
+                        Layout.preferredHeight: parent.height
+                        Layout.preferredWidth: columnData ? columnData.width : 0
+                        Layout.minimumWidth: columnData ? columnData.width : 0
                         Layout.fillWidth: true
 
-                        text: qsTrc("project", "Name")
+                        sourceComponent: columnData ? headerLabelComp : null
 
-                        // It is not possible to set the `font` and `font.capitalization` properties at the same time.
-                        // The following alternatives do not work:
-                        // - font: { let f = ui.theme.bodyBoldFont; f.capitalization = Font.AllUppercase; return f }
-                        //
-                        // - font: ui.theme.bodyBoldFont
-                        //   Component.onCompleted: { font.capitalization = Font.AllUppercase }
-                        //   (breaks updating the font when changed in Preferences > Appearance
-                        //
-                        // - Qt.font(Object.assign(ui.theme.bodyBoldFont, { capitalization: Font.AllUppercase }))
-                        //   (complains that ui.theme.bodyBoldFont is const and cannot be modified)
-                        font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, {
-                            capitalization: Font.AllUppercase
-                        }))
-                        horizontalAlignment: Text.AlignLeft
+                        readonly property string headerText: columnData ? columnData.header : ""
                     }
 
-                    Repeater {
-                        model: root.columns
+                    Item {
+                        Layout.preferredHeight: parent.height
+                        Layout.preferredWidth: root._remainingColumnsMinWidth
+                        Layout.maximumWidth: root._remainingColumnsMinWidth
+                        Layout.minimumWidth: 0
+                        Layout.fillWidth: true
 
-                        delegate: StyledTextLabel {
-                            Layout.preferredWidth: modelData.width(parent.width)
+                        Flickable {
+                            id: headerFlickable
 
-                            text: modelData.header
+                            anchors.fill: parent
+                            clip: true
 
-                            font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, {
-                                capitalization: Font.AllUppercase
-                            }))
-                            horizontalAlignment: Text.AlignLeft
+                            flickableDirection: Flickable.HorizontalFlick
+                            contentWidth: root._remainingColumnsMinWidth
+                            contentHeight: height
+                            boundsBehavior: Flickable.StopAtBounds
+
+                            onContentXChanged: {
+                                root._columnsContentX = contentX
+                            }
+
+                            RowLayout {
+                                id: headerColumnsRow
+                                width: headerFlickable.contentWidth
+                                height: headerFlickable.height
+                                spacing: view.columnSpacing
+
+                                Repeater {
+                                    id: headerColumnsRepeater
+                                    model: Math.max(root.columns.length - 1, 0)
+
+                                    delegate: Loader {
+                                        readonly property var columnData: root.columns[model.index + 1]
+
+                                        Layout.preferredWidth: columnData.width
+                                        Layout.minimumWidth: columnData.width
+
+                                        sourceComponent: headerLabelComp
+
+                                        readonly property string headerText: columnData.header
+                                    }
+                                }
+                            }
+
+                            ScrollBar.horizontal: StyledScrollBar {
+                                parent: listViewContainer
+
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+
+                                policy: ScrollBar.AlwaysOn
+
+                                visible: headerFlickable.contentWidth > headerFlickable.width
+                                z: 2
+                            }
                         }
                     }
                 }
@@ -204,7 +270,7 @@ Item {
 
                     readonly property real itemInset: 12
                     readonly property real rowHeight: 64
-                    readonly property real columnSpacing: 44
+                    readonly property real columnSpacing: 24
 
                     readonly property int cellHeight: rowHeight + spacing
 
@@ -214,6 +280,8 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
                         anchors.right: parent.right
+
+                        policy: ScrollBar.AlwaysOn
 
                         visible: view.contentHeight > view.height
                         z: 2
@@ -225,19 +293,21 @@ Item {
                         required property int index
 
                         columns: root.columns
+                        columnsContentX: root._columnsContentX
+                        columnsMinWidth: root._remainingColumnsMinWidth
+                        showBottomBorder: index < view.count - 1
 
                         itemInset: view.itemInset
                         implicitHeight: view.rowHeight
                         columnSpacing: view.columnSpacing
 
-                        isCloudItem: root.isCloudList
-                        thumbnailFull: root.thumbnailFull
-
-                        placeholder: root.placeholder
-
                         navigation.panel: navPanel
                         navigation.row: index + 1
                         navigation.column: 0
+
+                        onColumnScrollRequested: function (columnX, columnWidth) {
+                            root.scrollColumnIntoView(columnX, columnWidth)
+                        }
 
                         onClicked: {
                             if (item.isCloud) {

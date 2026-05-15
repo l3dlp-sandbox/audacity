@@ -74,7 +74,7 @@ public:
     std::string GetAudioDownloadListUrl(std::string_view audioId) const;
 
     std::string GetNetworkStatsUrl(std::string_view projectId) const;
-    std::string GetProjectPagePath(std::string_view userSlug, std::string_view projectSlug, AudiocomTrace) const;
+    std::string GetProjectPagePath(std::string_view userSlug, std::string_view projectId, AudiocomTrace) const;
     std::string
     GetProjectsPagePath(std::string_view userSlug, AudiocomTrace) const;
 

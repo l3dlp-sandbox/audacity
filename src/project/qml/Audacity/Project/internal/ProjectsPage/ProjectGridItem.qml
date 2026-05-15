@@ -37,12 +37,26 @@ FocusScope {
     property string placeholder: ""
     property bool isCreateNew: false
     property bool isNoResultsFound: false
-    property bool isCloud: false
-    property int cloudProjectId: 0
+
+    property var contextMenuModel: null
+    property bool showIndicator: false
+    property Component indicatorButton: null
 
     property alias navigation: navCtrl
 
     signal clicked
+
+    Component.onCompleted: {
+        if (root.contextMenuModel != null) {
+            root.contextMenuModel.load()
+        }
+    }
+
+    onContextMenuModelChanged: {
+        if (root.contextMenuModel != null) {
+            root.contextMenuModel.load()
+        }
+    }
 
     NavigationControl {
         id: navCtrl
@@ -172,64 +186,54 @@ FocusScope {
             }
 
             Loader {
-                active: root.isCloud
+                active: (root.contextMenuModel != null)
 
-                anchors.left: parent.left
-                anchors.leftMargin: 8
+                anchors.top: parent.top
+                anchors.topMargin: 8
+                anchors.right: parent.right
+                anchors.rightMargin: 8
+
+                sourceComponent: MenuButton {
+                    id: menuButton
+
+                    width: 20
+                    height: width
+
+                    normalColor: ui.theme.buttonColor
+
+                    menuModel: root.contextMenuModel
+
+                    onHandleMenuItem: function (itemId) {
+                        root.contextMenuModel.handleMenuItem(itemId)
+                    }
+
+                    NavigationFocusBorder {
+                        navigationCtrl: NavigationControl {
+                            name: "MenuButton"
+                            panel: navCtrl.panel
+                            row: navCtrl.row
+                            column: navCtrl.column + 1
+                            enabled: menuButton.visible && menuButton.enabled
+                            accessible.name: qsTrc("project", "Project item menu")
+                            accessible.role: MUAccessible.Button
+
+                            onTriggered: {
+                                menuButton.clicked(null)
+                            }
+                        }
+                    }
+                }
+            }
+
+            Loader {
+                active: root.showIndicator && root.indicatorButton != null
+
                 anchors.right: parent.right
                 anchors.rightMargin: 8
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 8
 
-                sourceComponent: RowLayout {
-                    visible: root.isCloud
-
-                    spacing: 8
-
-                    // CloudProjectStatusWatcher {
-                    //     id: cloudProjectStatusWatcher
-                    // }
-
-                    // Component.onCompleted: {
-                    //     cloudProjectStatusWatcher.load(root.cloudProjectId)
-                    // }
-
-                    // ProgressBar {
-                    //     Layout.fillWidth: true
-                    //     Layout.preferredHeight: 16
-
-                    //     visible: cloudProjectStatusWatcher.isProgress
-
-                    //     from: 0
-                    //     to: cloudProjectStatusWatcher.progressTotal
-                    //     value: cloudProjectStatusWatcher.progressCurrent
-
-                    //     navigation.panel: root.navigation.panel
-                    //     navigation.row: root.navigation.row
-                    //     navigation.column: root.navigation.column + 1
-                    // }
-
-                    CloudProjectIndicatorButton {
-                        Layout.alignment: Qt.AlignTrailing | Qt.AlignVCenter
-
-                        mouseArea.enabled: false
-
-                        isProgress: false //cloudProjectStatusWatcher.isProgress
-                        isDownloadedAndUpToDate: true //cloudProjectStatusWatcher.isDownloadedAndUpToDate
-
-                        navigation.panel: root.navigation.panel
-                        navigation.row: root.navigation.row
-                        navigation.column: root.navigation.column + 2
-
-                        // onClicked: {
-                        //     if (isProgress) {
-                        //         cloudProjectStatusWatcher.cancel()
-                        //     } else {
-                        //         root.clicked()
-                        //     }
-                        // }
-                    }
-                }
+                sourceComponent: root.indicatorButton
             }
         }
 

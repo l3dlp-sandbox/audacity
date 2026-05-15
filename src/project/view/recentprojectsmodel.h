@@ -50,6 +50,7 @@ public:
 private:
     void updateRecentProjects();
     void setRecentProjects(const std::vector<QVariantMap>& items);
+    void clearContextMenuModels();
 };
 }
 

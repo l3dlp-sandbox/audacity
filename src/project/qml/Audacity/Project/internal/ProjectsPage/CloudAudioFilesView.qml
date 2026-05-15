@@ -2,8 +2,9 @@
 * Audacity: A Digital Audio Editor
 */
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
 
 import Muse.Ui 1.0
 import Muse.UiComponents
@@ -65,7 +66,7 @@ ProjectsView {
 
     QtObject {
         id: prv
-        property string gridPlaceholderFile: ":/resources/AudioFilePlaceholder.svg"
+        property string placeholderFile: ":/resources/AudioFilePlaceholder.svg"
         property bool updateDesiredRowCountScheduled: false
 
         readonly property var activeView: root.item
@@ -158,7 +159,7 @@ ProjectsView {
 
             backgroundColor: root.backgroundColor
             sideMargin: root.sideMargin
-            placeholder: prv.gridPlaceholderFile
+            placeholder: prv.placeholderFile
 
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrder
@@ -177,6 +178,16 @@ ProjectsView {
         ProjectsListView {
             id: list
 
+            readonly property int nameColumnWidth: nameLabelWidth
+            readonly property int modifiedColumnWidth: 100
+            readonly property int durationColumnWidth: 100
+            readonly property int sizeColumnWidth: 75
+            readonly property int btnColumnWidth: 44
+
+            readonly property int nameLabelWidth: 200
+            readonly property int thumbnailMinimumWidth: 250
+            readonly property int thumbnailHeight: 48
+
             anchors.fill: parent
 
             model: cloudAudioFilesModel
@@ -184,8 +195,6 @@ ProjectsView {
 
             backgroundColor: root.backgroundColor
             sideMargin: root.sideMargin
-
-            thumbnailFull: true
 
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrder
@@ -197,14 +206,73 @@ ProjectsView {
 
             columns: [
                 ProjectsListView.ColumnItem {
+                    id: nameColumn
+
+                    width: nameColumnWidth
+
+                    header: qsTrc("project", "Name")
+
+                    delegate: RowLayout {
+                        anchors.fill: parent
+
+                        StyledTextLabel {
+                            id: nameLabel
+
+                            Layout.preferredWidth: nameLabelWidth
+                            Layout.minimumWidth: nameLabelWidth
+                            Layout.fillWidth: !thumbnailItem.visible
+
+                            text: item.name ?? ""
+                            font: ui.theme.largeBodyFont
+                            horizontalAlignment: Text.AlignLeft
+
+                            NavigationFocusBorder {
+                                navigationCtrl: NavigationControl {
+                                    name: "NameLabel"
+                                    panel: navigationPanel
+                                    row: navigationRow
+                                    column: navigationColumnStart
+                                    enabled: nameLabel.visible && nameLabel.enabled && !nameLabel.isEmpty
+                                    accessible.name: nameColumn.header + ": " + nameLabel.text
+                                    accessible.role: MUAccessible.StaticText
+
+                                    onActiveChanged: function (active) {
+                                        if (active) {
+                                            listItem.scrollIntoView()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Item {
+                            id: thumbnailItem
+
+                            visible: parent.width > (nameLabelWidth + thumbnailMinimumWidth)
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+
+                            ProjectThumbnail {
+                                anchors.centerIn: parent
+                                width: parent.width
+                                height: thumbnailHeight
+
+                                path: item ? item.thumbnailUrl : ""
+                                placeholder: prv.placeholderFile
+
+                                backgroundColor: "transparent"
+                                lineColor: Qt.alpha(ui.theme.fontPrimaryColor, 0.8)
+                                borderColor: "transparent"
+                            }
+                        }
+                    }
+                },
+                ProjectsListView.ColumnItem {
                     id: modifiedColumn
 
                     header: qsTrc("project", "Modified")
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return 0.10 * parentWidthExclusingSpacing
-                    }
+                    width: modifiedColumnWidth
 
                     delegate: StyledTextLabel {
                         id: modifiedLabel
@@ -223,9 +291,10 @@ ProjectsView {
                                 accessible.name: modifiedColumn.header + ": " + modifiedLabel.text
                                 accessible.role: MUAccessible.StaticText
 
-                                onActiveChanged: {
+                                onActiveChanged: function (active) {
                                     if (active) {
                                         listItem.scrollIntoView()
+                                        listItem.scrollColumnIntoView(remainingColumnIndex)
                                     }
                                 }
                             }
@@ -237,12 +306,10 @@ ProjectsView {
                 },
                 ProjectsListView.ColumnItem {
                     id: durationColumn
+
                     header: qsTrc("global", "Duration", "file duration")
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return 0.10 * parentWidthExclusingSpacing
-                    }
+                    width: durationColumnWidth
 
                     delegate: StyledTextLabel {
                         id: durationLabel
@@ -261,9 +328,10 @@ ProjectsView {
                                 accessible.name: durationColumn.header + ": " + (Boolean(item.duration) ? item.duration : qsTrc("global", "Unknown"))
                                 accessible.role: MUAccessible.StaticText
 
-                                onActiveChanged: {
+                                onActiveChanged: function (active) {
                                     if (active) {
                                         listItem.scrollIntoView()
+                                        listItem.scrollColumnIntoView(remainingColumnIndex)
                                     }
                                 }
                             }
@@ -275,12 +343,10 @@ ProjectsView {
                 },
                 ProjectsListView.ColumnItem {
                     id: sizeColumn
+
                     header: qsTrc("global", "Size", "file size")
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return 0.10 * parentWidthExclusingSpacing
-                    }
+                    width: sizeColumnWidth
 
                     delegate: StyledTextLabel {
                         id: sizeLabel
@@ -299,9 +365,10 @@ ProjectsView {
                                 accessible.name: sizeColumn.header + ": " + (Boolean(item.fileSize) ? item.fileSize : qsTrc("global", "Unknown"))
                                 accessible.role: MUAccessible.StaticText
 
-                                onActiveChanged: {
+                                onActiveChanged: function (active) {
                                     if (active) {
                                         listItem.scrollIntoView()
+                                        listItem.scrollColumnIntoView(remainingColumnIndex)
                                     }
                                 }
                             }
@@ -313,33 +380,72 @@ ProjectsView {
                 },
                 ProjectsListView.ColumnItem {
                     id: btnColumn
+
                     header: ""
 
-                    width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
-                        return 0.05 * parentWidthExclusingSpacing
-                    }
+                    width: btnColumnWidth
 
-                    delegate: Rectangle {
+                    delegate: Item {
+                        width: parent.width
+                        height: 28
+
                         MenuButton {
                             id: menuButton
 
-                            width: 16
-                            height: 16
+                            visible: Boolean(item.contextMenuModel)
 
-                            CloudAudioFileContextMenuModel {
-                                id: contextMenuModel
+                            width: 28
+                            height: 28
 
-                                audioId: item.itemId ?? ""
-                                slug: item.slug ?? ""
-                            }
+                            anchors.centerIn: parent
 
-                            Component.onCompleted: contextMenuModel.load()
-
-                            menuModel: contextMenuModel
+                            menuModel: item.contextMenuModel
 
                             onHandleMenuItem: function (itemId) {
-                                contextMenuModel.handleMenuItem(itemId)
+                                item.contextMenuModel.handleMenuItem(itemId)
+                            }
+
+                            Component.onCompleted: {
+                                if (menuModel != null) {
+                                    menuModel.load()
+                                }
+                            }
+
+                            onMenuModelChanged: {
+                                if (menuModel != null) {
+                                    menuModel.load()
+                                }
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                color: "transparent"
+                                radius: 3
+                                border.width: 1
+                                border.color: ui.theme.strokeColor
+                            }
+
+                            NavigationFocusBorder {
+                                navigationCtrl: NavigationControl {
+                                    name: "MenuButton"
+                                    panel: navigationPanel
+                                    row: navigationRow
+                                    column: navigationColumnStart
+                                    enabled: menuButton.visible && menuButton.enabled
+                                    accessible.name: qsTrc("project", "Project item menu")
+                                    accessible.role: MUAccessible.Button
+
+                                    onActiveChanged: function (active) {
+                                        if (active) {
+                                            listItem.scrollIntoView()
+                                            listItem.scrollColumnIntoView(remainingColumnIndex)
+                                        }
+                                    }
+
+                                    onTriggered: {
+                                        menuButton.clicked(null)
+                                    }
+                                }
                             }
                         }
                     }

@@ -6,18 +6,19 @@
 #include "framework/uicomponents/qml/Muse/UiComponents/abstractmenumodel.h"
 
 namespace au::project {
-class CloudAudioFileContextMenuModel : public muse::uicomponents::AbstractMenuModel
+class RecentProjectContextMenuModel : public muse::uicomponents::AbstractMenuModel
 {
     Q_OBJECT
 
 public:
-    CloudAudioFileContextMenuModel(QString audioId, QString slug, QObject* parent = nullptr);
+    RecentProjectContextMenuModel(bool isCloudProject, QString path, QString displayNameOverride, QObject* parent = nullptr);
 
     Q_INVOKABLE void load() override;
     void handleMenuItem(const QString& itemId) override;
 
 private:
-    QString m_audioId;
-    QString m_slug;
+    bool isCloudProject;
+    QString m_path;
+    QString m_displayNameOverride;
 };
 }

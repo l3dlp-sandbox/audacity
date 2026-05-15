@@ -3,11 +3,12 @@
 */
 #include "cloudprojectsmodel.h"
 
-#include "framework/global/async/asyncable.h"
 #include "framework/global/dataformatter.h"
 #include "framework/global/types/datetime.h"
 
 #include "project/types/projecttypes.h"
+
+#include "view/cloudprojectcontextmenumodel.h"
 
 using namespace muse;
 using namespace au::project;
@@ -31,12 +32,25 @@ void CloudProjectsModel::load()
 
 void CloudProjectsModel::reload()
 {
+    doClear();
+    setState(State::Loading);
+}
+
+void CloudProjectsModel::clear()
+{
+    doClear();
+    setState(State::Fine);
+}
+
+void CloudProjectsModel::doClear()
+{
     audioComService()->clearProjectListCache();
     m_isWaitingForPromise = false;
     ++m_reloadGeneration;
 
     beginResetModel();
 
+    clearContextMenuModels();
     m_items.clear();
     m_totalItems = muse::nidx;
     m_desiredRowCount = 0;
@@ -45,8 +59,6 @@ void CloudProjectsModel::reload()
 
     emit hasMoreChanged();
     emit desiredRowCountChanged();
-
-    setState(State::Loading);
 }
 
 CloudProjectsModel::State CloudProjectsModel::state() const
@@ -128,6 +140,13 @@ void CloudProjectsModel::loadItemsIfNecessary()
                     obj[FILE_SIZE_KEY] = (item.fileSize > 0) ? DataFormatter::formatFileSize(item.fileSize).toQString() : QString();
                     obj[IS_CREATE_NEW_KEY] = false;
                     obj[IS_NO_RESULTS_FOUND_KEY] = false;
+                    obj[SHOW_INDICATOR_KEY] = true;
+
+                    const auto id = obj[CLOUD_ITEM_ID_KEY].toString();
+                    const auto localPath = obj[PATH_KEY].toString();
+                    const auto displayName = obj[NAME_KEY].toString();
+                    obj[CONTEXT_MENU_MODEL_KEY] = QVariant::fromValue(
+                        new CloudProjectContextMenuModel(id, localPath, displayName, this));
 
                     m_items.push_back(obj);
                 }
@@ -157,4 +176,15 @@ void CloudProjectsModel::loadItemsIfNecessary()
 bool CloudProjectsModel::needsLoading()
 {
     return hasMore() && static_cast<int>(m_items.size()) < m_desiredRowCount;
+}
+
+void CloudProjectsModel::clearContextMenuModels()
+{
+    for (QVariantMap& item : m_items) {
+        auto* model = item[CONTEXT_MENU_MODEL_KEY].value<CloudProjectContextMenuModel*>();
+        item[CONTEXT_MENU_MODEL_KEY] = QVariant();
+        if (model != nullptr) {
+            model->deleteLater();
+        }
+    }
 }

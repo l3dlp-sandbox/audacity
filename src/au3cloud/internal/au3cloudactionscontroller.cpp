@@ -75,13 +75,25 @@ void Au3CloudActionsController::openSignInDialog(const muse::actions::ActionQuer
 
 void Au3CloudActionsController::openCloudProjectPage(const muse::actions::ActionQuery& query)
 {
-    const auto slug = query.param("slug").toString();
-    if (slug.empty()) {
-        LOGE() << "Cannot open cloud project page: empty slug";
-        return;
+    std::string url {};
+    if (!query.param("id").isNull()) {
+        const auto id = query.param("id").toString();
+        if (id.empty()) {
+            LOGE() << "Cannot open cloud project page: empty id";
+            return;
+        }
+
+        url = audioComService()->getCloudProjectPage(id);
+    } else if (!query.param("path").isNull()) {
+        const auto path = query.param("path").toPath();
+        if (path.empty()) {
+            LOGE() << "Cannot open cloud project page: empty path";
+            return;
+        }
+
+        url = audioComService()->getCloudProjectPage(path);
     }
 
-    const auto url = audioComService()->getCloudProjectPage(slug);
     if (url.empty()) {
         LOGE() << "Cannot open cloud project page: empty URL";
         return;

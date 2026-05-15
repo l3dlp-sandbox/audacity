@@ -1,24 +1,6 @@
 /*
- * SPDX-License-Identifier: GPL-3.0-only
- * Audacity-CLA-applies
- *
- * Audacity
- * Music Composition & Notation
- *
- * Copyright (C) 2024 Audacity BVBA and others
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 3 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+* Audacity: A Digital Audio Editor
+*/
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
@@ -31,18 +13,30 @@ ListItemBlank {
     id: root
 
     required property var item
-    property alias columns: columnsRepeater.model
+    property var columns: []
+    property real columnsContentX: 0
+    property real columnsMinWidth: 0
+    signal columnScrollRequested(real columnX, real columnWidth)
 
-    property Component thumbnailComponent: defaultThumbnailComponent
+    function scrollColumnIntoView(remainingColumnIndex) {
+        var x = 0
+
+        if (remainingColumnIndex + 1 >= root.columns.length) {
+            return
+        }
+
+        for (var i = 0; i < remainingColumnIndex; i++) {
+            x += root.columns[i + 1].width + root.columnSpacing
+        }
+
+        var colWidth = root.columns[remainingColumnIndex + 1].width
+        root.columnScrollRequested(x, colWidth)
+    }
 
     property real itemInset: 12
     property real columnSpacing: 44
+
     property alias showBottomBorder: bottomBorder.visible
-
-    property string placeholder: ""
-
-    property bool isCloudItem: false
-    property bool thumbnailFull: false
 
     implicitHeight: 64
 
@@ -55,102 +49,70 @@ ListItemBlank {
 
     focusBorder.anchors.bottomMargin: bottomBorder.visible ? bottomBorder.height : 0
 
-    QtObject {
-        id: prv
-
-        property color backgroundColor: root.thumbnailFull ? "transparent" : ui.theme.backgroundSecondaryColor
-        property color lineColor: Qt.alpha(ui.theme.fontPrimaryColor, 0.8)
-        property color borderColor: root.thumbnailFull ? "transparent" : ui.theme.strokeColor
-    }
-
-    Component {
-        id: defaultThumbnailComponent
-
-        ProjectThumbnail {
-            path: root.item.thumbnailUrl ?? ""
-            placeholder: root.placeholder
-
-            backgroundColor: prv.backgroundColor
-            lineColor: prv.lineColor
-            borderColor: prv.borderColor
-        }
-    }
-
     RowLayout {
         anchors.fill: parent
+
         anchors.leftMargin: root.itemInset
         anchors.rightMargin: root.itemInset
 
         spacing: root.columnSpacing
 
-        RowLayout {
-            id: nameLayout
+        Loader {
+            readonly property var columnData: root.columns.length > 0 ? root.columns[0] : null
 
+            active: columnData !== null
+
+            Layout.preferredWidth: columnData ? columnData.width : 0
+            Layout.minimumWidth: columnData ? columnData.width : 0
             Layout.fillWidth: true
 
-            spacing: 24
+            readonly property ProjectListItem listItem: root
+            readonly property var item: root.item
+            readonly property NavigationPanel navigationPanel: root.navigation.panel
+            readonly property int navigationRow: root.navigation.row
+            readonly property int navigationColumnStart: 100
 
-            StyledTextLabel {
-                id: projectName
-
-                Layout.preferredWidth: 200
-
-                text: root.item.name ?? ""
-                font: ui.theme.largeBodyFont
-                horizontalAlignment: Text.AlignLeft
-            }
-
-            Loader {
-                Layout.fillWidth: root.thumbnailFull
-                Layout.fillHeight: root.thumbnailFull
-                Layout.preferredWidth: root.thumbnailFull ? -1 : 71
-                Layout.preferredHeight: root.thumbnailFull ? -1 : 40
-
-                sourceComponent: root.thumbnailComponent
-            }
-
-            Item {
-                visible: !root.thumbnailFull
-                Layout.fillWidth: true
-            }
-
-            Loader {
-                active: root.isCloudItem ?? false
-                visible: active
-                Layout.alignment: Qt.AlignTrailing | Qt.AlignVCenter
-
-                sourceComponent: CloudProjectIndicatorButton {
-                    id: cloudIndicator
-
-                    isProgress: false //cloudProjectStatusWatcher.isProgress
-                    isDownloadedAndUpToDate: true //cloudProjectStatusWatcher.isDownloadedAndUpToDate
-
-                    navigation.panel: root.navigation.panel
-                    navigation.row: root.navigation.row
-                    navigation.column: 3
-                    navigation.onActiveChanged: {
-                        if (navigation.active) {
-                            root.scrollIntoView()
-                        }
-                    }
-                }
-            }
+            sourceComponent: columnData ? columnData.delegate : null
         }
 
-        Repeater {
-            id: columnsRepeater
+        Item {
+            Layout.preferredHeight: parent.height
+            Layout.preferredWidth: root.columnsMinWidth
+            Layout.maximumWidth: root.columnsMinWidth
+            Layout.minimumWidth: 0
+            Layout.fillWidth: true
 
-            delegate: Loader {
-                Layout.preferredWidth: modelData.width(parent.width)
+            clip: true
 
-                // These properties are here to give the delegate access to them
-                readonly property ProjectListItem listItem: root
-                readonly property var item: root.item
-                readonly property NavigationPanel navigationPanel: root.navigation.panel
-                readonly property int navigationRow: root.navigation.row
-                readonly property int navigationColumnStart: 100 * (model.index + 1)
+            RowLayout {
+                id: columnsRow
+                x: -root.columnsContentX
+                width: Math.max(parent.width, root.columnsMinWidth)
+                height: parent.height
 
-                sourceComponent: modelData.delegate
+                spacing: root.columnSpacing
+
+                Repeater {
+                    id: columnsRepeater
+
+                    model: Math.max(root.columns.length - 1, 0)
+
+                    delegate: Loader {
+                        readonly property var columnData: root.columns[model.index + 1]
+
+                        Layout.preferredWidth: columnData.width
+                        Layout.minimumWidth: columnData.width
+
+                        readonly property ProjectListItem listItem: root
+                        readonly property var item: root.item
+                        readonly property NavigationPanel navigationPanel: root.navigation.panel
+                        readonly property int navigationRow: root.navigation.row
+                        readonly property int navigationColumnStart: 100 * (model.index + 2)
+                        readonly property int remainingColumnIndex: model.index
+
+                        sourceComponent: columnData.delegate
+                    }
+                }
             }
         }
     }

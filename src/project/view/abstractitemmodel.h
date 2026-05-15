@@ -65,6 +65,8 @@ protected:
     static const QString CLOUD_ITEM_ID_KEY;
     static const QString CLOUD_VISIBILITY_KEY;
     static const QString CLOUD_VIEW_COUNT_KEY;
+    static const QString CONTEXT_MENU_MODEL_KEY;
+    static const QString SHOW_INDICATOR_KEY;
 
     std::vector<QVariantMap> m_items;
 };
