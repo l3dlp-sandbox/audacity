@@ -55,6 +55,10 @@ void CommandLineParser::init()
 
     m_parser.addOption(QCommandLineOption({ "F", "factory-settings" }, "Use factory settings"));
 
+    m_parser.addOption(QCommandLineOption("memory-leak-report",
+                                          "Track allocations and write a leak report on shutdown"
+                                          " (Windows debug builds only; significant runtime overhead)"));
+
     m_parser.addOption(QCommandLineOption("session-type", "Startup with given session type", "type"));
     m_parser.addOption(internalCommandLineOption("import-media-file", "Import media file on startup", "path"));
     m_parser.addOption(internalCommandLineOption("remove-media-after-import", "Remove imported media files after import"));
@@ -141,6 +145,10 @@ void CommandLineParser::parse(int argc, char** argv)
 
     if (m_parser.isSet("F")) {
         m_options->app.revertToFactorySettings = true;
+    }
+
+    if (m_parser.isSet("memory-leak-report")) {
+        m_options->app.memoryLeakReport = true;
     }
 
     // Audio plugin registration
