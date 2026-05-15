@@ -13,6 +13,7 @@
 #include "framework/global/async/async.h"
 #include "framework/global/runtime.h"
 #include "framework/global/types/ret.h"
+#include "framework/global/io/dir.h"
 
 #include "au3-cloud-audiocom/CloudSyncService.h"
 #include "au3-cloud-audiocom/OAuthService.h"
@@ -560,7 +561,8 @@ muse::RetVal<muse::ProgressPtr> Au3AudioComService::openCloudProject(const muse:
 
         auto cancelCheck = [progress](double) -> bool { return !progress->isCanceled(); };
         if (!forceOverwrite && self->isSnapshotUpToDate(dbProjectData, cancelCheck, cancellationContext)) {
-            progress->finish(muse::RetVal<muse::Val>::make_ok(muse::Val(muse::io::path_t(dbProjectData->LocalPath))));
+            const auto normalizedLocalPath = muse::io::Dir::fromNativeSeparators(muse::io::path_t(dbProjectData->LocalPath));
+            progress->finish(muse::RetVal<muse::Val>::make_ok(muse::Val(muse::io::path_t(normalizedLocalPath))));
             return;
         }
 
@@ -576,11 +578,12 @@ muse::RetVal<muse::ProgressPtr> Au3AudioComService::openCloudProject(const muse:
         }
 
         if (result.Status == sync::ProjectSyncResult::StatusCode::Succeeded) {
-            progress->finish(muse::RetVal<muse::Val>::make_ok(muse::Val(muse::io::path_t(result.ProjectPath))));
+            const auto normalizedLocalPath = muse::io::Dir::fromNativeSeparators(result.ProjectPath);
+            progress->finish(muse::RetVal<muse::Val>::make_ok(muse::Val(muse::io::path_t(normalizedLocalPath))));
         } else {
             const auto err = syncResultCodeToErr(result.Result.Code);
             if (err == Err::SyncResultNotFound) {
-                self->removeProjectFromDatabase(result.ProjectPath);
+                self->removeProjectFromDatabase(muse::io::Dir::fromNativeSeparators(muse::io::path_t(result.ProjectPath)));
             }
 
             progress->finish(make_ret(err));
