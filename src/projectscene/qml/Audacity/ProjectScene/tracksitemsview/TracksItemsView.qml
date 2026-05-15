@@ -97,8 +97,13 @@ Rectangle {
         id: tracksModel
 
         onTotalTracksHeightChanged: {
-            timeline.context.onResizeFrameContentHeight(
-                tracksModel.totalTracksHeight + tracksViewState.tracksVerticalScrollPadding)
+            let totalContentHeight = tracksModel.totalTracksHeight + tracksViewState.tracksVerticalScrollPadding
+            timeline.context.onResizeFrameContentHeight(totalContentHeight)
+
+            let maxContentY = Math.max(totalContentHeight - tracksItemsView.height, 0)
+            if (tracksItemsView.contentY > maxContentY) {
+                tracksItemsView.contentY = maxContentY
+            }
         }
 
         onEscapePressed: {
