@@ -1175,6 +1175,10 @@ Rectangle {
             anchors.bottom: parent.bottom
 
             x: timeline.context.lastPlaybackSeekPosition
+            // The seek line marks "where playback will resume" — meaningless
+            // while recording (the playhead is being driven by record position),
+            // so hide it to avoid showing a stale marker at the pre-record cursor.
+            visible: !playbackState.isRecording
         }
 
         PlayCursorLine {
