@@ -204,7 +204,7 @@ FocusScope {
                     menuModel: root.contextMenuModel
 
                     onHandleMenuItem: function (itemId) {
-                        root.contextMenuModel.handleMenuItem(itemId)
+                        Qt.callLater(root.contextMenuModel.handleMenuItem, itemId)
                     }
 
                     NavigationFocusBorder {
