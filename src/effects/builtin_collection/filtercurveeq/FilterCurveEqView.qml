@@ -130,6 +130,7 @@ BuiltinEffectBase {
                     navigation.order: invertButton.navigation.order + 1
 
                     icon: IconCode.ZOOM_IN
+                    toolTipTitle: qsTrc("effects/filtercurveeq", "Zoom in")
                     enabled: filterCurveEq.canZoomIn
 
                     onClicked: filterCurveEq.zoomIn()
@@ -145,6 +146,7 @@ BuiltinEffectBase {
                     navigation.order: zoomInButton.navigation.order + 1
 
                     icon: IconCode.ZOOM_OUT
+                    toolTipTitle: qsTrc("effects/filtercurveeq", "Zoom out")
                     enabled: filterCurveEq.canZoomOut
 
                     onClicked: filterCurveEq.zoomOut()
